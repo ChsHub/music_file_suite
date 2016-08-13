@@ -1,25 +1,24 @@
 # -*- coding: utf8 -*-
 # python-2.7.12
 __author__ = 'Christian'
-import exceptions
 
-import utility.log as log
+import logging
 from view.view import View
+from model.model import Model
+import datetime
+
+
+def get_log_name():
+    return str(datetime.datetime.now()).replace(':', '_').replace('.', '_')
+
 
 def main():
-    log.logfile = log.Log()
+    logging.basicConfig(filename='log_files/' + get_log_name() + '.log', level=logging.DEBUG)
+    Main_model = Model()
+    Main_view = View(Main_model)
 
-    try:
-
-        Main_view = View()
-
-        # TODO remove return
-        return
-
-    except exceptions as e:
-        log.logfile.handle_error("UNKNOWN", "UNKNOWN", e)
-
-    log.logfile.write_logfile(u".")
+    # TODO remove return
+    return
 
 
 if __name__ == '__main__':
