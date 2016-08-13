@@ -5,10 +5,12 @@ import encoding
 # PATH FORMATTING
 
 def get_clean_path(path):
-    return encoding.f_encode(path).replace("\\", "/").replace("//", "/")
+    # TODO Remove second replace()
+    return path.replace(u"\\", u"/").replace(u"//", u"/")
 
 
 def get_full_path(path, file_name):
+
     return path + "/" + file_name
 
 

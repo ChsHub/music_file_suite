@@ -4,7 +4,7 @@ import codecs
 import os
 import encoding
 import path_str
-import lib.utility.log as log
+import logging
 
 
 def get_absolute_path(rel_path):
@@ -40,9 +40,9 @@ def rename_files_replace(path, old, new, files):
 
 
 def get_dir_list(path):
-    path = encoding.f_decode(path)
+
     # try:
-    dir_list = os.listdir(path)
+    dir_list = os.listdir(encoding.f_decode(path))
     return map(encoding.f_encode, dir_list)
 
     # except WindowsError as e:
@@ -60,21 +60,14 @@ def read_file_data(path, file_name):
         # return data
 
     except IOError as e:
-        log.logfile.handle_error("read_file_data", path, e)
+        logging.error("read_file_data "+ path+ " "+ str(e))
 
 
 def write_file_data(path, file_name, data, mode=u'w'):
-
     change_dir(path)
 
-    #print(file_name)
-    #print(data)
-    #print(path)
-
     with open(encoding.f_decode(file_name), mode) as f:
-        print(data)
         f.write(encoding.f_encode(data))
-#        f.write(data)
         f.close()
 
 
@@ -92,7 +85,7 @@ def rename_file(path, old_file, new_file):
         change_dir(path)
         os.rename(old_file_uni, new_file_uni)
     except WindowsError as e:
-        log.logfile.handle_error("set new file name", "old: " + old_file + " //  new: " + new_file, e)
+        logging.error("set new file name", "old: " + old_file + " //  new: " + new_file, e)
 
 
 def replace_in_file(file, path, re, ne=""):
