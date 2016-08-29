@@ -1,10 +1,11 @@
 # -*- coding: utf8 -*-
 __author__ = 'Christian'
 import codecs
+import logging
 import os
+
 import encoding
 import path_str
-import logging
 
 
 def get_absolute_path(rel_path):
@@ -15,6 +16,8 @@ def get_absolute_path(rel_path):
 def change_dir(path):
     os.chdir(encoding.f_decode(path))
 
+def get_cwd():
+    return path_str.get_clean_path(os.getcwd())
 
 def depth_search_paths(path, result):
     list = get_dir_list(path)
@@ -40,7 +43,6 @@ def rename_files_replace(path, old, new, files):
 
 
 def get_dir_list(path):
-
     # try:
     dir_list = os.listdir(encoding.f_decode(path))
     return map(encoding.f_encode, dir_list)
@@ -60,14 +62,14 @@ def read_file_data(path, file_name):
         # return data
 
     except IOError as e:
-        logging.error("read_file_data "+ path+ " "+ str(e))
+        logging.error("read_file_data " + path + " " + str(e))
 
 
 def write_file_data(path, file_name, data, mode=u'w'):
     change_dir(path)
 
     with open(encoding.f_decode(file_name), mode) as f:
-        f.write(encoding.f_encode(data))
+        f.write(data)
         f.close()
 
 

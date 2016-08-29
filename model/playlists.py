@@ -1,8 +1,10 @@
 # -*- coding: utf8 -*-
 __author__ = 'christian'
+import logging
+
 import lib.utility.path_str as path_str
 from lib.utility import os_interface as os_interface
-import logging
+
 
 class playlist_wpl:
     def __init__(self):
@@ -21,7 +23,7 @@ class playlist_wpl:
 
         old_data = os_interface.read_file_data(path, playlist_name)
         if old_data is None:
-            logging.error("empty playlist "+playlist_name)
+            logging.error("empty playlist " + playlist_name)
             return None
 
         tracks_str = old_data.split("seq")
@@ -92,7 +94,6 @@ class playlist_m3u:
         return
 
     def generate_playlist(self, album_path, playlist_path, playlist_name, files, playlist_type):
-
         album_path = path_str.get_relative_path(playlist_path, album_path)
         files = [path_str.get_full_path(album_path, file) for file in files]
         data = "\n".join(files).replace("/", '\\')

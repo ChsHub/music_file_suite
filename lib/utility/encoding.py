@@ -1,5 +1,6 @@
 __author__ = 'Christian'
 
+
 def f_encode(input_uni):
     if input_uni is not None:
         return input_uni.encode('UTF-8').replace("&apos;", "\'")

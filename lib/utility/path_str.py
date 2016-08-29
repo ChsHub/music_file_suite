@@ -1,21 +1,19 @@
 __author__ = 'Christian'
-import encoding
 
 
 # PATH FORMATTING
 
 def get_clean_path(path):
     # TODO Remove second replace()
-    return path.replace(u"\\", u"/").replace(u"//", u"/")
+    return path.replace("\\",
+                        "/").replace("//", "/")
 
 
 def get_full_path(path, file_name):
-
     return path + "/" + file_name
 
 
 def get_relative_path(source, target):
-
     source = source.split("/")
     target = target.split("/")
 
