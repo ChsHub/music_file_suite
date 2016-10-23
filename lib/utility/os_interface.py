@@ -12,6 +12,9 @@ def get_absolute_path(rel_path):
     # TODO fix ..
     return os.getcwd() + rel_path
 
+def delete_file(path, file_name):
+    file_path = path_str.get_full_path(path, file_name)
+    os.remove(file_path)
 
 def change_dir(path):
     os.chdir(encoding.f_decode(path))

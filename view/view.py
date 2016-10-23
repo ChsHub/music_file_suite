@@ -6,7 +6,7 @@ import lib.utility.encoding as encoding
 import lib.utility.os_interface as os
 import lib.utility.path_str as path_str
 import resource.saved_input as saved_input
-
+# TODO Feedback for apply change
 
 class View:
     # class

@@ -5,10 +5,10 @@ __author__ = 'Christian'
 import datetime
 import logging
 
+import utility.os_interface as os
 from model.model import Model
 from view.view import View
-import lib.utility.os_interface as os
-import lib.utility.encoding as encoding
+
 
 class Controller:
     _Main_view = None
@@ -31,22 +31,32 @@ class Controller:
     def set_data(self, is_album):
         return self._Main_model.set_data(is_album)
 
+
 def get_log_name():
-    #return os.get_cwd() + '/log_files/' + str(datetime.datetime.now()).replace(':', '_').replace('.', '_') + '.log'
-    return encoding.f_decode('log_files/' + str(datetime.datetime.now()).replace(':', '_').replace('.', '_') + '.log')
+    # return os.get_cwd() + '/log_files/' + str(datetime.datetime.now()).replace(':', '_').replace('.', '_') + '.log'
+    return 'log_files/' + str(datetime.datetime.now()).replace(':', '_').replace('.', '_') + '.log'
+
+
+def init_logging():
+    logging_path = os.get_cwd() + '/log_files'
+    dir_list = os.get_dir_list(logging_path)
+
+    while len(dir_list) > 10:
+        os.delete_file(logging_path, dir_list.pop(0))
+
+    # WRITE Log
+    logging.basicConfig(filename=get_log_name(), level=logging.DEBUG)
 
 
 def main():
-    logging.basicConfig(filename=get_log_name(), level=logging.DEBUG)
-    print(get_log_name())
-    print(os.get_cwd())
-    try:
-        Controller()
+    init_logging()
+    # try:
+    Controller()
 
-        logging.warning("TEST")
-    except Exception as e:
-        logging.error(str(e))
-    logging.shutdown()
+    # logging.error("TEST")
+    # except Exception as e:
+    #   logging.error(str(e))
+    # logging.shutdown()
 
 
 if __name__ == '__main__':

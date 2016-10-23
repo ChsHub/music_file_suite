@@ -3,7 +3,7 @@ __author__ = 'Christian'
 import logging
 import re
 
-import lib.utility.eyed3_interface as eyed3_interface
+import lib.utility.tag_interface as eyed3_interface
 import lib.utility.os_interface as os_interface
 from lib.utility import encoding
 from lib.utility import utilities
@@ -135,8 +135,8 @@ class Song:
 
     def _set_new_tag(self, data):
 
-        self._audio_tag.reset_tag()
-        self._audio_tag.set_tag_title(data[0])
+        #self._audio_tag.reset_tag() TODO REmove
+        self._audio_tag.set_tag_title(data[3])
         self._audio_tag.set_tag_artist(data[5])
 
     def _set_new_tag_album(self, data):
