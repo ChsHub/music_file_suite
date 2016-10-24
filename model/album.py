@@ -10,6 +10,7 @@ class Album:
     _artist = None
     _album_artist = None
     _Songs = None
+    _failed_Songs = None
 
     def __init__(self, album_dir):
 
@@ -20,17 +21,22 @@ class Album:
         self._album_dir = album_dir
 
         artist, album = utilities.get_artist_and_album(album_dir)
-        self.read_album_path(artist, album)
+        self._read_album_path(artist, album)
 
         files = utilities.get_mp3_files(album_dir)
 
         print("ANALYZE FILES")
         self._Songs = []
+        self._failed_Songs = []
 
         for file in files:
-            self._Songs += [Song(album_dir, file)]
+            new_song = Song(album_dir, file)
+            if new_song.get_error():
+                self._failed_Songs += [new_song]
+            else:
+                self._Songs += [new_song]
 
-    def read_album_path(self, artist, album):
+    def _read_album_path(self, artist, album):
 
         self._artist = artist
         self._album_artist = artist  # Album path
@@ -48,6 +54,8 @@ class Album:
             [song.set_data_album(self._album_dir, self._artist, self._album_artist, self._album) for song in self._Songs]
         else:
             [song.set_data(self._album_dir) for song in self._Songs]
+
+        print("COMPLETE")
 
     def change_files(self, is_album):
         for song in self._Songs:

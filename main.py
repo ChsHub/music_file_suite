@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 # python-2.7.12
 __author__ = 'Christian'
+_max_count_logfiles = 10
 
 import datetime
 import logging
@@ -38,15 +39,15 @@ def get_log_name():
 
 
 def init_logging():
+    # Delete old log files
     logging_path = os.get_cwd() + '/log_files'
     dir_list = os.get_dir_list(logging_path)
 
-    while len(dir_list) > 10:
+    while len(dir_list) > _max_count_logfiles:
         os.delete_file(logging_path, dir_list.pop(0))
 
     # WRITE Log
-    logging.basicConfig(filename=get_log_name(), level=logging.DEBUG)
-
+    logging.basicConfig(handlers=[logging.FileHandler(get_log_name(), 'w', 'utf-8')], level=logging.DEBUG)
 
 def main():
     init_logging()

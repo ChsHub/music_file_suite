@@ -1,14 +1,16 @@
+# -*- coding: utf-8 -*-
 __author__ = 'Christian'
 
 import logging
-import encoding
 import path_str
-# mutagen-1.34.1
-from mutagen.easyid3 import EasyID3
+#from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
+from mutagen._file import File
+from mutagen.id3 import ID3, TRCK, TIT2, TPE1, TALB, TPE2
 
 
 # TODO test if set is successful
+
 
 class Tag:
     _tag = None
@@ -25,11 +27,11 @@ class Tag:
     def __get_audiofile(self, path, file_name):
 
         full_path_uni = path_str.get_full_path(path, file_name)
-        full_path_uni = encoding.f_decode(full_path_uni)
 
         audiofile = None
         try:
-            audiofile = EasyID3(full_path_uni)
+            audiofile = File(full_path_uni)
+            # audiofile = MP3(full_path_uni, ID3=EasyID3, encoding=3)
 
         except Exception as e:
             logging.error("error get audiofile")
@@ -49,14 +51,14 @@ class Tag:
             return None
         return tag
 
-    def reset_tag(self):
+  #  def reset_tag(self):
 
-        self._tag.delete()
-        self._tag = MP3(encoding.f_decode(self.file_path), ID3=EasyID3)
+ #       self._tag.delete()
+ #       self._tag = MP3(self.file_path, ID3=EasyID3, v1=0, v2_version=3)
 
     def save_tag(self):
         try:
-            self._tag.save()
+            self._tag.save(v1=0,v2_version=3)
         except IOError as e:
             logging.error("FAIL: Save Tag (file disabled wr rights)", "save_tag " + self.file_path, e)
         except NotImplementedError as e:
@@ -72,48 +74,47 @@ class Tag:
                 attribute = self._tag[attribute_str]
                 if attribute:
                     # if attribute_str == "tracknumber":
-                    #   print "here"
-                    return encoding.f_encode(attribute[0])
+                    return attribute[0]
         return None
 
     def get_tag_title(self):
-        return self.get_attribute("title")
+        return self.get_attribute('TIT2')
 
     def get_tag_track_num(self):
-        return self.get_attribute("tracknumber")
+        return self.get_attribute('TRCK')
 
     def get_artist(self):
-        return self.get_attribute("artist")
+        return self.get_attribute('TPE1')
 
     def get_album_artist(self):
-        return self.get_attribute("albumartist")
+        return self.get_attribute('TPE2')
 
     def get_album(self):
-        return self.get_attribute("album")
+        return self.get_attribute('TALB')
 
     # SETTER
     def set_tag_title(self, title):
 
-        self._tag["title"] = encoding.f_decode(title)
+        self._tag['TIT2'] = TIT2(encoding=3, text=title)
         self.save_tag()
 
     def set_tag_track_num(self, track_num):
 
         if track_num:
-            self._tag["tracknumber"] = encoding.f_decode(track_num)
+            self._tag["TRCK"] = TRCK(encoding=3, text=track_num)
             self.save_tag()
 
     def set_tag_artist(self, artist):
 
-        self._tag["artist"] = encoding.f_decode(artist)
+        self._tag['TPE1'] = TPE1(encoding=3, text=artist)
         self.save_tag()
 
     def set_tag_album_artist(self, album_artist):
 
-        self._tag["albumartist"] = encoding.f_decode(album_artist)
+        self._tag["TPE2"] = TPE2(encoding=3, text=album_artist)
         self.save_tag()
 
     def set_tag_album(self, album):
 
-        self._tag["album"] = encoding.f_decode(album)
+        self._tag["TALB"] = TALB(encoding=3, text=album)
         self.save_tag()

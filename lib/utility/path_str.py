@@ -5,8 +5,7 @@ __author__ = 'Christian'
 
 def get_clean_path(path):
     # TODO Remove second replace()
-    return path.replace("\\",
-                        "/").replace("//", "/")
+    return path.replace("\\", "/").replace("//", "/")
 
 
 def get_full_path(path, file_name):

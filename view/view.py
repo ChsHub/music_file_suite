@@ -1,8 +1,6 @@
 import logging
-from Tkinter import *
-from tkFileDialog import askdirectory
-
-import lib.utility.encoding as encoding
+from tkinter import *
+from tkinter.filedialog import askdirectory
 import lib.utility.os_interface as os
 import lib.utility.path_str as path_str
 import resource.saved_input as saved_input
@@ -67,7 +65,6 @@ class View:
         self._create_selections(frame1)
 
         # get data from model
-        file_path = encoding.f_encode(file_path)
         self._Controller.analyze_files(file_path, False)
 
         # second column
@@ -173,7 +170,6 @@ class View:
 
         if album_dir == "":
             return
-        album_dir = encoding.f_encode(album_dir)
         album_dir = path_str.get_clean_path(album_dir)
 
         logging.info("album_dir: " + album_dir)

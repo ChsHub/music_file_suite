@@ -5,7 +5,6 @@ import re
 
 import lib.utility.tag_interface as eyed3_interface
 import lib.utility.os_interface as os_interface
-from lib.utility import encoding
 from lib.utility import utilities
 
 
@@ -21,7 +20,7 @@ class Song:
     # file property
     _file_name = None
     _audio_tag = None
-    _error = None
+    _error = False
     # desicions
     _is_album = None
 
@@ -49,16 +48,9 @@ class Song:
         # TODO remove is_file_name normal -> just read file name
         if not self._read_song_title():  # Artist - Song.mp3
             if not self._read_song_title_album():  # 00 Song.mp3
-                print "ERROR Handling needed"
                 logging.error("FAIL: " + self._file_name)
+                self._audio_tag.set_tag_track_num('404') # TODO Error num
                 self._error = True
-
-        print("END")
-        # ERROR CHECK
-
-    # TODO remove
-    def __new__(self):
-        return self
 
     def get_file_normal_name(self, title, artist):
         if not artist or not title:
@@ -97,10 +89,10 @@ class Song:
     # 00 Song.mp3
     def _read_song_title_album(self):
 
-        match = re.findall(r"(\d+)\s(\w+)", self._file_name)
-        if len(match) == 3 and match[0] == None:
-            self._track_num_file_name = match[1]
-            self._title_file_name = match[2][:-4]
+        match = re.findall(r"(\d+)\s(.+)", self._file_name)
+        if len(match) == 1:
+            self._track_num_file_name = match[0][0]
+            self._title_file_name = match[0][1][:-4]
             return True
         return False
 
@@ -124,6 +116,9 @@ class Song:
     def get_album_names(self):
         return self._album
 
+    def get_error(self):
+        return self._error
+
     #### Apply changes ####
 
     def _rename_file(self, album_path, new_name):
@@ -135,7 +130,6 @@ class Song:
 
     def _set_new_tag(self, data):
 
-        #self._audio_tag.reset_tag() TODO REmove
         self._audio_tag.set_tag_title(data[3])
         self._audio_tag.set_tag_artist(data[5])
 
@@ -154,6 +148,7 @@ class Song:
             return
         data = self.get_data_album(artist, album_artist, album)
         self._set_new_tag_album(data)
+
         self._rename_file(album_path, data[0])
 
     def set_data(self, album_path):
@@ -161,15 +156,18 @@ class Song:
         if self._error:
             logging.error("FAIL: " + self._file_name)
             return
-        # self._clean_title()
+
         data = self.get_data()
         self._set_new_tag(data)
+        self._audio_tag.set_tag_track_num("")
+
         self._rename_file(album_path, data[0])
 
     #### GETTER ####
 
     def get_data_album(self, artist, album_artist, album):
 
+        # TODO ignore meta
         ignore_meta = True
 
         if ignore_meta:
