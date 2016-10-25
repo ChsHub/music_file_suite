@@ -47,9 +47,11 @@ def rename_files_replace(path, old, new, files):
 
 def get_dir_list(path):
     # try:
-    dir_list = os.listdir(path)
-    return dir_list
-
+    if os.path.isdir(path):
+        dir_list = os.listdir(path)
+        return dir_list
+    else:
+        return []
     # except WindowsError as e:
     #   log.logfile.handle_error("Windows Error", path, e)
     # return None

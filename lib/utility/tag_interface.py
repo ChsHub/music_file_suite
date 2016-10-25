@@ -2,11 +2,10 @@
 __author__ = 'Christian'
 
 import logging
+
 import path_str
-#from mutagen.easyid3 import EasyID3
-from mutagen.mp3 import MP3
 from mutagen._file import File
-from mutagen.id3 import ID3, TRCK, TIT2, TPE1, TALB, TPE2
+from mutagen.id3 import TRCK, TIT2, TPE1, TALB, TPE2
 
 
 # TODO test if set is successful
@@ -51,14 +50,9 @@ class Tag:
             return None
         return tag
 
-  #  def reset_tag(self):
-
- #       self._tag.delete()
- #       self._tag = MP3(self.file_path, ID3=EasyID3, v1=0, v2_version=3)
-
     def save_tag(self):
         try:
-            self._tag.save(v1=0,v2_version=3)
+            self._tag.save(v1=0, v2_version=3)
         except IOError as e:
             logging.error("FAIL: Save Tag (file disabled wr rights)", "save_tag " + self.file_path, e)
         except NotImplementedError as e:
@@ -73,7 +67,6 @@ class Tag:
             if attribute_str in self._tag:
                 attribute = self._tag[attribute_str]
                 if attribute:
-                    # if attribute_str == "tracknumber":
                     return attribute[0]
         return None
 

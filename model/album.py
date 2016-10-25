@@ -36,6 +36,8 @@ class Album:
             else:
                 self._Songs += [new_song]
 
+        print("FAILED: "+str(len(self._failed_Songs)))
+
     def _read_album_path(self, artist, album):
 
         self._artist = artist
