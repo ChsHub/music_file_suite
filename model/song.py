@@ -3,8 +3,8 @@ __author__ = 'Christian'
 import logging
 import re
 
-import lib.utility.tag_interface as eyed3_interface
 import lib.utility.os_interface as os_interface
+import lib.utility.tag_interface as eyed3_interface
 from lib.utility import utilities
 
 
@@ -49,7 +49,7 @@ class Song:
         if not self._read_song_title():  # Artist - Song.mp3
             if not self._read_song_title_album():  # 00 Song.mp3
                 logging.error("FAIL: " + self._file_name)
-                self._audio_tag.set_tag_track_num('404') # TODO Error num
+                self._audio_tag.set_tag_track_num('404')  # TODO Error num
                 self._error = True
 
     def get_file_normal_name(self, title, artist):
@@ -111,14 +111,6 @@ class Song:
         if nr_in_playlist:
             self._track_num["Playlist"] = [nr_in_playlist]
 
-    #### GETTER ####
-
-    def get_album_names(self):
-        return self._album
-
-    def get_error(self):
-        return self._error
-
     #### Apply changes ####
 
     def _rename_file(self, album_path, new_name):
@@ -130,6 +122,7 @@ class Song:
 
     def _set_new_tag(self, data):
 
+        self._audio_tag.reset()
         self._audio_tag.set_tag_title(data[3])
         self._audio_tag.set_tag_artist(data[5])
 
@@ -212,3 +205,9 @@ class Song:
                 title,
                 track_num,
                 artist]
+
+    def get_album_names(self):
+        return self._album
+
+    def get_error(self):
+        return self._error

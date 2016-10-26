@@ -7,7 +7,6 @@ import path_str
 from mutagen._file import File
 from mutagen.id3 import TRCK, TIT2, TPE1, TALB, TPE2
 
-
 # TODO test if set is successful
 
 
@@ -16,7 +15,7 @@ class Tag:
     file_path = None
 
     def __init__(self, path, file_name):
-        # print(EasyID3.valid_keys.keys())
+
         self._tag = self.__get_tag(path, file_name)
         self.file_path = path_str.get_full_path(path, file_name)
 
@@ -30,7 +29,6 @@ class Tag:
         audiofile = None
         try:
             audiofile = File(full_path_uni)
-            # audiofile = MP3(full_path_uni, ID3=EasyID3, encoding=3)
 
         except Exception as e:
             logging.error("error get audiofile")
@@ -111,3 +109,6 @@ class Tag:
 
         self._tag["TALB"] = TALB(encoding=3, text=album)
         self.save_tag()
+
+    def reset(self):
+        self._tag.clear()
