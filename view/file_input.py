@@ -1,5 +1,5 @@
 import logging
-from tkinter import LEFT
+from tkinter import TOP, LEFT
 from tkinter.filedialog import askdirectory
 
 import lib.utility.os_interface as os
@@ -16,14 +16,13 @@ class FileInput(StandardFrame):
     analyze_files = None
 
     def __init__(self, master, album_dir, color, analyze_files):
-        super().__init__(master=master)
+        super().__init__(master=master, side=TOP, borderwidth=1)
+
 
         self.analyze_files = analyze_files
-        file_input_frame = StandardFrame(master)
-        file_input_frame.pack()
-        self._file_label = StandardLabel(album_dir, file_input_frame, 0, 0, color)
+        self._file_label = StandardLabel(album_dir, self, 0, 0, color)
         self._file_label.pack(side=LEFT)
-        StandardButton("Open File", file_input_frame, self._open_file_callback, 0, 0, color).pack(side=LEFT)
+        StandardButton("Open File", self, self._open_file_callback, 0, 0, color).pack(side=LEFT)
 
 
     #### CALLBACK ####

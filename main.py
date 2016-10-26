@@ -1,14 +1,14 @@
 # -*- coding: utf8 -*-
 # python-2.7.12
-__author__ = 'Christian'
-_max_count_logfiles = 10
+
 
 import datetime
 import logging
-
 import utility.os_interface as os
+from model.downloader import Downloader
 from model.model import Model
 from view.view import View
+_max_count_logfiles = 10
 
 
 class Controller:
@@ -32,9 +32,12 @@ class Controller:
     def set_data(self, is_album):
         return self._Main_model.set_data(is_album)
 
+    def download(self, url):
+
+        Downloader(url).start()
+
 
 def get_log_name():
-    # return os.get_cwd() + '/log_files/' + str(datetime.datetime.now()).replace(':', '_').replace('.', '_') + '.log'
     return 'log_files/' + str(datetime.datetime.now()).replace(':', '_').replace('.', '_') + '.log'
 
 
@@ -49,6 +52,7 @@ def init_logging():
     # WRITE Log
     logging.basicConfig(handlers=[logging.FileHandler(get_log_name(), 'w', 'utf-8')], level=logging.DEBUG)
 
+
 def main():
     init_logging()
     # try:
@@ -57,7 +61,7 @@ def main():
     # logging.error("TEST")
     # except Exception as e:
     #   logging.error(str(e))
-    # logging.shutdown()
+    logging.shutdown()
 
 
 if __name__ == '__main__':
