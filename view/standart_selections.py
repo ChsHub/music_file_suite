@@ -7,7 +7,7 @@ class StandartSelections:
 
     def __init__(self, master, color, get_data):
 
-        self.selection = StandardSelection(StandardFrame(master, TOP, padx=0), text_select_title, text_select_options, [True, False], color, get_data)
+        self.selection = StandardSelection(master, text_select_title, text_select_options, [True, False], color, get_data)
 
     def get_is_album(self):
         return self.selection.get_is_album()

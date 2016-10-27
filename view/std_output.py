@@ -6,10 +6,9 @@ from standard_label import StandardLabel
 
 class StdOutput(StandardFrame):
     def __init__(self, master):
-        super().__init__(master, TOP, padx=0)
+        super().__init__(master, TOP, borderwidth=1)
 
-        self.label_frame = StandardFrame(self, TOP, borderwidth=1)
-        self.label = StandardLabel('', self.label_frame).pack(expand=YES, fill=X)
+        self.label = StandardLabel('', self).pack(expand=YES, fill=X)
 
     def start_output(self):
 
@@ -23,4 +22,4 @@ class StdOutput(StandardFrame):
 
 
     def create_label(self, output):
-        self.label = StandardLabel('', self.label_frame).pack(expand=YES, fill=X)
+        self.label = StandardLabel('', self).pack(expand=YES, fill=X)

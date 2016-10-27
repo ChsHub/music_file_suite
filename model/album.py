@@ -44,11 +44,9 @@ class Album:
         self._album = album  # Album path
 
 
-    def get_data(self, is_album):
-        if is_album:
-            return [song.get_data_album(self._artist, self._album_artist, self._album) for song in self._Songs]
-        else:
-            return [song.get_data() for song in self._Songs]
+    def get_data(self):
+
+        return [song.get_data(self._artist, self._album_artist, self._album) for song in self._Songs]
 
     def set_data(self, is_album):
         if is_album:

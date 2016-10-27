@@ -46,11 +46,14 @@ class Song:
         self.read_tag_data()  # Meta
         # self.read_playlist(nr_in_playlist)  # Playlist
         # TODO remove is_file_name normal -> just read file name
-        if not self._read_song_title():  # Artist - Song.mp3
-            if not self._read_song_title_album():  # 00 Song.mp3
-                logging.error("FAIL: " + self._file_name)
-                self._audio_tag.set_tag_track_num('404')  # TODO Error num
-                self._error = True
+        if self._read_song_title():  # Artist - Song.mp3
+            self._is_album = False
+        elif self._read_song_title_album():  # 00 Song.mp3
+            self._is_album = True
+        else:
+            logging.error("FAIL: " + self._file_name)
+            self._audio_tag.set_tag_track_num('404')  # TODO Error num
+            self._error = True
 
     def get_file_normal_name(self, title, artist):
         if not artist or not title:
@@ -158,7 +161,7 @@ class Song:
 
     #### GETTER ####
 
-    def get_data_album(self, artist, album_artist, album):
+    def _get_data_album(self, artist, album_artist, album):
 
         # TODO ignore meta
         ignore_meta = True
@@ -180,7 +183,7 @@ class Song:
                 track_num,
                 artist]
 
-    def get_data(self):
+    def _get_data_normal(self):
         ignore_meta = True
 
         if ignore_meta:
@@ -205,6 +208,13 @@ class Song:
                 title,
                 track_num,
                 artist]
+
+    def get_data(self, artist, album_artist, album):
+        if self._is_album:
+            return self._get_data_album( artist, album_artist, album)
+        else:
+            return self._get_data_normal()
+
 
     def get_album_names(self):
         return self._album

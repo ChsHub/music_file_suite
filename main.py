@@ -4,10 +4,13 @@
 
 import datetime
 import logging
+
 import utility.os_interface as os
+from model.converter import Converter
 from model.downloader import Downloader
 from model.model import Model
-from view.view import View
+from view.window import View
+
 _max_count_logfiles = 10
 
 
@@ -19,22 +22,24 @@ class Controller:
         self._Main_view = View(self)
         self._Main_view.init_gui()
 
-    def analyze_files(self, file_path, is_album):
+    def analyze_files(self, file_path):
         self._Main_model = Model(self)
-        return self._Main_model.analyze_files(file_path, is_album)
+        return self._Main_model.analyze_files(file_path)
 
     def update_view(self, album_names):
         self._Main_view.update_view(album_names)
 
-    def get_data(self, is_album):
-        return self._Main_model.get_data(is_album)
+    def get_data(self):
+        return self._Main_model.get_data()
 
     def set_data(self, is_album):
         return self._Main_model.set_data(is_album)
 
     def download(self, url):
-
         Downloader(url).start()
+
+    def convert_all(self, path):
+        Converter(path).start()
 
 
 def get_log_name():
