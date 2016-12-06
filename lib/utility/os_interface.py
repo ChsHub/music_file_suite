@@ -2,26 +2,31 @@
 # python3
 __author__ = 'Christian'
 
+import codecs
 import logging
 import os
+import re
 import path_str
-import codecs
+
 
 def get_absolute_path(rel_path):
     # TODO fix ..
     return os.getcwd() + rel_path
 
+
 def delete_file(path, file_name):
     file_path = path_str.get_full_path(path, file_name)
     os.remove(file_path)
 
-def change_dir(path):
 
+def change_dir(path):
     os.chdir(path)
+
 
 def get_cwd():
     current_dir = os.getcwd()
     return path_str.get_clean_path(current_dir)
+
 
 def depth_search_paths(path, result):
     list = get_dir_list(path)
@@ -53,9 +58,9 @@ def get_dir_list(path):
         return dir_list
     else:
         return []
-    # except WindowsError as e:
-    #   log.logfile.handle_error("Windows Error", path, e)
-    # return None
+        # except WindowsError as e:
+        #   log.logfile.handle_error("Windows Error", path, e)
+        # return None
 
 
 def read_file_data(path, file_name):
@@ -65,7 +70,6 @@ def read_file_data(path, file_name):
             data = f.read()
             f.close()
         return data
-        # return data
 
     except IOError as e:
         logging.error("read_file_data " + path + " " + str(e))
@@ -93,7 +97,7 @@ def rename_file(path, old_file, new_file):
         os.rename(old_file_uni, new_file_uni)
     except WindowsError as e:
         # TODO error on second rename
-        logging.error("set new file name", "old: " + old_file + " //  new: " + new_file)#, e)
+        logging.error("set new file name", "old: " + old_file + " //  new: " + new_file)  # , e)
 
 
 def replace_in_file(file, path, re, ne=""):
@@ -103,3 +107,18 @@ def replace_in_file(file, path, re, ne=""):
         return new_name
     else:
         return file
+
+
+def save_input(path, file_name, var_name, var_data):
+    data = read_file_data(path=path, file_name=file_name)
+    try:
+        my_regex = re.escape(var_name) + r".*[\n]"
+        logging.info("os_interface.save_input: "+path+" "+file_name)
+        data = re.sub(my_regex, var_name + " = '" + var_data + "'\n", data)
+        write_file_data(path=path,
+                file_name=file_name, data=data)
+    except Exception as e:
+        logging.error(str(e))
+
+def exists(path):
+    return os.path.isfile(path)

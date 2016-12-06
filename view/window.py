@@ -60,8 +60,8 @@ class View:
     #### CALLBACK ####
 
     def _apply_change_callback(self):
-        is_album = self._selection.get_is_album()
-        self._Controller.set_data(is_album)
+        #is_album = self._selection.get_is_album() TODO remove
+        self._Controller.set_data()
 
     #### CONTROLLER ####
 

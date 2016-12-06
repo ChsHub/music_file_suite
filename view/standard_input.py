@@ -1,4 +1,4 @@
-from tkinter import Entry, TOP, LEFT,YES, X, RIGHT, END
+from tkinter import Entry, TOP, LEFT,YES, X, RIGHT, StringVar
 
 from standard_button import StandardButton
 from standard_frame import StandardFrame
@@ -22,3 +22,10 @@ class StandardInput(StandardFrame):
 
         input = self._entry.get()
         self._controller_callback(input)
+
+
+    def _get_path(self, path):
+        path_text = StringVar()
+        path_text.set(path)
+        self._entry.config(textvariable=path_text)
+        self._controller_callback(path)

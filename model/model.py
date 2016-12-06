@@ -14,8 +14,8 @@ class Model:
 
         self._Album = Album(album_dir)
 
-    def set_data(self, is_album):
-        self._Album.set_data(is_album)
+    def set_data(self):
+        self._Album.set_data()
 
     def get_data(self):
         return self._Album.get_data()

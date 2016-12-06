@@ -35,7 +35,7 @@ class Album:
             else:
                 self._Songs += [new_song]
 
-        print("FAILED: "+str(len(self._failed_Songs)))
+        print("FAILED: " + str(len(self._failed_Songs)))
 
     def _read_album_path(self, artist, album):
 
@@ -43,21 +43,11 @@ class Album:
         self._album_artist = artist  # Album path
         self._album = album  # Album path
 
-
     def get_data(self):
 
         return [song.get_data(self._artist, self._album_artist, self._album) for song in self._Songs]
 
-    def set_data(self, is_album):
-        if is_album:
-            [song.set_data_album(self._album_dir, self._artist, self._album_artist, self._album) for song in self._Songs]
-        else:
-            [song.set_data(self._album_dir) for song in self._Songs]
-
-        print("COMPLETE")
-
-    def change_files(self, is_album):
+    def set_data(self):
         for song in self._Songs:
-            song.write_date(is_album)
-        print("CHANGE FILES")
-        print("RETURN FEEDBACK")
+            song.set_data(self._album_dir, self._artist, self._album_artist, self._album)
+        print("COMPLETE")

@@ -2,16 +2,11 @@
 # python-2.7.12
 
 
-import datetime
-import logging
-
-import utility.os_interface as os
+from utility.logger import Logger
 from model.converter import Converter
 from model.downloader import Downloader
 from model.model import Model
 from view.window import View
-
-_max_count_logfiles = 10
 
 
 class Controller:
@@ -32,8 +27,8 @@ class Controller:
     def get_data(self):
         return self._Main_model.get_data()
 
-    def set_data(self, is_album):
-        return self._Main_model.set_data(is_album)
+    def set_data(self):
+        return self._Main_model.set_data()
 
     def download(self, url):
         Downloader(url).start()
@@ -42,31 +37,17 @@ class Controller:
         Converter(path).start()
 
 
-def get_log_name():
-    return 'log_files/' + str(datetime.datetime.now()).replace(':', '_').replace('.', '_') + '.log'
-
-
-def init_logging():
-    # Delete old log files
-    logging_path = os.get_cwd() + '/log_files'
-    dir_list = os.get_dir_list(logging_path)
-
-    while len(dir_list) > _max_count_logfiles:
-        os.delete_file(logging_path, dir_list.pop(0))
-
-    # WRITE Log
-    logging.basicConfig(handlers=[logging.FileHandler(get_log_name(), 'w', 'utf-8')], level=logging.DEBUG)
-
 
 def main():
-    init_logging()
+    logger = Logger()
     # try:
     Controller()
 
     # logging.error("TEST")
     # except Exception as e:
     #   logging.error(str(e))
-    logging.shutdown()
+
+    logger.shutdown()
 
 
 if __name__ == '__main__':
