@@ -1,5 +1,6 @@
 import sys
 from tkinter import TOP, YES, X
+
 from standard_frame import StandardFrame
 from standard_label import StandardLabel
 

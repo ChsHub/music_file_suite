@@ -1,6 +1,8 @@
-from standard_input import StandardInput
 from tkinter import END
+
+from standard_input import StandardInput
 from texts import text_download_input
+
 
 class DownloadInput(StandardInput):
     def __init__(self, master, color, callback):

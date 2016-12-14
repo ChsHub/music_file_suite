@@ -1,8 +1,8 @@
-from standart_selection import StandardSelection
+from standard_selection import StandardSelection
 from standard_frame import StandardFrame
 from tkinter import TOP
 from texts import text_select_title, text_select_options
-class StandartSelections:
+class StandardSelections:
     selection = None
 
     def __init__(self, master, color, get_data):

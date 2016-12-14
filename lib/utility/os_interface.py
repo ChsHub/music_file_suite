@@ -6,12 +6,13 @@ import codecs
 import logging
 import os
 import re
+
 import path_str
 
 
 def get_absolute_path(rel_path):
-    # TODO fix ..
-    return os.getcwd() + rel_path
+    full_path = path_str.get_clean_path(path_str.get_full_path(os.getcwd(), rel_path))
+    return full_path
 
 
 def delete_file(path, file_name):
@@ -76,9 +77,7 @@ def read_file_data(path, file_name):
 
 
 def write_file_data(path, file_name, data, mode='w'):
-    change_dir(path)
-
-    with codecs.open(file_name, mode, 'utf-8') as f:
+    with codecs.open(path_str.get_full_path(path, file_name), mode, 'utf-8') as f:
         f.write(data)
         f.close()
 
@@ -92,7 +91,7 @@ def rename_file(path, old_file, new_file):
         return
 
     try:
-
+        # TODO remove change dir
         change_dir(path)
         os.rename(old_file_uni, new_file_uni)
     except WindowsError as e:
@@ -113,12 +112,13 @@ def save_input(path, file_name, var_name, var_data):
     data = read_file_data(path=path, file_name=file_name)
     try:
         my_regex = re.escape(var_name) + r".*[\n]"
-        logging.info("os_interface.save_input: "+path+" "+file_name)
+        logging.info("os_interface.save_input: " + path + " " + file_name)
         data = re.sub(my_regex, var_name + " = '" + var_data + "'\n", data)
         write_file_data(path=path,
-                file_name=file_name, data=data)
+                        file_name=file_name, data=data)
     except Exception as e:
         logging.error(str(e))
+
 
 def exists(path):
     return os.path.isfile(path)

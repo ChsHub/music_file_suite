@@ -1,5 +1,6 @@
 import datetime
 import logging
+import sys
 
 import utility.os_interface as os
 
@@ -17,6 +18,13 @@ class Logger:
 
         # WRITE Log
         logging.basicConfig(handlers=[logging.FileHandler(self._get_log_name(), 'w', 'utf-8')], level=logging.DEBUG)
+
+        ch = logging.StreamHandler(sys.stdout)
+        ch.setLevel(logging.DEBUG)
+       # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter('%(levelname)s - %(message)s')
+        ch.setFormatter(formatter)
+        logging.getLogger().addHandler(ch)
 
     def _get_log_name(self):
         return 'log_files/' + str(datetime.datetime.now()).replace(':', '_').replace('.', '_') + '.log'

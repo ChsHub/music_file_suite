@@ -2,11 +2,12 @@
 # python-2.7.12
 
 
-from utility.logger import Logger
-from model.converter import Converter
-from model.downloader import Downloader
+from converter import Converter
+
+from downloader import Downloader
 from model.model import Model
-from view.window import View
+from utility.logger import Logger
+from view.window import Window
 
 
 class Controller:
@@ -14,18 +15,19 @@ class Controller:
     _Main_model = None
 
     def __init__(self):
-        self._Main_view = View(self)
+        self._Main_model = Model(self)
+        self._Main_view = Window(self)
         self._Main_view.init_gui()
 
+
     def analyze_files(self, file_path):
-        self._Main_model = Model(self)
-        return self._Main_model.analyze_files(file_path)
+        self._Main_model.analyze_files(file_path)
 
     def update_view(self, album_names):
         self._Main_view.update_view(album_names)
 
-    def get_data(self):
-        return self._Main_model.get_data()
+    def set_view(self, data):
+        self._Main_view.set_preview_data(data)
 
     def set_data(self):
         return self._Main_model.set_data()
@@ -35,7 +37,6 @@ class Controller:
 
     def convert_all(self, path):
         Converter(path).start()
-
 
 
 def main():

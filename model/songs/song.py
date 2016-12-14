@@ -8,19 +8,19 @@ from tag_data import Tag_data
 
 class Song:
     _file_name = None
+
     _tag_data = None
     _file_data = None
     _ignore_meta = True
 
-    def __init__(self, album_path, file_name):  # , ign_meta, name_album, is_album, read_path):
+    def __init__(self, album_path, file_name):
 
         self._file_name = file_name
-
         self._error = False
 
         # READ
-        self._tag_data = Tag_data(album_path, file_name)  # Meta
-        self._file_data = File_data(file_name)
+        self._tag_data = Tag_data(album_path, self._file_name)  # Meta
+        self._file_data = File_data(self._file_name)
         # self.read_playlist(nr_in_playlist)  # Playlist
 
     #### GETTER ####
@@ -74,5 +74,7 @@ class Song:
     def set_data(self, album_path, artist, album_artist, album):
 
         data = self.get_data(artist, album_artist, album)
+        if self._error:
+            return
         self._tag_data._set_new_tag(data)
         self._file_data._rename_file(album_path, data[0], self._file_name)
