@@ -1,4 +1,5 @@
-from tkinter import Entry, TOP, LEFT,YES, X, RIGHT, StringVar
+from tkinter import Entry, LEFT,YES, X, RIGHT, StringVar, NO, TOP
+
 from standard_button import StandardButton
 from standard_frame import StandardFrame
 
@@ -7,8 +8,8 @@ class StandardInput(StandardFrame):
     _entry = None
     _controller_callback = None
 
-    def __init__(self, master, color, controller_callback, text):
-        super().__init__(master, side=TOP, borderwidth=1)
+    def __init__(self, master, color, controller_callback, text, expand=NO, side=TOP):
+        super().__init__(master, side=side, borderwidth=1, expand=expand)
 
         self._controller_callback = controller_callback
         self._entry = Entry(self, width=50)

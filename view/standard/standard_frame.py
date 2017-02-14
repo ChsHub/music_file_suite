@@ -1,9 +1,11 @@
-from tkinter import Frame, LEFT,W, SOLID, X, YES
+from tkinter import Frame, W, SOLID, BOTH, YES, X, BOTTOM, TOP
+
 from colors import color_background
 
-class StandardFrame(Frame):
 
-    def __init__(self, master, side, padx=10, pady=10, borderwidth=0, relief=SOLID):
+class StandardFrame(Frame):
+    def __init__(self, master, side, padx=10, pady=10, borderwidth=0, relief=SOLID, fill=X,
+                 bg=color_background, expand=YES):
         super().__init__(master=master, padx=padx, pady=pady,
-                       width=300, height=300, bg=color_background, bd=borderwidth, relief=relief)
-        self.pack(side=side, anchor=W, fill=X, expand=YES)
+                         width=300, height=300, bg=bg, bd=borderwidth, relief=relief)
+        self.pack(side=side, anchor=W, fill=BOTH, expand=expand)

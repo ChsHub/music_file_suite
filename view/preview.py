@@ -1,37 +1,37 @@
+import logging
 import tkinter.font as tkFont
-from tkinter import TOP, LEFT
+from tkinter import TOP, LEFT, BOTTOM, X, BOTH, Y, NO
 from tkinter.ttk import Treeview, Scrollbar
 
 from standard_button import StandardButton
 from standard_frame import StandardFrame
 from texts import text_preview_details, text_preview_change, text_preview_playlist
-
+from colors import color_blue, color_yellow, color_pink
 
 class Preview(StandardFrame):
+    _listbox = None
+    preview_frame = None
+
     def __init__(self, master, data, apply_change_callback):
-        super().__init__(master, side=TOP)
+        super().__init__(master, borderwidth=1, side=TOP)
+        self.preview_frame = StandardFrame(self, TOP, pady=0, fill=Y)
 
-        preview_border_frame = StandardFrame(self, TOP, borderwidth=1)
-        preview_frame = StandardFrame(preview_border_frame, TOP, pady=0)
-
-        if not data:
-            return
-
-        self.listbox = MultiColumnListbox(preview_frame, text_preview_details, data)
-
+        self._listbox = MultiColumnListbox(self.preview_frame, text_preview_details, data)
+        logging.info("created List bod")
         # CONTROL FRAMES
-        button_frame = StandardFrame(preview_border_frame, side=TOP, padx=0, pady=0)
-        left_button_frame = StandardFrame(button_frame, side=LEFT, padx=0, pady=0)
-        right_button_frame = StandardFrame(button_frame, side=LEFT, padx=0, pady=0)
+        button_frame = StandardFrame(self, side=TOP, padx=0, pady=0, fill=X, expand=NO)
+        left_button_frame = StandardFrame(button_frame, side=LEFT, padx=0, pady=0, fill=X)
+        right_button_frame = StandardFrame(button_frame, side=LEFT, padx=0, pady=0, fill=X)
         # CONTROL
-        StandardButton(text_preview_change, left_button_frame, apply_change_callback, 0, 0).pack(side=TOP)
-        StandardButton(text_preview_playlist, right_button_frame, None, 0, 0).pack(side=TOP)
-
-    def scroll_callback(self, scroll, step):
-        print(scroll)
+        StandardButton(text_preview_change, left_button_frame, apply_change_callback, 0, 0).pack(side=BOTTOM)
+        # TODO Playlist
+        StandardButton(text_preview_playlist, right_button_frame, None, 0, 0).pack(side=BOTTOM)
 
     def update_view(self, data):
-        self.listbox._build_tree(text_preview_details, data)
+        # self._listbox.destroy()
+        # self._listbox._build_tree(text_preview_details, data)
+        self._listbox.destroy()
+        self._listbox = MultiColumnListbox(self.preview_frame, text_preview_details, data)
 
 
 # https://stackoverflow.com/questions/5286093/display-listbox-with-columns-using-tkinter
@@ -65,13 +65,22 @@ class MultiColumnListbox(Treeview):
             # adjust the column's width to the header string
             self.column(col, width=tkFont.Font().measure(col.title()))
 
+        if not song_list:
+            return
         for item in song_list:
             self.insert('', 'end', values=item)
             # adjust column's width if necessary to fit each value
             for ix, val in enumerate(item):
-                col_w = tkFont.Font().measure(val)
-                if self.column(header[ix], width=None) < col_w:
-                    self.column(header[ix], width=col_w)
+                try:
+                    if val:
+                        col_w = tkFont.Font().measure(val)
+                        if self.column(header[ix], width=None) < col_w:
+                            logging.info(val)
+                            logging.info(col_w)
+                            self.column(header[ix], width=col_w)
+                except Exception as e:
+                    logging.error(str(e))
+
 
 
 def sortby(tree, col, descending):

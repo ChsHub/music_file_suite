@@ -2,7 +2,7 @@
 # python3
 __author__ = 'Christian'
 
-import codecs
+from codecs import open
 import logging
 import os
 import re
@@ -67,7 +67,7 @@ def get_dir_list(path):
 def read_file_data(path, file_name):
     path = path_str.get_full_path(path, file_name)
     try:
-        with open(path, 'r') as f:
+        with open(path, 'r', 'utf-8') as f:
             data = f.read()
             f.close()
         return data
@@ -77,7 +77,7 @@ def read_file_data(path, file_name):
 
 
 def write_file_data(path, file_name, data, mode='w'):
-    with codecs.open(path_str.get_full_path(path, file_name), mode, 'utf-8') as f:
+    with open(path_str.get_full_path(path, file_name), mode, 'utf-8') as f:
         f.write(data)
         f.close()
 

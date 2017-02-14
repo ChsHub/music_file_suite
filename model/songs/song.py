@@ -40,6 +40,7 @@ class Song:
             file_name = self.get_file_album_name(title, track_num)
         # No Album
         else:
+            # TODO don't overwrite
             track_num = ""
             album = ""
             album_artist = ""

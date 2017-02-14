@@ -1,5 +1,5 @@
 import logging
-from tkinter import Tk, LEFT
+from tkinter import Tk, LEFT, BOTH
 from colors import color_button
 from column import Column
 from convert_input import ConvertInput
@@ -21,7 +21,7 @@ class Window:
     # gui elements
     _album_selection = None
     _preview = None
-    _column2 = None
+
     _selection = None
 
     def __init__(self, Controller):
@@ -30,14 +30,15 @@ class Window:
     def init_gui(self):
         self._root = Tk()
         self._root.title(text_view_title)
-        self._root = StandardFrame(self._root, side=LEFT)
+        self._root = StandardFrame(self._root, side=LEFT, fill=BOTH)
 
-        # first column
+        # column
         column1 = Column(self._root)
-        self._column2 = Column(self._root)
+        column2 = Column(self._root)
 
+        self._preview = Preview(column2, None, self._apply_change_callback)
         # COLUMN 1
-        FileInput(column1.get_parent(), color_button, self.analyze_files)
+        FileInput(column2.get_parent(), color_button, self.analyze_files)
         # self._selection = StandardSelections(frame1, color_button, self.get_data)
         DownloadInput(column1.get_parent(), color_button, self._Controller.download)
         ConvertInput(column1.get_parent(), color_button, self._Controller.convert_all)
@@ -50,10 +51,7 @@ class Window:
 
     def _create_preview(self, data):
         logging.info("CREATE preview")
-        if self._preview:
-            self._preview.update_view(data)
-        else:
-            self._preview = Preview(self._column2, data, self._apply_change_callback)
+        self._preview.update_view(data)
 
     #### CALLBACK ####
 

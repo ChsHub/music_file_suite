@@ -1,6 +1,6 @@
 import logging
 from tkinter.filedialog import askdirectory
-
+from tkinter import NO, BOTTOM
 import lib.utility.os_interface as os
 import lib.utility.path_str as path_str
 from os_interface import save_input
@@ -11,7 +11,7 @@ from texts import text_file_input
 
 class FileInput(StandardInput):
     def __init__(self, master, color, controller_callback):
-        super().__init__(master, color, controller_callback, text_file_input)
+        super().__init__(master, color, controller_callback, text_file_input, expand=NO, side=BOTTOM)
         self._get_path(file_path)
 
     def _callback(self):

@@ -21,3 +21,5 @@ class Downloader(Thread):
                         shell=True)
         os.change_dir(os_dir)
         print("DOWNLOAD: DONE")
+
+        # TODO GUI
