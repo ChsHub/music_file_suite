@@ -4,28 +4,29 @@ __author__ = 'Christian'
 
 from codecs import open
 import logging
-import os
+from os import rename, chdir, remove, getcwd, listdir
+from os.path import isdir, isfile
 import re
 
 import path_str
 
 
 def get_absolute_path(rel_path):
-    full_path = path_str.get_clean_path(path_str.get_full_path(os.getcwd(), rel_path))
+    full_path = path_str.get_clean_path(path_str.get_full_path(getcwd(), rel_path))
     return full_path
 
 
 def delete_file(path, file_name):
     file_path = path_str.get_full_path(path, file_name)
-    os.remove(file_path)
+    remove(file_path)
 
 
 def change_dir(path):
-    os.chdir(path)
+    chdir(path)
 
 
 def get_cwd():
-    current_dir = os.getcwd()
+    current_dir = getcwd()
     return path_str.get_clean_path(current_dir)
 
 
@@ -54,8 +55,8 @@ def rename_files_replace(path, old, new, files):
 
 def get_dir_list(path):
     # try:
-    if os.path.isdir(path):
-        dir_list = os.listdir(path)
+    if isdir(path):
+        dir_list = listdir(path)
         return dir_list
     else:
         return []
@@ -93,7 +94,7 @@ def rename_file(path, old_file, new_file):
     try:
         # TODO remove change dir
         change_dir(path)
-        os.rename(old_file_uni, new_file_uni)
+        rename(old_file_uni, new_file_uni)
     except WindowsError as e:
         # TODO error on second rename
         logging.error("set new file name", "old: " + old_file + " //  new: " + new_file)  # , e)
@@ -121,4 +122,4 @@ def save_input(path, file_name, var_name, var_data):
 
 
 def exists(path):
-    return os.path.isfile(path)
+    return isfile(path) or isdir(path)

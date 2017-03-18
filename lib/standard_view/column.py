@@ -1,6 +1,4 @@
 from tkinter import LEFT, TOP, BOTH
-
-from colors import color_blue
 from standard_frame import StandardFrame
 
 

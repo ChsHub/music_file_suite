@@ -3,6 +3,7 @@ import lib.utility.os_interface as os_interface
 
 
 def get_artist_and_album(album_path):
+
     temp = album_path.split("/")
 
     # split last element in list

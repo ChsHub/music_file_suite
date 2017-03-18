@@ -1,12 +1,11 @@
-import logging
+from logging import info, error
 import tkinter.font as tkFont
-from tkinter import TOP, LEFT, BOTTOM, X, BOTH, Y, NO
+from tkinter import TOP, LEFT, BOTTOM, X, Y, NO
 from tkinter.ttk import Treeview, Scrollbar
-
 from standard_button import StandardButton
 from standard_frame import StandardFrame
 from texts import text_preview_details, text_preview_change, text_preview_playlist
-from colors import color_blue, color_yellow, color_pink
+
 
 class Preview(StandardFrame):
     _listbox = None
@@ -17,7 +16,7 @@ class Preview(StandardFrame):
         self.preview_frame = StandardFrame(self, TOP, pady=0, fill=Y)
 
         self._listbox = MultiColumnListbox(self.preview_frame, text_preview_details, data)
-        logging.info("created List bod")
+        info("created List bod")
         # CONTROL FRAMES
         button_frame = StandardFrame(self, side=TOP, padx=0, pady=0, fill=X, expand=NO)
         left_button_frame = StandardFrame(button_frame, side=LEFT, padx=0, pady=0, fill=X)
@@ -75,11 +74,11 @@ class MultiColumnListbox(Treeview):
                     if val:
                         col_w = tkFont.Font().measure(val)
                         if self.column(header[ix], width=None) < col_w:
-                            logging.info(val)
-                            logging.info(col_w)
+                            info(val)
+                            info(col_w)
                             self.column(header[ix], width=col_w)
                 except Exception as e:
-                    logging.error(str(e))
+                    error(str(e))
 
 
 

@@ -1,4 +1,4 @@
-import logging
+from logging import info
 from tkinter import Tk, LEFT, BOTH
 from colors import color_button
 from column import Column
@@ -27,7 +27,7 @@ class Window:
     def __init__(self, Controller):
         self._Controller = Controller
 
-    def init_gui(self):
+
         self._root = Tk()
         self._root.title(text_view_title)
         self._root = StandardFrame(self._root, side=LEFT, fill=BOTH)
@@ -44,13 +44,15 @@ class Window:
         ConvertInput(column1.get_parent(), color_button, self._Controller.convert_all)
         StdOutput(column1.get_parent())
 
+    def start(self):
         # build gui
         self._root.mainloop()
+        info("WINDOW CLOSED")
 
     #### GUI FUNCTIONS ####
 
     def _create_preview(self, data):
-        logging.info("CREATE preview")
+        print("CREATE preview")
         self._preview.update_view(data)
 
     #### CALLBACK ####

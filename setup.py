@@ -13,17 +13,16 @@
 
 import sys
 from cx_Freeze import setup, Executable
+build_exe_options = {"includes": ["tkinter"]}
 
 base = None
 if sys.platform == 'win32':
     base = 'Win32GUI'
 
-executables = [
-    Executable('main.py', base=base)
-]
+executables = [Executable('main.py', base=base)]
 
 setup(name='simple_Tkinter',
       version='0.1',
       description='Sample cx_Freeze Tkinter script',
-      executables=executables
-      )
+      options={"build_exe": build_exe_options},
+      executables=executables)
