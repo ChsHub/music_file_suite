@@ -1,10 +1,13 @@
-from tkinter import LEFT, TOP, BOTH
+from tkinter import TOP, Frame, SOLID
+
+from colors import color_background
 from standard_frame import StandardFrame
 
 
-class Column(StandardFrame):
-    def __init__(self, master):
-        super().__init__(master, side=LEFT, fill=BOTH)
+class Column(Frame):
+    def __init__(self, master, padx=10, pady=10):
+        Frame.__init__(self, master=master, padx=padx, pady=pady, width=300, height=300, bg=color_background, bd=0,
+                       relief=SOLID)
 
     def get_parent(self):
         if len(self.winfo_children()) % 2 == 0:

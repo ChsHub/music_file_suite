@@ -1,8 +1,10 @@
-from utilities import get_files, get_artist_and_album
 from logging import info
+
 from meta_data import MetaData
 from song import Song
 from texts import Selection
+from utilities import get_files, get_artist_and_album
+
 
 class Album:
     album_path = None
@@ -24,13 +26,13 @@ class Album:
         # gather data from path
         artist, album = get_artist_and_album(self.album_path)
         self.meta_data[MetaData.Artist] = artist
-        self.meta_data[MetaData.AlbumArtist]  = artist  # Album path
-        self.meta_data[MetaData.Album]  = album  # Album path
+        self.meta_data[MetaData.AlbumArtist] = artist  # Album path
+        self.meta_data[MetaData.Album] = album  # Album path
 
         info("ANALYZE: START")
         for file in get_files(self.album_path, [".mp3", ".mp4", ".webm", ".flv"]):
             self.add_song(album_path, file)
-            if not self.active: # interupt by another process
+            if not self.active:  # interupt by another process
                 return
 
         info("ANALIZE: DONE")

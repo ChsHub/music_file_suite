@@ -88,7 +88,7 @@ class Song:
                 title = "NONE"
             if not track_num:
                 track_num = "NONE"
-            return title + u' ' + track_num
+            return track_num + u' ' + title
 
         def set_meta_ignore_strategy(self):
             self._getter[MetaData.Title] = lambda: self._song._file_data._title

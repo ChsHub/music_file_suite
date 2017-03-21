@@ -8,3 +8,7 @@ class MetaData(Enum):
     TrackNum = "Track Nr."
     AlbumArtist = "Album Artist"
     Album = "Album"
+
+class Types:
+    MP3 = [".mp3"]
+    VIDEO = [".mp4", ".flv", ".webm"]

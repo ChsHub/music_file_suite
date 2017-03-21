@@ -23,9 +23,9 @@ class Preview(StandardFrame):
         left_button_frame = StandardFrame(button_frame, side=LEFT, padx=0, pady=0, fill=X)
         right_button_frame = StandardFrame(button_frame, side=LEFT, padx=0, pady=0, fill=X)
         # CONTROL
-        StandardButton(text_preview_change, left_button_frame, apply_change_callback, 0, 0).pack(side=BOTTOM)
+        StandardButton(text_preview_change, left_button_frame, callback=apply_change_callback).pack(side=BOTTOM)
         # TODO Playlist
-        StandardButton(text_preview_playlist, right_button_frame, None, 0, 0).pack(side=BOTTOM)
+        StandardButton(text_preview_playlist, right_button_frame, callback=None).pack(side=BOTTOM)
 
     def update_view(self, data):
         # self._listbox.destroy()
