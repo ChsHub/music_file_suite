@@ -7,4 +7,4 @@ converter_command = 'D:\\Making\\Python\\music_file_suite\\lib\\ffmpeg\\bin\\ffm
 # 48000
 path_to_convert_dir = 'D:\\Downloads\\Downloader\\Neu mp3 need meta'
 
-file_path = 'D:/Musik/New Alben/Simon Garfunkel/Collection'
+file_path = 'D:/Downloads/Downloader/Neu mp4'

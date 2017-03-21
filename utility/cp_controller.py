@@ -4,6 +4,7 @@ from threading import Thread, BoundedSemaphore, Semaphore
 from model.model import Model
 from window import Window
 
+# python 3
 
 # TODO concrete class inherits from cp controller
 class WorkThread(Thread):
@@ -28,7 +29,6 @@ class WorkThread(Thread):
         print("END THREAD")
 
 
-# python 3
 # uses consumer-producer-problem
 # view stores model calls
 class Controller:
@@ -78,31 +78,7 @@ class Controller:
 
         self._empty_sem.release()
 
-        element[0](element[1])
+        element.pop(0)(*element) # (*[x, y]) = (x, y)
 
     def create_thread(self):
         self._threads += [WorkThread(self._consume)]
-
-        ## MODEL
-
-    def analyze_files(self, file_path):
-        self.produce([self._Main_model.analyze_files, file_path])
-
-    def set_data(self):
-        if self._Main_model:
-            return self._Main_model.set_data()
-
-    def update_view(self, album_names):
-        if self._Main_view:
-            self._Main_view.update_view(album_names)
-
-    # called: Model -> Album -> Controller -> Window
-    def set_view(self, data):
-        if self._Main_view:
-            self._Main_view.set_preview_data(data)
-
-    def download(self, url):
-        self.produce([self._Main_model.download_file, url])
-
-    def convert_all(self, path):
-        self.produce([self._Main_model.convert_file, path])

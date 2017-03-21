@@ -1,5 +1,5 @@
-import lib.utility.tag_interface as eyed3_interface
-
+import tag_interface as eyed3_interface
+from meta_data import MetaData
 
 class Tag_data:
     _audio_tag = None
@@ -37,8 +37,8 @@ class Tag_data:
 
     def _set_new_tag(self, data):
         self._audio_tag.reset()
-        self._audio_tag.set_tag_title(data[3])
-        self._audio_tag.set_tag_artist(data[5])
-        self._audio_tag.set_tag_track_num(data[4])
-        self._audio_tag.set_tag_album_artist(data[2])
-        self._audio_tag.set_tag_album(data[1])
+        self._audio_tag.set_tag_title(data[MetaData.Title])
+        self._audio_tag.set_tag_artist(MetaData.Artist)
+        self._audio_tag.set_tag_track_num(MetaData.TrackNum)
+        self._audio_tag.set_tag_album_artist(MetaData.AlbumArtist)
+        self._audio_tag.set_tag_album(MetaData.Album)

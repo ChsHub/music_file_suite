@@ -1,10 +1,11 @@
-from logging import info, error
-import tkinter.font as tkFont
+from tkinter.font import Font
+from logging import info
 from tkinter import TOP, LEFT, BOTTOM, X, Y, NO
 from tkinter.ttk import Treeview, Scrollbar
+from meta_data import MetaData
 from standard_button import StandardButton
 from standard_frame import StandardFrame
-from texts import text_preview_details, text_preview_change, text_preview_playlist
+from texts import text_preview_change, text_preview_playlist
 
 
 class Preview(StandardFrame):
@@ -15,7 +16,7 @@ class Preview(StandardFrame):
         super().__init__(master, borderwidth=1, side=TOP)
         self.preview_frame = StandardFrame(self, TOP, pady=0, fill=Y)
 
-        self._listbox = MultiColumnListbox(self.preview_frame, text_preview_details, data)
+        self._listbox = MultiColumnListbox(self.preview_frame, [str(x.value) for x in MetaData], data)
         info("created List bod")
         # CONTROL FRAMES
         button_frame = StandardFrame(self, side=TOP, padx=0, pady=0, fill=X, expand=NO)
@@ -30,17 +31,17 @@ class Preview(StandardFrame):
         # self._listbox.destroy()
         # self._listbox._build_tree(text_preview_details, data)
         self._listbox.destroy()
-        self._listbox = MultiColumnListbox(self.preview_frame, text_preview_details, data)
+        self._listbox = MultiColumnListbox(self.preview_frame, [str(x.value) for x in MetaData], data)
 
 
 # https://stackoverflow.com/questions/5286093/display-listbox-with-columns-using-tkinter
 class MultiColumnListbox(Treeview):
     """use a ttk.TreeView as a multicolumn ListBox"""
 
-    def __init__(self, master, car_header, car_list):
-        super().__init__(columns=car_header, show="headings")
+    def __init__(self, master, header, data_list):
+        super().__init__(columns=header, show="headings")
         self._setup_widgets(master)
-        self._build_tree(car_header, car_list)
+        self._build_tree(header, data_list)
 
     def _setup_widgets(self, master):
 
@@ -58,31 +59,29 @@ class MultiColumnListbox(Treeview):
         master.grid_rowconfigure(0, weight=1)
 
     def _build_tree(self, header, song_list):
+        # for i, col in enumerate(header):
         for col in header:
-            self.heading(col, text=col.title(),
-                         command=lambda c=col: sortby(self, c, 0))
+            self.heading(col, text=col, command=lambda c=col: sort_by(self, c, 0))
             # adjust the column's width to the header string
-            self.column(col, width=tkFont.Font().measure(col.title()))
+            self.column(col, width=Font().measure(col.title()))
 
         if not song_list:
             return
         for item in song_list:
             self.insert('', 'end', values=item)
+
+        for col in range(len(header)):
             # adjust column's width if necessary to fit each value
-            for ix, val in enumerate(item):
-                try:
-                    if val:
-                        col_w = tkFont.Font().measure(val)
-                        if self.column(header[ix], width=None) < col_w:
-                            info(val)
-                            info(col_w)
-                            self.column(header[ix], width=col_w)
-                except Exception as e:
-                    error(str(e))
+            col_width = 0
+            for song in song_list:
+                if song[col]:
+                    width = Font().measure("i"*len(song[col]))
+                    if col_width < width:
+                        col_width = width
+            self.column(header[col], width=col_width)
 
 
-
-def sortby(tree, col, descending):
+def sort_by(tree, col, descending):
     """sort tree contents when a column header is clicked on"""
     # grab values to sort
     data = [(tree.set(child, col), child) \
@@ -94,4 +93,4 @@ def sortby(tree, col, descending):
     for ix, item in enumerate(data):
         tree.move(item[1], '', ix)
     # switch the heading so it will sort in the opposite direction
-    tree.heading(col, command=lambda col=col: sortby(tree, col, int(not descending)))
+    tree.heading(col, command=lambda col=col: sort_by(tree, col, int(not descending)))

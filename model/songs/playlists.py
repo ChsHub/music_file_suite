@@ -2,8 +2,8 @@
 __author__ = 'christian'
 import logging
 
-import lib.utility.path_str as path_str
-from lib.utility import os_interface as os_interface
+import utility.path_str as path_str
+from utility import os_interface as os_interface
 
 
 class playlist_wpl:

@@ -1,7 +1,6 @@
 import logging
 import re
-
-import lib.utility.os_interface as os_interface
+import utility.os_interface as os_interface
 from path_str import change_file_name
 
 
@@ -57,7 +56,7 @@ class File_data:
     def get_is_album(self):
         return self.is_album
 
-    def _rename_file(self, album_path, new_name, file_name):
+    def rename_file(self, album_path, new_name, file_name):
 
         os_interface.rename_file(album_path, file_name, new_name + '.mp3') # TODO mp3
 

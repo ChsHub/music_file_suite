@@ -1,12 +1,10 @@
 # -*- coding: utf8 -*-
 # python3
-__author__ = 'Christian'
-
-from codecs import open
 import logging
+import re
+from codecs import open
 from os import rename, chdir, remove, getcwd, listdir
 from os.path import isdir, isfile
-import re
 
 import path_str
 

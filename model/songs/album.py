@@ -1,79 +1,71 @@
+from utilities import get_files, get_artist_and_album
 from logging import info
-from os_interface import exists
-import lib.utility.utilities as utilities
+from meta_data import MetaData
 from song import Song
+from texts import Selection
 
 class Album:
-    _album_dir = None
-    _set_view = None
+    album_path = None
     # Meta
-    _album = None
-    _artist = None
-    _album_artist = None
     _Songs = []
     _failed_Songs = None
     # Threading
     active = True
+    meta_data = None
 
-    def __init__(self, album_dir, set_view):
+    def __init__(self, album_path, set_view):
 
-        # gather data from path
-
-        if not album_dir:
+        if not album_path:
             raise ValueError
 
-        self._album_dir = album_dir
-        self._set_view = set_view
+        self.meta_data = {}
+        self.album_path = album_path
 
-        artist, album = utilities.get_artist_and_album(self._album_dir)
-        self._read_album_path(artist, album)
-
-        files = utilities.get_mp3_files(self._album_dir)
+        # gather data from path
+        artist, album = get_artist_and_album(self.album_path)
+        self.meta_data[MetaData.Artist] = artist
+        self.meta_data[MetaData.AlbumArtist]  = artist  # Album path
+        self.meta_data[MetaData.Album]  = album  # Album path
 
         info("ANALYZE: START")
-        for file in files:
-            self.add_song(album_dir, file)
-            if not self.active:
+        for file in get_files(self.album_path, [".mp3", ".mp4", ".webm", ".flv"]):
+            self.add_song(album_path, file)
+            if not self.active: # interupt by another process
                 return
 
         info("ANALIZE: DONE")
+        set_view(self.get_data())
 
-        data = self.get_data()
-        # TODO find none
-        # data = sorted(data)
-        self._set_view(data)
+    # DATA #
 
-
-    ## DATA ##
-
-    def _read_album_path(self, artist, album):
-        self._artist = artist
-        self._album_artist = artist  # Album path
-        self._album = album  # Album path
-
+    def __getitem__(self, item):
+        return self.meta_data[item]
 
     def get_data(self):
-        return [song.get_data(self._artist, self._album_artist, self._album) for song in self._Songs]
-
+        return [[song[x] for x in MetaData] for song in self._Songs]
 
     def set_data(self):
         for song in self._Songs:
-            song.set_data(self._album_dir, self._artist, self._album_artist, self._album)
+            song.set_data(self, self.album_path)
         info("COMPLETE")
 
-
     def add_song(self, album_path, file):
-        new_song = Song(album_path, file)
+        new_song = Song(album_path, file, self)
         if not new_song.get_error():
             self._Songs += [new_song]
-
-
-        # self._failed_Songs = self._Songs[:]
-        # map(lambda: not Song.get_error, self._Songs)
-        # map(Song.get_error, self._Songs)
-
-        # info("FAILED: " + str(len(self._failed_Songs)))
 
     # Threading
     def set_inactive(self):
         self.active = False
+
+    def set_is_album(self, is_album):
+
+        if is_album == Selection.ALBUM:
+            for song in self._Songs:
+                song.set_album_strategy()
+        elif is_album == Selection.RANDOM:
+            for song in self._Songs:
+                song.set_common_strategy()
+        elif is_album == Selection.DETECTED:
+            for song in self._Songs:
+                song.set_detected_strategy()

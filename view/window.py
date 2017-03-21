@@ -7,9 +7,10 @@ from download_input import DownloadInput
 from file_input import FileInput
 from preview import Preview
 from standard_frame import StandardFrame
+from standard_selection import StandardSelection
 from std_output import StdOutput
 from texts import text_view_title
-
+from texts import Selection
 
 # TODO Feedback for apply change
 
@@ -17,35 +18,30 @@ class Window:
     # class
     _root = None
     _Controller = None
-
     # gui elements
     _album_selection = None
     _preview = None
-
     _selection = None
 
-    def __init__(self, Controller):
-        self._Controller = Controller
+    def __init__(self, controller):
 
-
+        self._Controller = controller
         self._root = Tk()
         self._root.title(text_view_title)
         self._root = StandardFrame(self._root, side=LEFT, fill=BOTH)
 
         # column
         column1 = Column(self._root)
-        column2 = Column(self._root)
+        #column2 = Column(self._root)
 
-        self._preview = Preview(column2, None, self._apply_change_callback)
-        # COLUMN 1
-        FileInput(column2.get_parent(), color_button, self.analyze_files)
-        # self._selection = StandardSelections(frame1, color_button, self.get_data)
+        self._preview = Preview(column1, None, self._apply_change_callback)
+        FileInput(column1.get_parent(), color_button, self.analyze_files)
+        StandardSelection(column1.get_parent(), Selection, color_button,  controller.update_view)
         DownloadInput(column1.get_parent(), color_button, self._Controller.download)
         ConvertInput(column1.get_parent(), color_button, self._Controller.convert_all)
         StdOutput(column1.get_parent())
 
     def start(self):
-        # build gui
         self._root.mainloop()
         info("WINDOW CLOSED")
 
@@ -58,18 +54,11 @@ class Window:
     #### CALLBACK ####
 
     def _apply_change_callback(self):
-        # is_album = self._selection.get_is_album() TODO remove
         self._Controller.set_data()
 
     #### CONTROLLER ####
     def analyze_files(self, album_dir):
-        # is_album = self._selection.get_is_album()
         self._Controller.analyze_files(album_dir)
-        # self.get_preview_data() TODO remove
 
     def set_preview_data(self, data):
         self._create_preview(data)
-
-        # def get_preview_data(self):
-        #    data = self._Controller.get_preview_data()
-        #   self._create_preview(data)

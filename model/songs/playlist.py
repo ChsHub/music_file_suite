@@ -1,13 +1,13 @@
-import lib.utility.utilities as utilities
 import playlists
-
+from utilities import get_playlist_name
+from levenshtein import is_levenshtein_fit
 
 class Playlist:
     _path_to_old_playlists = "D:\Musik\Wiedergabelisten win"
 
     def __init__(self, files, album, artist):
         # TODO: rename create_playlist_name
-        playlist_name = utilities.get_playlist_name(artist, album)
+        playlist_name = get_playlist_name(artist, album)
         playlist_files = self.get_playlist_files(self._path_to_old_playlists, playlist_name)
 
         files = self.get_mp3_files_ordered(files, playlist_files)
@@ -37,7 +37,7 @@ class Playlist:
             else:
                 play_file_short = play_file[:-4]
                 for dir_file in dir_files:
-                    if levenshtein.is_levenshtein_fit(play_file_short, dir_file[:-4]):
+                    if is_levenshtein_fit(play_file_short, dir_file[:-4]):
                         result.append((dir_file, i))
                         dir_files.remove(dir_file)
                         break

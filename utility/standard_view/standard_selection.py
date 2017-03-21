@@ -7,11 +7,8 @@ from standard_radio import StandardRadio
 class StandardSelection(StandardFrame):
     radio = None
 
-    def __init__(self, master, title, radio_titles, radio_values, color, get_data):
+    def __init__(self, master, radio_enum, color, get_data):
         super().__init__(master, side=TOP, borderwidth=1, padx=10, pady=10)
 
-        StandardLabel(title, self, 0, 0, color).pack()
-        self.radio = StandardRadio(self, radio_titles, radio_values, get_data)
-
-    def get_is_album(self):
-        return self.radio.get_is_album()
+        # StandardLabel(title, self, 0, 0, color).pack()
+        self.radio = StandardRadio(self, [s.value for s in radio_enum], list(radio_enum), get_data)

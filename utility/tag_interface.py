@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Christian'
-
 import logging
-
 import path_str
 from mutagen._file import File
 from mutagen.id3 import TRCK, TIT2, TPE1, TALB, TPE2

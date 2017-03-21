@@ -1,20 +1,14 @@
 # -*- coding: utf8 -*-
+from enum import Enum
 
-text_preview_details = ["File Name",
-            "Album Name",
-            "Album Artist",
-            "Title",
-            "Track Num",
-            "Artist"]
+class Selection(Enum):
+    DETECTED = "as detected"
+    ALBUM = "is Album"
+    RANDOM = "is random"
 
 text_preview_change = "Apply Change"
 text_preview_playlist = "Create Playlist"
 text_download_input = "Download YT"
 text_convert_input = "Convert"
 text_file_input = "Open File"
-
-
-text_select_title = "Album"
-text_select_options = ["is Album", "is random"]
-
 text_view_title = 'mp3 organize'

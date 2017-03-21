@@ -1,6 +1,3 @@
-__author__ = 'Christian'
-
-
 # PATH FORMATTING
 
 def get_clean_path(path):

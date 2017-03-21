@@ -1,5 +1,5 @@
 __author__ = 'Christian'
-import lib.utility.os_interface as os_interface
+from os_interface import get_dir_list
 
 
 def get_artist_and_album(album_path):
@@ -12,13 +12,9 @@ def get_artist_and_album(album_path):
     return (temp[-2], temp[-1])
 
 
-def _is_mp3(file_name):
-    return ".mp3" in file_name[-4:].lower()
-
-
-def get_mp3_files(target_path):
-    files = os_interface.get_dir_list(target_path)
-    files = filter(_is_mp3, files)
+def get_files(target_path, types):
+    files = get_dir_list(target_path)
+    files = filter(lambda x: x[-4:].lower() in types, files)
 
     return sorted(files)
 
