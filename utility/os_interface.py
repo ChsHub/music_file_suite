@@ -1,17 +1,21 @@
 # -*- coding: utf8 -*-
 # python3
-import logging
-import re
 from codecs import open
-from os import rename, chdir, remove, getcwd, listdir
-from os.path import isdir, isfile
+from logging import error, info
+from os import rename, chdir, remove, getcwd, listdir, mkdir
+from os.path import isdir, isfile, abspath, normpath
+from re import escape, sub
 
 import path_str
 
 
+def make_directory(path):
+    if not exists(path):
+        mkdir(path)
+
+
 def get_absolute_path(rel_path):
-    full_path = path_str.get_clean_path(path_str.get_full_path(getcwd(), rel_path))
-    return full_path
+    return abspath(rel_path)
 
 
 def delete_file(path, file_name):
@@ -27,8 +31,16 @@ def get_cwd():
     current_dir = getcwd()
     return path_str.get_clean_path(current_dir)
 
+# from os import walk
+# for x,z,y in walk("."):
+#    print(x)
+#    print(z)
+#    print(y)
+#    print()
 
+# TODO use os.walk, os.path.join
 def depth_search_paths(path, result):
+    raise NotImplemented
     list = get_dir_list(path)
     i = 0
     if list is None:
@@ -54,13 +66,13 @@ def rename_files_replace(path, old, new, files):
 def get_dir_list(path):
     # try:
     if isdir(path):
-        dir_list = listdir(path)
-        return dir_list
+        print(get_cwd())
+        abs_path = get_absolute_path(path)
+        print(abs_path)
+        dir_list = listdir(abs_path)
+        return sorted(dir_list)
     else:
         return []
-        # except WindowsError as e:
-        #   log.logfile.handle_error("Windows Error", path, e)
-        # return None
 
 
 def read_file_data(path, file_name):
@@ -72,7 +84,7 @@ def read_file_data(path, file_name):
         return data
 
     except IOError as e:
-        logging.error("read_file_data " + path + " " + str(e))
+        error("read_file_data " + path + " " + str(e))
 
 
 def write_file_data(path, file_name, data, mode='w'):
@@ -95,29 +107,30 @@ def rename_file(path, old_file, new_file):
         rename(old_file_uni, new_file_uni)
     except WindowsError as e:
         # TODO error on second rename
-        logging.error("set new file name", "old: " + old_file + " //  new: " + new_file)  # , e)
+        error("set new file name", "old: " + old_file + " //  new: " + new_file)  # , e)
 
 
-def replace_in_file(file, path, re, ne=""):
-    if re in file:
-        new_name = file.replace(re, ne)
-        rename_file(path, file, new_name)
+def replace_in_file_name(file_name, path, old, new=""):
+    if old in file_name:
+        new_name = file_name.replace(old, new)
+        rename_file(path, file_name, new_name)
         return new_name
     else:
-        return file
+        return file_name
 
 
 def save_input(path, file_name, var_name, var_data):
     data = read_file_data(path=path, file_name=file_name)
     try:
-        my_regex = re.escape(var_name) + r".*[\n]"
-        logging.info("os_interface.save_input: " + path + " " + file_name)
-        data = re.sub(my_regex, var_name + " = '" + var_data + "'\n", data)
+        my_regex = escape(var_name) + r".*[\n]"
+        info("os_interface.save_input: " + path + " " + file_name)
+        data = sub(my_regex, var_name + " = '" + var_data + "'\n", data)
         write_file_data(path=path,
                         file_name=file_name, data=data)
     except Exception as e:
-        logging.error(str(e))
+        error(str(e))
 
 
 def exists(path):
     return isfile(path) or isdir(path)
+

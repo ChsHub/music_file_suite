@@ -1,15 +1,18 @@
 from logging import info
 
+from meta_data import Types
 from meta_data import MetaData
 from song import Song
 from texts import Selection
-from utilities import get_files, get_artist_and_album
+from utilities import get_artist_and_album
+from os_interface import get_dir_list
 
 
 class Album:
     album_path = None
     # Meta
     _Songs = []
+    _Videos = []
     _failed_Songs = None
     # Threading
     active = True
@@ -28,10 +31,15 @@ class Album:
         self.meta_data[MetaData.Artist] = artist
         self.meta_data[MetaData.AlbumArtist] = artist  # Album path
         self.meta_data[MetaData.Album] = album  # Album path
-
         info("ANALYZE: START")
-        for file in get_files(self.album_path, [".mp3", ".mp4", ".webm", ".flv"]):
-            self.add_song(album_path, file)
+
+        for file in get_dir_list(self.album_path):
+            file_type = file[-4:].lower()
+            if file_type in Types.MP3:
+                self._Songs += [Song(album_path, file, self)]
+            elif file_type in Types.VIDEO:
+                self._Videos += [Song(album_path, file, self)]
+
             if not self.active:  # interupt by another process
                 return
 
@@ -50,11 +58,6 @@ class Album:
         for song in self._Songs:
             song.set_data(self, self.album_path)
         info("COMPLETE")
-
-    def add_song(self, album_path, file):
-        new_song = Song(album_path, file, self)
-        if not new_song.get_error():
-            self._Songs += [new_song]
 
     # Threading
     def set_inactive(self):

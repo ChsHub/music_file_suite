@@ -1,22 +1,10 @@
-__author__ = 'Christian'
-from os_interface import get_dir_list
-
-
 def get_artist_and_album(album_path):
-
     temp = album_path.split("/")
 
     # split last element in list
     for x in temp.pop().split(" - "):
         temp.append(x)
     return (temp[-2], temp[-1])
-
-
-def get_files(target_path, types):
-    files = get_dir_list(target_path)
-    files = filter(lambda x: x[-4:].lower() in types, files)
-
-    return sorted(files)
 
 
 def track_nr_int_to_str(nr):

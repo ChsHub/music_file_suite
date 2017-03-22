@@ -9,6 +9,7 @@ class MetaData(Enum):
     AlbumArtist = "Album Artist"
     Album = "Album"
 
+
 class Types:
-    MP3 = [".mp3"]
-    VIDEO = [".mp4", ".flv", ".webm"]
+    MP3 = ".mp3"
+    VIDEO = ".mp4,.webm,.flv"

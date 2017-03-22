@@ -36,18 +36,18 @@ class Window:
         self.notebook = Notebook(self.outer_comlumn.get_parent())
 
         # column
+        column1 = Column(self.notebook)
         column2 = Column(self.notebook)
         column3 = Column(self.notebook)
-        column1 = Column(self.notebook)
         # Column 1
         self._preview = Preview(column1.get_parent(), None, self._apply_change_callback)
         StandardSelection(column1.get_parent(), Selection, controller.update_view)
         StdOutput(column1.get_parent())
         # Column 2
-        self._preview = Preview(column2.get_parent(), None, self._apply_change_callback)
+        Preview(column2.get_parent(), None, self._apply_change_callback)
         DownloadInput(column2.get_parent(), color_button, self._Controller.download)
         # Column 3
-        self._preview = Preview(column3.get_parent(), None, self._apply_change_callback)
+        Preview(column3.get_parent(), None, self._apply_change_callback)
         ConvertInput(column3.get_parent(), color_button, self._Controller.convert_all)
 
         self.notebook.add_screen(column1, "Meta")

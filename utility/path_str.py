@@ -8,8 +8,9 @@ def get_clean_path(path):
 def get_full_path(path, file_name):
     return path + "/" + file_name
 
-
+# http://stackoverflow.com/questions/7287996/python-get-relative-path-from-comparing-two-absolute-paths
 def get_relative_path(source, target):
+    raise NotImplementedError
     source = source.split("/")
     target = target.split("/")
 
