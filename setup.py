@@ -23,11 +23,11 @@ os.environ['TCL_LIBRARY'] = "C:\\Python36-32\\tcl\\tcl8.6"
 os.environ['TK_LIBRARY'] = "C:\\Python36-32\\tcl\\tk8.6"
 executables = [Executable('main.py', base=base)]
 
-
 setup(name='simple_Tkinter',
       version='0.1',
       description='Sample cx_Freeze Tkinter script',
       options={"build_exe": build_exe_options},
+      install_requires=[],
       executables=executables)
 # command:
 # python setup.py bdist_msi

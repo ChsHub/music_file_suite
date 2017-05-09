@@ -1,16 +1,19 @@
 from logging import info
-from tkinter import Tk
+from tkinter import Tk, BOTTOM
 
 from colors import color_button
-from column import Column
-from convert_input import ConvertInput
+from standard_view.column import Column
 from download_input import DownloadInput
 from file_input import FileInput
-from notebook import Notebook
+from meta_tags import FileTypes
+from standard_view.notebook import Notebook
 from preview import Preview
-from standard_selection import StandardSelection
+from standard_view.standard_button import StandardButton
+from standard_view.standard_frame import StandardFrame
+from standard_view.standard_selection import StandardSelection
 from std_output import StdOutput
-from texts import text_view_title, Selection
+from texts import text_convert_input
+from texts import text_view_title, SelectionAlbum, SelectionMeta
 
 
 # TODO more Feedback (Apply change, convert, download, ect.)
@@ -22,17 +25,16 @@ class Window:
     _Controller = None
     # gui elements
     _album_selection = None
-    _preview = None
+    _preview_songs = None
     _selection = None
 
     def __init__(self, controller):
         self._Controller = controller
+        self._preview = {}
         self._root = Tk()
         self._root.title(text_view_title)
-        # self._root = StandardFrame(self._root, side=LEFT, fill=BOTH)
         self.outer_comlumn = Column(self._root, pady=0, padx=0)
         self.outer_comlumn.pack()
-
         self.notebook = Notebook(self.outer_comlumn.get_parent())
 
         # column
@@ -40,15 +42,19 @@ class Window:
         column2 = Column(self.notebook)
         column3 = Column(self.notebook)
         # Column 1
-        self._preview = Preview(column1.get_parent(), None, self._apply_change_callback)
-        StandardSelection(column1.get_parent(), Selection, controller.update_view)
+        self._preview[FileTypes.MP3] = Preview(column1.get_parent(), None, self._Controller.set_data)
+        StandardSelection(column1.get_parent(), SelectionAlbum, controller.set_is_album)
+        StandardSelection(column1.get_parent(), SelectionMeta, controller.set_is_meta)
         StdOutput(column1.get_parent())
         # Column 2
-        Preview(column2.get_parent(), None, self._apply_change_callback)
+        Preview(column2.get_parent(), None, self._Controller.set_data)
         DownloadInput(column2.get_parent(), color_button, self._Controller.download)
         # Column 3
-        Preview(column3.get_parent(), None, self._apply_change_callback)
-        ConvertInput(column3.get_parent(), color_button, self._Controller.convert_all)
+        self._preview[FileTypes.VIDEO] = Preview(column3.get_parent(), None,
+                                                 lambda: self._Controller.set_data(FileTypes.VIDEO))
+        button_frame = StandardFrame(master=column3.get_parent(), side=BOTTOM, borderwidth=1)
+        StandardButton(master=button_frame, text=text_convert_input, color=color_button,
+                       callback=self._Controller.convert_all)
 
         self.notebook.add_screen(column1, "Meta")
         self.notebook.add_screen(column2, "Download")
@@ -59,20 +65,9 @@ class Window:
         self._root.mainloop()
         info("WINDOW CLOSED")
 
-    #### GUI FUNCTIONS ####
-
-    def _create_preview(self, data):
-        info("CREATE preview")
-        self._preview.update_view(data)
-
-    #### CALLBACK ####
-
-    def _apply_change_callback(self):
-        self._Controller.set_data()
-
     #### CONTROLLER ####
     def analyze_files(self, album_dir):
         self._Controller.analyze_files(album_dir)
 
-    def set_preview_data(self, data):
-        self._create_preview(data)
+    def set_preview_data(self, data, type):
+        self._preview[type].update_view(data)

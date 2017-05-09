@@ -1,7 +1,7 @@
 import logging
 import re
 import utility.os_interface as os_interface
-from path_str import change_file_name
+from utility.path_str import change_file_name
 
 
 class File_data:
@@ -13,7 +13,6 @@ class File_data:
     _error = False
 
     def __init__(self, file_name):
-
 
         if self._read_song_title(file_name):  # Artist - Song.mp3
             self.is_album = False
@@ -58,8 +57,7 @@ class File_data:
 
     def rename_file(self, album_path, new_name, file_name):
 
-        os_interface.rename_file(album_path, file_name, new_name + '.mp3') # TODO mp3
+        os_interface.rename_file(album_path, file_name, new_name + '.mp3')  # TODO non mp3
 
         self._file_name = new_name
         return 0
-

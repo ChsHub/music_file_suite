@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
-import logging
-import path_str
+
+from logging import info, error
+from mutagen.easyid3 import EasyID3
+from mutagen.mp3 import MP3
 from mutagen._file import File
-from mutagen.id3 import TRCK, TIT2, TPE1, TALB, TPE2
+from mutagen.id3 import ID3, TRCK, TIT2, TPE1, TALB, TPE2
+from utility.path_str import get_full_path
+
 
 # TODO test if set is successful
 
@@ -13,47 +17,37 @@ class Tag:
 
     def __init__(self, path, file_name):
 
-        self._tag = self.__get_tag(path, file_name)
-        self.file_path = path_str.get_full_path(path, file_name)
+        self.file_path = get_full_path(path, file_name)
+        self._tag = self.__get_tag(self.file_path)
 
         if self.file_path is None:
             raise NameError
 
-    def __get_audiofile(self, path, file_name):
+    def __get_tag(self, full_path_uni):
 
-        full_path_uni = path_str.get_full_path(path, file_name)
-
-        audiofile = None
         try:
-            audiofile = File(full_path_uni)
+            # audio_file = File(full_path_uni)
+            audio_file = MP3(full_path_uni)  # , ID3=EasyID3, encoding=3 )#,, ID3=EasyID3, encoding=3
 
         except Exception as e:
-            logging.error("error get audiofile")
-
-        if audiofile is None:
-            logging.error("get_audiofile audiofile is none: " + file_name)
+            error("get audio_file " + full_path_uni)
             return None
 
-        return audiofile
-
-    def __get_tag(self, path, file_name):
-        audiofile = self.__get_audiofile(path, file_name)
-        tag = audiofile
-
-        if tag is None:
-            logging.error("get_tag tag is none: " + file_name)
+        if audio_file is None:
+            error("get_audiofile audio_file is none: " + full_path_uni)
             return None
-        return tag
+
+        return audio_file
 
     def save_tag(self):
         try:
-            self._tag.save(v1=0, v2_version=3)
+            self._tag.save(v1=0, v2_version=3)  #
         except IOError as e:
-            logging.error("FAIL: Save Tag (file disabled wr rights)", "save_tag " + self.file_path, e)
+            error("FAIL: Save Tag (file disabled wr rights)", "save_tag " + self.file_path, e)
         except NotImplementedError as e:
-            logging.error("Implement", self.file_path, e)
+            error("Implement", self.file_path, e)
         except Warning as e:
-            logging.error("reset_tag corrupted file", self.file_path, e)
+            error("reset_tag corrupted file", self.file_path, e)
 
     # GETTER
     def get_attribute(self, attribute_str):
@@ -84,28 +78,38 @@ class Tag:
     def set_tag_title(self, title):
 
         self._tag['TIT2'] = TIT2(encoding=3, text=title)
+        # self._tag['title'] = title
         self.save_tag()
 
     def set_tag_track_num(self, track_num):
 
         if track_num:
             self._tag["TRCK"] = TRCK(encoding=3, text=track_num)
+            # self._tag["track_num"] = track_num
             self.save_tag()
 
     def set_tag_artist(self, artist):
 
         self._tag['TPE1'] = TPE1(encoding=3, text=artist)
+        # self._tag["artist"] = artist
         self.save_tag()
 
     def set_tag_album_artist(self, album_artist):
 
         self._tag["TPE2"] = TPE2(encoding=3, text=album_artist)
+        # self._tag["albumartist"] = album_artist
         self.save_tag()
 
     def set_tag_album(self, album):
 
         self._tag["TALB"] = TALB(encoding=3, text=album)
+        # self._tag["album"] = album
         self.save_tag()
 
     def reset(self):
-        self._tag.clear()
+        if self._tag:
+            self._tag.clear()
+            return True
+        else:
+            error("COULD NOT RESET TAG " + self.file_path)
+            return False

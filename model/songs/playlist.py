@@ -1,6 +1,7 @@
 import playlists
-from utilities import get_playlist_name
-from levenshtein import is_levenshtein_fit
+from utility import get_playlist_name
+from utility.levenshtein import is_levenshtein_fit
+
 
 class Playlist:
     _path_to_old_playlists = "D:\Musik\Wiedergabelisten win"
@@ -14,11 +15,8 @@ class Playlist:
 
         raise NotImplementedError
 
-
     def get_playlist_files(self, path_to_playlists, playlist_name):
         return playlists.playlist_wpl().get_files(path_to_playlists, playlist_name)
-
-
 
     # normal order if not possible
     def get_mp3_files_ordered(self, dir_files, playlist_files):

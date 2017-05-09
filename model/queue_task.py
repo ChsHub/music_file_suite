@@ -1,3 +1,4 @@
+from collections import deque
 from threading import BoundedSemaphore
 
 
@@ -6,25 +7,20 @@ class QueueTask:
     __queue_sem = None
 
     def __init__(self):
-        self.__queue = []
+        self.__queue = deque([])
         self.__queue_sem = BoundedSemaphore(value=1)
 
     def add_element(self, element):
-
-        self.__queue_sem.acquire()
-        not_empty = self.__queue == []
-        self.__queue.append(element)
-        self.__queue_sem.release()
-
+        with self.__queue_sem:
+            not_empty = len(self.__queue) == 0
+            self.__queue.appendleft(element)
 
         while not_empty:
             self.consume_element(self.__queue[0])
 
-            self.__queue_sem.acquire()
-            self.__queue.pop(0)
-            not_empty = self.__queue != []
-            self.__queue_sem.release()
-
+            with self.__queue_sem:
+                self.__queue.popleft()
+                not_empty = len(self.__queue) != 0
 
     def consume_element(self, element):
         raise NotImplementedError

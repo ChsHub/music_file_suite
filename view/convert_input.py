@@ -11,4 +11,4 @@ class ConvertInput(StandardInput):
     def _callback(self):
         super()._callback()
         self._entry.delete(0, END)
-        #self._get_path()
+        # self._get_path()

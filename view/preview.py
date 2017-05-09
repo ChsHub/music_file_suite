@@ -2,9 +2,9 @@ from tkinter.font import Font
 from logging import info
 from tkinter import TOP, LEFT, BOTTOM, X, Y, NO
 from tkinter.ttk import Treeview, Scrollbar
-from meta_data import MetaData
-from standard_button import StandardButton
-from standard_frame import StandardFrame
+from meta_tags import MetaTags
+from standard_view.standard_button import StandardButton
+from standard_view.standard_frame import StandardFrame
 from texts import text_preview_change, text_preview_playlist
 
 
@@ -16,7 +16,7 @@ class Preview(StandardFrame):
         super().__init__(master, borderwidth=1, side=TOP)
         self.preview_frame = StandardFrame(self, TOP, pady=0, fill=Y)
 
-        self._listbox = MultiColumnListbox(self.preview_frame, [str(x.value) for x in MetaData], data)
+        self._listbox = MultiColumnListbox(self.preview_frame, [str(x.value) for x in MetaTags], data)
         info("created List bod")
         # CONTROL FRAMES
         button_frame = StandardFrame(self, side=TOP, padx=0, pady=0, fill=X, expand=NO)
@@ -31,7 +31,7 @@ class Preview(StandardFrame):
         # self._listbox.destroy()
         # self._listbox._build_tree(text_preview_details, data)
         self._listbox.destroy()
-        self._listbox = MultiColumnListbox(self.preview_frame, [str(x.value) for x in MetaData], data)
+        self._listbox = MultiColumnListbox(self.preview_frame, [str(x.value) for x in MetaTags], data)
 
 
 # https://stackoverflow.com/questions/5286093/display-listbox-with-columns-using-tkinter
@@ -75,7 +75,7 @@ class MultiColumnListbox(Treeview):
             col_width = 0
             for song in song_list:
                 if song[col]:
-                    width = Font().measure("i"*len(song[col]))
+                    width = Font().measure("i" * len(song[col]))
                     if col_width < width:
                         col_width = width
             self.column(header[col], width=col_width)

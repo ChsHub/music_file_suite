@@ -1,8 +1,10 @@
+from logging import error, info
 from threading import BoundedSemaphore
+
 from album import Album
 from converter import Converter
 from downloader import Downloader
-from os_interface import exists
+from utility.os_interface import exists
 
 
 class Model:
@@ -24,30 +26,28 @@ class Model:
         if self._Album:
             self._Album.set_inactive()
 
-        self._album_sem.acquire()
-        self._Album = Album(album_dir, self._set_view)
-        self._album_sem.release()
+        with self._album_sem:
+            self._Album = Album(album_dir, self._Controller.set_view)
 
     def set_data(self):
         self._Album.set_data()
 
-    def _set_view(self, data):
-        self._Controller.set_view(data)
+    def set_is_album(self, is_album):
+        with self._album_sem:
+            if self._Album:
+                self._Album.set_is_album(is_album)
 
-    def update_view(self, is_album):
-
-        data = None
-        self._album_sem.acquire()
-        if self._Album:
-            self._Album.set_is_album(is_album)
-            data = self._Album.get_data()
-        self._album_sem.release()
-
-        if data:
-            self._Controller.set_view(data)
+    def set_is_meta(self, is_meta):
+        with self._album_sem:
+            if self._Album:
+                self._Album.set_is_meta(is_meta)
 
     def download_file(self, url):
         self._Downloader.add_element(url)
 
-    def convert_file(self, url):
-        self._Converter.add_element(url)
+    def convert_file(self):
+        with self._album_sem:
+            if self._Album:
+                self._Converter.add_element(element=self._Album.album_path)  # add songs
+            else:
+                info("NO PATH OPENED")

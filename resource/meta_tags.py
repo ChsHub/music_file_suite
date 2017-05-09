@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class MetaData(Enum):
+class MetaTags(Enum):
     FileName = "File Name"
     Artist = "Artist"
     Title = "Title"
@@ -10,6 +10,6 @@ class MetaData(Enum):
     Album = "Album"
 
 
-class Types:
+class FileTypes(Enum):
     MP3 = ".mp3"
     VIDEO = ".mp4,.webm,.flv"

@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 # python-3.5
 from controller import Controller
-from logger import Logger
+from utility.logger import Logger
 
 
 def main():
