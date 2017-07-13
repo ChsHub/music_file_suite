@@ -1,14 +1,14 @@
 import playlists
-from utility import get_playlist_name
 from utility.levenshtein import is_levenshtein_fit
 
 
+# Read old playlists
 class Playlist:
     _path_to_old_playlists = "D:\Musik\Wiedergabelisten win"
 
     def __init__(self, files, album, artist):
         # TODO: rename create_playlist_name
-        playlist_name = get_playlist_name(artist, album)
+        playlist_name = artist + " - " + album + ".wpl"
         playlist_files = self.get_playlist_files(self._path_to_old_playlists, playlist_name)
 
         files = self.get_mp3_files_ordered(files, playlist_files)

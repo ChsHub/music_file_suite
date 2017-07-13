@@ -12,7 +12,7 @@ from utility.path_str import get_full_path
 # TODO test if set is successful
 
 
-class Tag:
+class TagMP3:
     _tag = None
     file_path = None
 
@@ -24,26 +24,22 @@ class Tag:
             raise NameError
 
         try:
-            self._tag = File(self.file_path, easy=True)
+            self._tag = MP3(self.file_path)  # , ID3=EasyID3, encoding=3)
         except Exception as e:
-            error("get audio_file " + self.file_path)
+            error("READ MP3 META " + self.file_path + " " + str(e))
 
         if self._tag is None:
-            error("get_audiofile audio_file is none: " + self.file_path)
-
-        print(type(self._tag))
+            error("READ MP3 META : " + self.file_path + " is none")
 
     def save_tag(self):
         try:
-            self._tag.save()
+            self._tag.save(v1=0, v2_version=3)
         except IOError as e:
             error("FAIL: Save Tag (file disabled wr rights)", "save_tag " + self.file_path, e)
         except NotImplementedError as e:
             error("Implement", self.file_path, e)
         except Warning as e:
             error("reset_tag corrupted file", self.file_path, e)
-        except Exception as e:
-            error(str(e))
 
     # GETTER
     def get_attribute(self, attribute_str):
@@ -56,43 +52,43 @@ class Tag:
         return None
 
     def get_tag_title(self):
-        return self.get_attribute('title')
+        return self.get_attribute('TIT2')
 
     def get_tag_track_num(self):
-        return self.get_attribute('track_num')
+        return self.get_attribute('TRCK')
 
     def get_artist(self):
-        return self.get_attribute('artist')
+        return self.get_attribute('TPE1')
 
     def get_album_artist(self):
-        return self.get_attribute('albumartist')
+        return self.get_attribute('TPE2')
 
     def get_album(self):
-        return self.get_attribute('album')
+        return self.get_attribute('TALB')
 
     # SETTER
     def set_tag_title(self, title):
         if title:
-            self._tag['title'] = title
+            self._tag['TIT2'] = TIT2(encoding=3, text=title)
 
     def set_tag_track_num(self, track_num):
         if track_num:
-            self._tag["track_num"] = track_num
+            self._tag["TRCK"] = TRCK(encoding=3, text=track_num)
 
     def set_tag_artist(self, artist):
         if artist:
-            self._tag["artist"] = artist
+            self._tag['TPE1'] = TPE1(encoding=3, text=artist)
 
     def set_tag_album_artist(self, album_artist):
         if album_artist:
-            self._tag["albumartist"] = album_artist
+            self._tag["TPE2"] = TPE2(encoding=3, text=album_artist)
 
     def set_tag_album(self, album):
         if album:
-            self._tag["album"] = album
+            self._tag["TALB"] = TALB(encoding=3, text=album)
 
     def reset(self):
-        if self._tag != None:
+        if self._tag:
             self._tag.clear()
             return True
         else:

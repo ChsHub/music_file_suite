@@ -12,7 +12,7 @@ class Preview(StandardFrame):
     _listbox = None
     preview_frame = None
 
-    def __init__(self, master, data, apply_change_callback):
+    def __init__(self, master, data, apply_change_callback, make_playlist_callback):
         super().__init__(master, borderwidth=1, side=TOP)
         self.preview_frame = StandardFrame(self, TOP, pady=0, fill=Y)
 
@@ -25,7 +25,7 @@ class Preview(StandardFrame):
         # CONTROL
         StandardButton(text_preview_change, left_button_frame, callback=apply_change_callback).pack(side=BOTTOM)
         # TODO Playlist
-        StandardButton(text_preview_playlist, right_button_frame, callback=None).pack(side=BOTTOM)
+        StandardButton(text_preview_playlist, right_button_frame, callback=make_playlist_callback).pack(side=BOTTOM)
 
     def update_view(self, data):
         # self._listbox.destroy()

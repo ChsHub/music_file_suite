@@ -1,14 +1,15 @@
 # -*- coding: utf8 -*-
 __author__ = 'christian'
-import logging
+from logging import error
 
-import utility.path_str as path_str
-from utility import os_interface as os_interface
+from utility.os_interface import write_file_data, read_file_data
+from utility.path_str import get_relative_path, get_full_path
+from utility.utilities import is_file_type
 
 
 class playlist_wpl:
     def __init__(self):
-        return
+        pass
 
     # filter src path
     def __get_new_track_path(self, old_track_path):
@@ -18,12 +19,12 @@ class playlist_wpl:
     def get_files(self, path, playlist_name):
 
         if ".wpl" not in playlist_name[-4:]:
-            logging.error("wrong playlist name", playlist_name)
+            error("wrong playlist name", playlist_name)
             return None
 
-        old_data = os_interface.read_file_data(path, playlist_name)
+        old_data = read_file_data(path, playlist_name)
         if old_data is None:
-            logging.error("empty playlist " + playlist_name)
+            error("empty playlist " + playlist_name)
             return None
 
         tracks_str = old_data.split("seq")
@@ -32,7 +33,7 @@ class playlist_wpl:
         if (len(tracks_str) is 2):
             tracks = tracks_str[1].split("<media")
             del tracks[0]
-            return map(path_str.get_file_name, map(self.__get_new_track_path, tracks))
+            return map(lambda name: name.split("\\")[-1].split("/")[-1], map(self.__get_new_track_path, tracks))
         else:
             return None
 
@@ -84,27 +85,20 @@ class playlist_xspf:
         depth = self.__step_down(new_data, depth, backlog)
         new_data += ['</playlist>']
 
-        data = "\n".join(new_data)
-
-        os_interface.write_file_data(playlist_path, playlist_name, data)
+        write_file_data(playlist_path, playlist_name, data="\n".join(new_data))
 
 
-class playlist_m3u:
-    def __init__(self):
-        return
+def generate_playlist_m3u(album_path, playlist_path, playlist_name, files):
+    album_path = get_relative_path(playlist_path, album_path)
+    files = [get_full_path(album_path, file) for file in files]
 
-    def generate_playlist(self, album_path, playlist_path, playlist_name, files, playlist_type):
-        album_path = path_str.get_relative_path(playlist_path, album_path)
-        files = [path_str.get_full_path(album_path, file) for file in files]
-        data = "\n".join(files).replace("/", '\\')
-
-        os_interface.write_file_data(playlist_path, playlist_name, data)
+    write_file_data(playlist_path, playlist_name, data="\n".join(files).replace("/", '\\'))
 
 
 # GENERATE the playlist
 def generate_playlist(album_path, playlist_path, playlist_name, files):
-    playlist_type = playlist_name[-4:]
-    if playlist_type in ".m3u" or playlist_type in ".pls":
-        playlist_m3u().generate_playlist(album_path, playlist_path, playlist_name, files, playlist_type)
-    elif playlist_type in ".xspf":
+    if is_file_type(playlist_name, types=[".m3u", ".pls"]):
+        generate_playlist_m3u(album_path, playlist_path, playlist_name, files)
+
+    elif is_file_type(playlist_name, types=".xspf"):
         playlist_xspf().generate_playlist(album_path, playlist_path, playlist_name, files)

@@ -3,12 +3,16 @@
 from controller import Controller
 from utility.logger import Logger
 
+# pip install youtube-dl
+# pip install mutagen
 
 def main():
-    logger = Logger()
+    logger = Logger(5)
     controller = Controller()
     logger.shutdown()
 
-
 if __name__ == '__main__':
+    # TODO database youtube links
+    # TODO upgrade youtube-dl, mutagen
+    # https://stackoverflow.com/questions/2720014/upgrading-all-packages-with-pip
     main()

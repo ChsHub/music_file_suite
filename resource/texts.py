@@ -13,6 +13,8 @@ class SelectionMeta(Enum):
     NO_META = "Ignore/overwrite meta data"
 
 
+SelectionTabs = ["Meta", "Download", "Convert", "Play"]
+
 text_preview_change = "Apply Change"
 text_preview_playlist = "Create Playlist"
 text_download_input = "Download YT"

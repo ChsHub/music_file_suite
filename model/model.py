@@ -51,3 +51,6 @@ class Model:
                 self._Converter.add_element(element=self._Album.album_path)  # add songs
             else:
                 info("NO PATH OPENED")
+
+    def make_playlist(self):
+        pass # TODO

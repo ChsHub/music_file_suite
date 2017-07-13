@@ -20,5 +20,5 @@ class FileInput(StandardInput):
         path = get_clean_path(path)
         info("path: " + path)
 
-        save_input(get_absolute_path("/resource"), "paths.py", "file_path", path)
+        save_input("resource", "paths.py", "file_path", path)  # TODO no hard code
         self._get_path(path)

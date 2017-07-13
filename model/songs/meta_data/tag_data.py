@@ -1,9 +1,12 @@
-from meta_tags import MetaTags
+from meta_tags import MetaTags, FileTypes
 from tag_interface import Tag
+from tag_interface_mp3 import TagMP3
 from logging import error, info
+from utility.utilities import is_file_type
 
 
 class Tag_data:
+    _audio_tag = None
     # meta data
     _album = None
     _album_artist = None
@@ -13,7 +16,14 @@ class Tag_data:
 
     def __init__(self, album_path, file_name):
 
-        self._audio_tag = Tag(album_path, file_name)
+        if is_file_type(file_name, ".mp3"):
+            self._audio_tag = TagMP3(album_path, file_name)
+        else:
+            self._audio_tag = Tag(album_path, file_name)
+
+
+        if not self._audio_tag or not self._audio_tag._tag:
+            pass
 
         album = self._audio_tag.get_album()
         if album:
@@ -35,7 +45,8 @@ class Tag_data:
         if artist:
             self._artist = artist
 
-        info("READ: ", self._album, self._album_artist, self.title, self._track_num, self._artist)
+        info("READ: " + str(self._album) + " " + str(self._album_artist) + " "
+             + str(self.title) + " " + str(self._track_num) + " " + str(self._artist))
 
     def _set_new_tag(self, data):
 
@@ -45,3 +56,4 @@ class Tag_data:
             self._audio_tag.set_tag_track_num(data[MetaTags.TrackNum])
             self._audio_tag.set_tag_album_artist(data[MetaTags.AlbumArtist])
             self._audio_tag.set_tag_album(data[MetaTags.Album])
+            self._audio_tag.save_tag()

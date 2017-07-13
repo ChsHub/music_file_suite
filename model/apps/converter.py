@@ -1,20 +1,33 @@
 # -*- coding: utf8 -*-
 # ffmpeg-20161027-bf14393-win64-static
 
-from logging import info
+from logging import error, info
 from re import sub
-from subprocess import call
+from subprocess import call, check_output
 
-from utility.os_interface import exists, get_cwd, get_dir_list, make_directory, change_dir
+from utility.os_interface import exists, get_cwd, get_dir_list, make_directory, change_dir, get_file_list
 from utility.path_str import get_full_path
-from paths import converter_command
+from utility.encoding import decode
+
+from paths import converter_command, input_command
 from queue_task import QueueTask
-from subprocess import PIPE, run
 
 
 class Converter(QueueTask):
     def __init__(self):
         QueueTask.__init__(self)
+
+    def get_file_extension(self, codec):
+
+        codec = decode(codec)
+        codec = codec.replace("\r", "").replace("\n", "")
+        print(codec)
+        resolve = {'vorbis': 'ogg', 'aac': 'm4a', 'mp3': 'mp3'}
+
+        if codec in resolve.keys():
+            return resolve[codec]
+
+        raise Exception("CODEC NOT SUPPORTED")
 
     def consume_element(self, path):
         os_dir = get_cwd()
@@ -22,21 +35,28 @@ class Converter(QueueTask):
 
         make_directory(path_to_convert_dir)
         change_dir(path_to_convert_dir)
-        files = get_dir_list(path)
+        files = get_file_list(path)
 
         info("Convert: " + str(len(files)) + " files")
-        for file_name_old in files:
-            file_name_new = get_full_path(path=path_to_convert_dir, file_name=sub(r'[^.]*$', 'mp3', file_name_old))
-            file_name_old = get_full_path(path=path, file_name=file_name_old)
 
-            info("Convert: " + file_name_old)
-            if not exists(file_name_new):
+        for input_f in files:
+            input_f = get_full_path(path, input_f)
+            # get codec with probe
+            print("INPUT: " + input_f)
+            audio_codec = check_output(input_command.replace("input", input_f),
+                                       stdin=None, stderr=None, shell=True)
 
-                command = converter_command.replace("input", file_name_old)
-                command = command.replace("output", file_name_new)
+            file_extension = self.get_file_extension(audio_codec)
+            print(file_extension)
+            output_f = sub(r'[^.]*$', file_extension, input_f)  # replace extension
+            output_f = output_f.split("/")[-1]  # remove old path
+            output_f = get_full_path(path_to_convert_dir, output_f)  # new path
 
-                call(command, stdout=None, stderr=None, shell=False)
-               # info(result.returncode, result.stdout, result.stderr)
+            if not exists(output_f):
+                call(converter_command.replace("input", input_f).replace("output", output_f),
+                     stdout=None, stderr=None, shell=False)
+            else:
+                error("Convert: " + input_f)
 
         change_dir(os_dir)
         info("Convert: DONE")

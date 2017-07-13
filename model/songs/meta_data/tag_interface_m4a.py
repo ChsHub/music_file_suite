@@ -6,13 +6,14 @@ from mutagen.mp3 import MP3
 from mutagen._file import File
 from mutagen.id3 import ID3, TRCK, TIT2, TPE1, TALB, TPE2
 from utility.path_str import get_full_path
+from tag_interface import Tag
 
 
 # mutagen-1.37
 # TODO test if set is successful
 
 
-class Tag:
+class Tag(Tag):
     _tag = None
     file_path = None
 
@@ -24,7 +25,7 @@ class Tag:
             raise NameError
 
         try:
-            self._tag = File(self.file_path, easy=True)
+            self._tag = File(self.file_path)
         except Exception as e:
             error("get audio_file " + self.file_path)
 
@@ -72,27 +73,23 @@ class Tag:
 
     # SETTER
     def set_tag_title(self, title):
-        if title:
-            self._tag['title'] = title
+        self._tag['\xa9nam'] = title
 
     def set_tag_track_num(self, track_num):
         if track_num:
-            self._tag["track_num"] = track_num
+            self._tag["trkn"] = track_num
 
     def set_tag_artist(self, artist):
-        if artist:
-            self._tag["artist"] = artist
+        self._tag['\xa9ART'] = artist
 
     def set_tag_album_artist(self, album_artist):
-        if album_artist:
-            self._tag["albumartist"] = album_artist
+        self._tag["aART"] = album_artist
 
     def set_tag_album(self, album):
-        if album:
-            self._tag["album"] = album
+        self._tag["\xa9alb"] = album
 
     def reset(self):
-        if self._tag != None:
+        if self._tag:
             self._tag.clear()
             return True
         else:

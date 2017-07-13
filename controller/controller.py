@@ -45,6 +45,10 @@ class Controller:
         if self._Main_model:
             self.submit(self._Main_model.convert_file)
 
+    def make_playlist(self):
+        if self._Main_model:
+            self.submit(self._Main_model.make_playlist)
+
     # +++Model+++
 
     # called: Model -> Album -> Controller -> Window

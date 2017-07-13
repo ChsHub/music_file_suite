@@ -27,7 +27,7 @@ setup(name='simple_Tkinter',
       version='0.1',
       description='Sample cx_Freeze Tkinter script',
       options={"build_exe": build_exe_options},
-      install_requires=[],
+      install_requires=["utility", "mutagen"],
       executables=executables)
 # command:
 # python setup.py bdist_msi
