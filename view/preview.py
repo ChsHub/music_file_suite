@@ -1,11 +1,12 @@
-from tkinter.font import Font
 from logging import info
 from tkinter import TOP, LEFT, BOTTOM, X, Y, NO
+from tkinter.font import Font
 from tkinter.ttk import Treeview, Scrollbar
-from meta_tags import MetaTags
-from standard_view.standard_button import StandardButton
-from standard_view.standard_frame import StandardFrame
-from texts import text_preview_change, text_preview_playlist
+
+from resource.meta_tags import MetaTags
+from resource.texts import text_preview_change, text_preview_playlist
+from view.standard_view.standard_button import StandardButton
+from view.standard_view.standard_frame import StandardFrame
 
 
 class Preview(StandardFrame):

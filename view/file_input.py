@@ -1,11 +1,12 @@
 from logging import info
 from tkinter import NO, BOTTOM
 from tkinter.filedialog import askdirectory
+
+from resource.texts import text_file_input
 from utility.os_interface import get_absolute_path
-from utility.path_str import get_clean_path
 from utility.os_interface import save_input
-from standard_view.standard_input import StandardInput
-from texts import text_file_input
+from utility.path_str import get_clean_path
+from view.standard_view.standard_input import StandardInput
 
 
 class FileInput(StandardInput):

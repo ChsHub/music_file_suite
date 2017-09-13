@@ -1,7 +1,7 @@
 from tkinter import END
 
-from standard_view.standard_input import StandardInput
-from texts import text_download_input
+from resource.texts import text_download_input
+from view.standard_view.standard_input import StandardInput
 
 
 class DownloadInput(StandardInput):

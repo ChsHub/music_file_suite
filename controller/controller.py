@@ -1,9 +1,9 @@
-from utility.threadPoolExecutor import ThreadPoolExecutor # TODO use concurrent.futures
+from utility.threadPoolExecutor import ThreadPoolExecutor  # TODO use concurrent.futures
 # from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import cpu_count
 from logging import info
 from model.model import Model
-from window import Window
+from view.window import Window
 
 
 # python 3.2+
@@ -14,8 +14,7 @@ class Controller:
         with ThreadPoolExecutor(max_workers=cpu_count() * 2) as executor:
             self.executor = executor
             self._Main_model = Model(self)
-            self._Main_view = Window(self)
-            self._Main_view.start()
+            self.Main_view = Window(self, "Music suite", "Music suite")
 
     def submit(self, *args):  # TODO ERROR
         self.executor.submit(*args)  # .result())
@@ -53,5 +52,5 @@ class Controller:
 
     # called: Model -> Album -> Controller -> Window
     def set_view(self, data, type):
-        if self._Main_view:
-            self._Main_view.set_preview_data(data, type)
+        if self.Main_view:
+            self.Main_view.set_preview_data(data, type)

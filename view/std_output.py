@@ -1,8 +1,8 @@
 import sys
 from tkinter import TOP, YES, X
 
-from standard_view.standard_frame import StandardFrame
-from standard_view.standard_label import StandardLabel
+from view.standard_view.standard_frame import StandardFrame
+from view.standard_view.standard_label import StandardLabel
 
 
 class StdOutput(StandardFrame):
