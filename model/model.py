@@ -43,12 +43,12 @@ class Model:
                 self._Album.set_is_meta(is_meta)
 
     def download_file(self, url):
-        self._Downloader.add_element(url)
+        self._Downloader.consume_element(url)
 
     def convert_file(self):
         with self._album_sem:
             if self._Album:
-                self._Converter.add_element(element=self._Album.album_path)  # add songs
+                self._Converter.consume_element(self._Album.album_path)  # add songs
             else:
                 info("NO PATH OPENED")
 
