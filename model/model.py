@@ -14,9 +14,9 @@ class Model:
     _Converter = None
     _album_sem = None
 
-    def __init__(self, Controller):
-        self._Controller = Controller
-        self._Downloader = Downloader()
+    def __init__(self, controller):
+        self._Controller = controller
+        self._Downloader = Downloader(self)
         self._Converter = Converter()
         self._album_sem = BoundedSemaphore(value=1)
 
@@ -45,12 +45,12 @@ class Model:
     def download_file(self, url):
         self._Downloader.consume_element(url)
 
-    def convert_file(self):
+    def convert_file(self, path):
         with self._album_sem:
-            if self._Album:
-                self._Converter.consume_element(self._Album.album_path)  # add songs
-            else:
-                info("NO PATH OPENED")
+            self._Converter.consume_element(path)  # add songs
 
     def make_playlist(self):
         pass # TODO
+
+    def set_download_progress(self, percent):
+        self._Controller.set_download_progress(percent)

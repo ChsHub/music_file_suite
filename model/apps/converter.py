@@ -1,9 +1,9 @@
 # -*- coding: utf8 -*-
-# ffmpeg-20161027-bf14393-win64-static
+import ffmpeg # todo
 
 from logging import error, info
 from re import sub
-from subprocess import call, check_output
+from subprocess import call, getoutput, check_call
 from threading import BoundedSemaphore
 
 from utility.encoding import decode
@@ -15,11 +15,12 @@ from paths import converter_command, input_command
 
 class Converter:
     def __init__(self):
+
+
         self.convert_sem = BoundedSemaphore(value=1)
 
     def get_file_extension(self, codec):
 
-        codec = decode(codec)
         codec = codec.replace("\r", "").replace("\n", "")
         print(codec)
         resolve = {'vorbis': 'ogg', 'aac': 'm4a', 'mp3': 'mp3'}
@@ -47,8 +48,12 @@ class Converter:
                 input_f = get_full_path(path, input_f)
                 # get codec with probe
                 print("INPUT: " + input_f)
-                audio_codec = check_output(input_command.replace("input", input_f),
-                                           stdin=None, stderr=None, shell=True)
+
+                #stream = ffmpeg.input(input_f)
+                #stream = ffmpeg.output(stream, filename="o.mp3")
+                #audio_codec = ffmpeg.run(stream)
+                print(input_command.replace("input", input_f))
+                audio_codec = getoutput(input_command.replace("input", input_f))#, shell=True)
 
                 file_extension = self.get_file_extension(audio_codec)
 

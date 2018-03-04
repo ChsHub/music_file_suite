@@ -10,11 +10,14 @@ from view.window import Window
 
 
 class Controller:
+    Main_view = None
+    _Main_model = None
+
     def __init__(self):
-        with ThreadPoolExecutor(max_workers=cpu_count() * 2) as executor:
-            self.executor = executor
-            self._Main_model = Model(self)
-            self.Main_view = Window(self, "Music suite", "Music suite")
+        self.executor = ThreadPoolExecutor()
+
+        self._Main_model = Model(self)
+        self.Main_view = Window(self)
 
     def submit(self, *args):  # TODO ERROR
         self.executor.submit(*args)  # .result())
@@ -40,9 +43,9 @@ class Controller:
         if self._Main_model:
             self.submit(self._Main_model.download_file, url)
 
-    def convert_all(self):
+    def convert_all(self, path):
         if self._Main_model:
-            self.submit(self._Main_model.convert_file)
+            self.submit(self._Main_model.convert_file, path)
 
     def make_playlist(self):
         if self._Main_model:
@@ -54,3 +57,6 @@ class Controller:
     def set_view(self, data, type):
         if self.Main_view:
             self.Main_view.set_preview_data(data, type)
+
+    def set_download_progress(self, percent):
+        self.Main_view.set_download_progress(percent)

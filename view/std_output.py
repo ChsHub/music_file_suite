@@ -1,24 +1,27 @@
 import sys
-from tkinter import TOP, YES, X
 
 from view.standard_view.standard_frame import StandardFrame
-from view.standard_view.standard_label import StandardLabel
+import toga
+
+#class IORedirector:
 
 
-class StdOutput(StandardFrame):
-    def __init__(self, master):
-        super().__init__(master, TOP, borderwidth=1)
+class StdOutput(toga.Box):
+    def __init__(self):
+        super().__init__()
 
-        self.label = StandardLabel('', self).pack(expand=YES, fill=X)
+        self.label = toga.Label('Nandemo')
+        self.add(self.label)
 
     def start_output(self):
-        self.temp = sys.stdout  # store original stdout object for later
-        sys.stdout = self.create_label
+        sys.stdout = self
 
     def stop_output(self):
         sys.stdout.close()  # ordinary file object
-        sys.stdout = self.temp  # restore print commands to interactive prompt
+        sys.stdout = sys.__stdout__  # restore print commands to interactive prompt
         print("back to normal")  # this shows up in the interactive prompt
 
-    def create_label(self, output):
-        self.label = StandardLabel('', self).pack(expand=YES, fill=X)
+    def write(self, output):
+        print("Hi")
+        self.label = toga.Label(output)
+        self.add(self.label)
