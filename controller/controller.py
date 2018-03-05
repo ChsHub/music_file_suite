@@ -1,7 +1,8 @@
-from utility.threadPoolExecutor import ThreadPoolExecutor  # TODO use concurrent.futures
-# from concurrent.futures import ThreadPoolExecutor
-from multiprocessing import cpu_count
+#from utility.threadPoolExecutor import ThreadPoolExecutor  # TODO use concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
 from logging import info
+
+from model.apps.converter import Converter
 from model.model import Model
 from view.window import Window
 
@@ -17,15 +18,16 @@ class Controller:
         self.executor = ThreadPoolExecutor()
 
         self._Main_model = Model(self)
+        self._Converter = Converter(self)
         self.Main_view = Window(self)
 
     def submit(self, *args):  # TODO ERROR
         self.executor.submit(*args)  # .result())
 
     # +++View+++
-    def analyze_files(self, file_path):
+    def analyze_files(self, path, files):
         if self._Main_model:
-            self.submit(self._Main_model.analyze_files, file_path)
+            self.submit(self._Main_model.analyze_files, path, files)
 
     def set_data(self):
         if self._Main_model:
@@ -43,13 +45,17 @@ class Controller:
         if self._Main_model:
             self.submit(self._Main_model.download_file, url)
 
-    def convert_all(self, path):
-        if self._Main_model:
-            self.submit(self._Main_model.convert_file, path)
+    def add_convert(self, path, files):
+        if self._Converter:
+            self.submit(self._Converter.consume_element, path, files)
 
     def make_playlist(self):
         if self._Main_model:
             self.submit(self._Main_model.make_playlist)
+
+    def start_convert(self, selection):
+        if self._Converter:
+            self.submit(self._Converter.start_convert, selection)
 
     # +++Model+++
 
@@ -60,3 +66,9 @@ class Controller:
 
     def set_download_progress(self, percent):
         self.Main_view.set_download_progress(percent)
+
+    def set_convert_progress(self, id, percent):
+        self.Main_view.set_convert_progress(id, percent)
+
+    def add_convert_line(self, line):
+        self.Main_view.add_convert_line(line)

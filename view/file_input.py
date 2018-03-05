@@ -1,25 +1,22 @@
-from logging import info
-from tkinter import NO, BOTTOM
-from tkinter.filedialog import askdirectory
+from wx import FileDialog, FD_OPEN, \
+    FD_FILE_MUST_EXIST, FD_MULTIPLE, ID_CANCEL
 
-from resource.texts import text_file_input
-from utility.os_interface import get_absolute_path
-from utility.os_interface import save_input
-from utility.path_str import get_clean_path
+from resource.meta_tags import FileTypes
+from resource.texts import text_open_file_title, text_open_file
 from view.standard_view.standard_input import StandardInput
 
 
 class FileInput(StandardInput):
-    def __init__(self, master, color, controller_callback):
-        super().__init__(master, color, controller_callback, text_file_input, expand=NO, side=BOTTOM)
 
-    def _callback(self):
-        path = askdirectory()
+    def button_callback(self, event):
+        file_types = FileTypes.VIDEO.value.replace(".", "*.").replace(",", ";")
 
-        if path == "":
-            return
-        path = get_clean_path(path)
-        info("path: " + path)
+        with FileDialog(self, text_open_file_title, "", "", wildcard=text_open_file +'('+ file_types+')|' + file_types,
+                        style=FD_OPEN | FD_FILE_MUST_EXIST | FD_MULTIPLE) as dialog:
+            if dialog.ShowModal() == ID_CANCEL:
+                return  # the user changed their mind
+            path = dialog.Directory
+            files = dialog.Filenames
 
-        save_input("resource", "paths.py", "file_path", path)  # TODO no hard code
-        self._get_path(path)
+        self._callback(path=path, files=files)
+        self._text_input.SetValue("")

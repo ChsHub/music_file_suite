@@ -13,9 +13,7 @@ class Table(ListCtrl):
     row_index = 0
 
     def __init__(self, parent, headers):
-        super().__init__(parent, size=(-1, 100),
-                                     style=LC_REPORT
-                                           | BORDER_SUNKEN)
+        super().__init__(parent, size=(-1, 100), style=LC_REPORT | BORDER_SUNKEN)
         # sizer = Grid(self)#cols=len(headers))
 
         for i, text in enumerate(headers):
@@ -36,13 +34,14 @@ class Table(ListCtrl):
     def update_cell(self, data, column, row=row_index):
         self.SetItem(row, column, data)
 
+
 class Preview(Panel):
     _listbox = None
 
     def __init__(self, parent, *buttons):
         super().__init__(parent)
 
-        self._listbox = Table(self, headers=[str(x.value) for x in MetaTags])#, size=(600, 200))
+        self._listbox = Table(self, headers=[str(x.value) for x in MetaTags])  # , size=(600, 200))
 
         # CONTROL FRAMES
         button_frame = Panel(self)

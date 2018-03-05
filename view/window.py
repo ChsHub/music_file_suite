@@ -1,24 +1,19 @@
-from wx import App, Frame, Notebook, Panel, StaticText, Button, EXPAND, BoxSizer, VERTICAL, HORIZONTAL, GridSizer
+
+from wx import App, Frame, Notebook, Panel, EXPAND, BoxSizer, VERTICAL, EVT_CLOSE, \
+    HORIZONTAL, GridSizer
 from view.preview import Table
 
-from resource.meta_tags import FileTypes
-from resource.texts import SelectionTabs, text_convert_input, text_download_input, text_preview_change
+from resource.texts import SelectionTabs, text_convert_input, text_download_input, text_preview_change, \
+    text_selction_meta, text_selction_album, SelectionCodecs
 from resource.texts import text_view_title, SelectionAlbum, SelectionMeta
 from view.file_input import FileInput
 from view.preview import Preview
-from view.standard_view.colors import color_button
-from view.standard_view.column import Column
-# from view.standard_view.standard_button import StandardButton
-# from view.standard_view.standard_frame import StandardFrame
 from view.standard_view.standard_input import StandardInput
-# from view.standard_view.standard_radiobutton import StandardRadiobutton
-# from view.standard_view.standard_selection import StandardSelection
-from view.std_output import StdOutput
+from view.standard_view.standard_selection import StandardSelection
 from resource.texts import text_preview_change, text_preview_playlist
+from view.standard_view.standard_button import StandardButton
 
-
-# TODO more Feedback (Apply change, convert, download, ect.)
-# TODO Strech Window
+# TODO more Feedback (Apply change, convert, ect.)
 
 
 class Window(App):
@@ -28,12 +23,16 @@ class Window(App):
     _album_selection = None
     _preview_songs = None
     _selection = None
+    _frame = None
+    _convert_list = None
 
     def __init__(self, controller):
         super().__init__()
         self._Controller = controller
 
-        frame = Frame(None, title='Music Suite')  # Create a Window TODO title
+        frame = Frame(None, title=text_view_title, size=(600, 300))  # Create a Window
+        self._frame = frame
+        frame.Bind(EVT_CLOSE, lambda x: frame.Destroy())  # Close Window
 
         self.notebook = Notebook(frame, EXPAND)  # Tabs
         # tabs
@@ -42,33 +41,34 @@ class Window(App):
         for label in SelectionTabs:
             tabs.append(Panel(self.notebook, EXPAND))
 
-        self.init_tab_meta(tabs[0])
-        self.init_tab_download(tabs[1])
-        self.init_tab_convert(tabs[2])
+        self.init_tab_download(tabs[0])
+        self.init_tab_convert(tabs[1])
+        self.init_tab_meta(tabs[2])
 
         for i, label in enumerate(SelectionTabs):
             self.notebook.AddPage(tabs[i], label)
 
+        frame.Layout()  # Update Layout to fix black square
         frame.Show()
         return
-        # Column 1
-        StandardSelection(tabs[0].get_parent(), SelectionAlbum, self._Controller.set_is_album)
-        StandardSelection(tabs[0].get_parent(), SelectionMeta, self._Controller.set_is_meta)
-        StdOutput(tabs[0].get_parent())
-        # Column 2
-        # Column 3
-
-        # button_frame = StandardFrame(master=tabs[2].get_parent(), side=BOTTOM, borderwidth=1)
-        # StandardButton(master=button_frame, text=text_convert_input, color=color_button,
-        #               callback=self._Controller.convert_all)
-
-        FileInput(self.outer_comlumn.get_parent(), color_button, self.analyze_files).pack(padx=10, pady=10)
 
     def init_tab_meta(self, tab):
+
         sizer = BoxSizer(VERTICAL)
-        sizer.Add(StandardInput(tab), 1, EXPAND)
+        sizer.Add(StandardInput(tab, self.analyze_files), 1, EXPAND)
         sizer.Add(Preview(tab, [self._Controller.set_data, text_preview_change],
                           [self._Controller.make_playlist, text_preview_playlist]), 1, EXPAND)
+
+        selections = Panel(tab)
+        sizer.Add(selections)
+        sel_sizer = BoxSizer(HORIZONTAL)
+        sel_sizer.Add(
+            StandardSelection(parent=selections, radio_enum=SelectionAlbum, callback=self._Controller.set_is_album,
+                              title=text_selction_album))
+        sel_sizer.Add(
+            StandardSelection(parent=selections, radio_enum=SelectionMeta, callback=self._Controller.set_is_meta,
+                              title=text_selction_meta))
+        selections.SetSizer(sel_sizer)
         tab.SetSizer(sizer)
 
     def init_tab_download(self, tab):
@@ -81,23 +81,38 @@ class Window(App):
         tab.SetSizer(sizer)
 
     def init_tab_convert(self, tab):
-        # Column 3 CONVERT
-        convert_input = StandardInput(tab)
-        # tabs[2].add(convert_input)
-        # tabs[2].add(Preview([lambda x: self._Controller.convert_all(convert_input.get_input()),
-        #                     text_convert_input]))
+        convert_input = FileInput(tab, self._Controller.add_convert)
+        self._convert_list = Table(tab, headers=["File", "Progress"])
+        sizer = BoxSizer(VERTICAL)
+        sizer.Add(convert_input, 1, EXPAND)
+        self.codec_selection = StandardSelection(tab, callback=None, title="Codec", radio_enum=SelectionCodecs)
+        sizer.Add(self.codec_selection)
+        sizer.Add(StandardButton(tab, text="Start",
+                                 callback=self.start_convert))
+
+        sizer.Add(self._convert_list, 1, EXPAND)
+        tab.SetSizer(sizer)
+
+    def start_convert(self, event):
+        self._Controller.start_convert(self.codec_selection.get_selection())
 
     #### CONTROLLER ####
-    def analyze_files(self, album_dir):
-        self._Controller.analyze_files(album_dir)
+    def analyze_files(self, path, files):
+        self._Controller.analyze_files(path, files)
 
     def set_preview_data(self, data, type):
+        raise NotImplementedError
         self._preview[type].update_view(data)
 
     def _download(self, url):
-
         self._download_list.add_line([url, "0%"])
         self._Controller.download(url)
 
     def set_download_progress(self, percent):
         self._download_list.update_cell(data=percent, column=1)
+
+    def set_convert_progress(self, id, percent):
+        self._convert_list.update_cell(percent, 1, row=id)
+
+    def add_convert_line(self, line):
+        self._convert_list.add_line(line)

@@ -13,11 +13,24 @@ class SelectionMeta(Enum):
     NO_META = "Ignore/overwrite meta data"
 
 
-SelectionTabs = ["Meta", "Download", "Convert", "Play"]
+class SelectionCodecs(Enum):
+    EXTRACT = "Extract Audio only (Keep format)"
+    CODEC2 = "MP3 Best Quality"
+    CODEC3 = "Optimised MP3"
+
+
+SelectionTabs = ["Download", "Convert", "Meta", "Config"]
 
 text_preview_change = "Apply Change"
 text_preview_playlist = "Create Playlist"
 text_download_input = "Download YT"
 text_convert_input = "Convert"
 text_file_input = "Open File"
-text_view_title = 'mp3 organize'
+text_view_title = 'Music Suite'
+text_open_file_title = "Open Files"
+text_open_file = "Music or Video"
+
+text_selction_meta = "Previous Meta Data"
+text_selction_album = "Is Album"
+
+convert_directory = "CONVERTED"

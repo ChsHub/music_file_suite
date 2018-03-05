@@ -1,22 +1,19 @@
-from tkinter import IntVar, W, LEFT, TOP
-
-from view.standard_view.standard_frame import StandardFrame
-from view.standard_view.standard_radiobutton import StandardRadiobutton
+from wx import ComboBox, CB_DROPDOWN, CB_READONLY, EVT_TEXT, Panel, StaticText, BoxSizer, VERTICAL
 
 
-class StandardSelection(StandardFrame):
-    radio = None
+class StandardSelection(Panel):
+    def __init__(self, parent, callback, title, radio_enum):
+        super().__init__(parent)
 
-    def __init__(self, master, radio_enum, get_data):
-        super().__init__(master, side=TOP, borderwidth=1, padx=10, pady=10)
+        sizer = BoxSizer(VERTICAL)
+        sizer.Add(StaticText(self, label=title))
+        self.selection = ComboBox(self, style=CB_DROPDOWN | CB_READONLY,
+                                  choices=[choice.value for choice in radio_enum])
+        self.selection.SetValue(list(radio_enum)[0].value)
+        if callback:
+            self.selection.Bind(EVT_TEXT, lambda x: callback(self.selection.GetValue()))
+        sizer.Add(self.selection)
+        self.SetSizer(sizer)
 
-        # StandardLabel(title, self, 0, 0, color).pack()
-        self._get_data = get_data
-        self.radio_values = list(radio_enum)
-        self._index = IntVar()
-
-        for i, text in enumerate([s.value for s in radio_enum]):
-            b = StandardRadiobutton(self, text=text,
-                                    variable=self._index, value=i,
-                                    command=lambda: self._get_data(self.radio_values[self._index.get()]))
-            b.pack(anchor=W, side=LEFT)
+    def get_selection(self):
+        return self.selection.GetValue()

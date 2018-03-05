@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 from logging import info, error
 from file_data import File_data
-from meta_tags import MetaTags
+from resource.meta_tags import MetaTags
 from tag_data import Tag_data
 
 

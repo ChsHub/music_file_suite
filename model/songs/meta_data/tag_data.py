@@ -1,4 +1,4 @@
-from meta_tags import MetaTags, FileTypes
+from resource.meta_tags import MetaTags, FileTypes
 from tag_interface import Tag
 from tag_interface_mp3 import TagMP3
 from logging import error, info

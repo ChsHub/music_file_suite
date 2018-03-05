@@ -4,10 +4,32 @@ from subprocess import PIPE, Popen
 from threading import BoundedSemaphore
 from re import findall
 from utility.os_interface import get_cwd, change_dir, get_file_count
+from utility.encoding import decode
 from tempfile import TemporaryFile
-from paths import downloader_command, path_to_download_dir
+from resource.paths import downloader_command, path_to_download_dir
 
 
+class StdOutput(): # TODO remove
+
+    def stop_output(self):
+        pass
+
+    def write_string(self, s, out=None, encoding=None):
+        print("HOLLOA")
+
+    def read(self):
+        return ""
+
+    def close(self):
+        return ""
+
+    def write(self, *args, **kwargs):
+        print("Hi")
+        print(args)
+        return args
+
+
+# TODO KILL/STOP
 class Downloader:
     __model = None
 
@@ -26,34 +48,25 @@ class Downloader:
 
             change_dir(path_to_download_dir)
 
-            process = Popen(downloader_command + [url], stdin=None, stdout=PIPE, stderr=None, shell=True)
+            process = Popen(downloader_command + [url], stdin=None, stdout=PIPE, stderr=None, shell=False)
 
-            # print(type(process.stdout))
+            # process.stdout = StdOutput()
+            # err, out = process.communicate()
+            # return
 
-            while process.stdout:
-                data = str(process.stdout.read(174))
-                print(data)
+            data = '0%'
+            while data:
                 data = findall(match, data)
                 if data:
                     self.__model.set_download_progress(data[-1])
-                # lines = data.split("\r")
-                # data = lines.pop()
-                # for line in lines:
-                #    print(line)
-
-            try:
-                outs, errs = process.communicate()
-            # print(outs)
-            # print(errs)
-            # print(argv)
-            except Exception as e:
-                process.kill()
-                outs, errs = process.communicate()
+                data = decode(process.stdout.read(108))
+                print(data)
 
             change_dir(os_dir)
 
-        # TODO remove
-        if file_count + 1 != get_file_count(path_to_download_dir):
-            error("DOWNLOAD: " + url)
-        else:
-            info("DOWNLOAD: DONE")
+        info("FINISH DOWNLOAD")
+
+
+if __name__ == "__main__":
+    d = Downloader(None)
+    d.consume_element('')

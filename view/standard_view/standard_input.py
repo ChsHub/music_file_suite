@@ -1,5 +1,7 @@
+from logging import error
+
 from wx import Panel, TextCtrl, Button, BoxSizer, EXPAND, HORIZONTAL, App, Frame, EVT_BUTTON
-from wx.grid import Grid
+
 from resource.texts import text_file_input
 
 
@@ -7,8 +9,12 @@ class StandardInput(Panel):
     _text_input = None
     _callback = None
 
-    def __init__(self, parent, padding=30, width=300, button_text=text_file_input, callback=None):
+    def __init__(self, parent, callback, padding=30, width=300, button_text=text_file_input):
         super().__init__(parent, EXPAND)
+
+        if not callback:
+            error("callback is none")
+            return
 
         self._callback = callback
         sizer = BoxSizer(HORIZONTAL)
@@ -22,21 +28,19 @@ class StandardInput(Panel):
 
         self.SetSizer(sizer)
 
-        # self.add(toga.Button(button_text, on_press=self.button_callback,  style=CSS())) # TODO open file dialoge
-        # self.add(toga.Button(text, on_press=self.button_callback, style=CSS())) # adding width on Button changes row
-
     def button_callback(self, event):
         self._callback(self._text_input.GetValue())
-        self._text_input.value = ""
+        self._text_input.SetValue("")
 
-    def get_input(self):
-        return self._text_input.value
+    def get_input(self):  # TODO remove
+        return self._text_input.GetValue()
+
 
 if __name__ == "__main__":
     app = App()
     frame = Frame(None, -1, 'win.py')
 
-    StandardInput(frame)
+    StandardInput(frame, lambda x: x)
 
     frame.Show()
     app.MainLoop()

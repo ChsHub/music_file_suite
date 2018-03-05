@@ -1,10 +1,10 @@
 from logging import info
 
-from meta_tags import FileTypes
-from meta_tags import MetaTags
+from resource.meta_tags import FileTypes
+from resource.meta_tags import MetaTags
 from utility.os_interface import get_dir_list
 from song import Song
-from texts import SelectionAlbum, SelectionMeta
+from resource.texts import SelectionAlbum, SelectionMeta
 from utility.utilities import get_artist_and_album
 
 
