@@ -1,20 +1,15 @@
-from logging import error, info
 from threading import BoundedSemaphore
 
 from album import Album
-from model.apps.downloader import Downloader
-from utility.os_interface import exists
 
 
 class Model:
     _Controller = None
     _Album = None
-    _Downloader = None
     _album_sem = None
 
     def __init__(self, controller):
         self._Controller = controller
-        self._Downloader = Downloader(self)
         self._album_sem = BoundedSemaphore(value=1)
 
     def analyze_files(self, path, files):
@@ -22,7 +17,7 @@ class Model:
             self._Album.set_inactive()
 
         with self._album_sem:
-            self._Album = Album(album_dir, self._Controller.set_view)
+            self._Album = Album(path, self._Controller.set_view)
 
     def set_data(self):
         self._Album.set_data()
@@ -37,11 +32,8 @@ class Model:
             if self._Album:
                 self._Album.set_is_meta(is_meta)
 
-    def download_file(self, url):
-        self._Downloader.consume_element(url)
-
     def make_playlist(self):
-        pass # TODO
+        pass  # TODO
 
     def set_download_progress(self, percent):
         self._Controller.set_download_progress(percent)

@@ -32,7 +32,7 @@ class StandardInput(Panel):
         self._callback(self._text_input.GetValue())
         self._text_input.SetValue("")
 
-    def get_input(self):  # TODO remove
+    def get_input(self):  # TODO Alternative Implementation / Refactor Window
         return self._text_input.GetValue()
 
 

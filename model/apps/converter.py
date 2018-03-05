@@ -1,12 +1,11 @@
 # -*- coding: utf8 -*-
-# import ffmpeg   todo
 
 from logging import error, info
 from re import sub
 from subprocess import getoutput, Popen
 from threading import BoundedSemaphore
 
-from utility.encoding import decode
+from utility.encoding import decode # TODO TEST for UTF-8 safety
 from utility.os_interface import exists, get_cwd, make_directory, change_dir, get_file_list
 from utility.path_str import get_full_path
 from resource.texts import convert_directory
@@ -33,7 +32,7 @@ class Converter:
         info(selection)
         strategy = SelectionCodecs(selection)
 
-        # TODO
+        # TODO Refactor converter
         # 1 convert into temp
         # 2 make dir
         # 3 copy to dir

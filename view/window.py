@@ -1,6 +1,7 @@
-
 from wx import App, Frame, Notebook, Panel, EXPAND, BoxSizer, VERTICAL, EVT_CLOSE, \
-    HORIZONTAL, GridSizer
+    HORIZONTAL, GridSizer, StaticText
+from wx.lib.agw.hyperlink import HyperLinkCtrl
+
 from view.preview import Table
 
 from resource.texts import SelectionTabs, text_convert_input, text_download_input, text_preview_change, \
@@ -12,6 +13,7 @@ from view.standard_view.standard_input import StandardInput
 from view.standard_view.standard_selection import StandardSelection
 from resource.texts import text_preview_change, text_preview_playlist
 from view.standard_view.standard_button import StandardButton
+
 
 # TODO more Feedback (Apply change, convert, ect.)
 
@@ -44,6 +46,7 @@ class Window(App):
         self.init_tab_download(tabs[0])
         self.init_tab_convert(tabs[1])
         self.init_tab_meta(tabs[2])
+        self._init_tab_config(tabs[3])
 
         for i, label in enumerate(SelectionTabs):
             self.notebook.AddPage(tabs[i], label)
@@ -92,6 +95,13 @@ class Window(App):
 
         sizer.Add(self._convert_list, 1, EXPAND)
         tab.SetSizer(sizer)
+
+    def _init_tab_config(self, tab):
+        sizer = BoxSizer(VERTICAL)
+        text = HyperLinkCtrl(tab, label="https://www.youtube.com/")
+        sizer.Add(text, 1, EXPAND)
+        tab.SetSizer(sizer)
+        # text.GotoURL(URL="") TODO BUTTONS FOR LIBS
 
     def start_convert(self, event):
         self._Controller.start_convert(self.codec_selection.get_selection())

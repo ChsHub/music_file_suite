@@ -8,27 +8,6 @@ from utility.encoding import decode
 from tempfile import TemporaryFile
 from resource.paths import downloader_command, path_to_download_dir
 
-
-class StdOutput(): # TODO remove
-
-    def stop_output(self):
-        pass
-
-    def write_string(self, s, out=None, encoding=None):
-        print("HOLLOA")
-
-    def read(self):
-        return ""
-
-    def close(self):
-        return ""
-
-    def write(self, *args, **kwargs):
-        print("Hi")
-        print(args)
-        return args
-
-
 # TODO KILL/STOP
 class Downloader:
     __model = None
@@ -39,6 +18,7 @@ class Downloader:
 
     # TODO test directory delete
     def consume_element(self, url):
+
         match = r'(\d*\.?\d%)'
 
         with self.download_sem:
@@ -65,8 +45,3 @@ class Downloader:
             change_dir(os_dir)
 
         info("FINISH DOWNLOAD")
-
-
-if __name__ == "__main__":
-    d = Downloader(None)
-    d.consume_element('')

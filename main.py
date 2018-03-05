@@ -12,7 +12,11 @@ def main():
     logger.shutdown()
 
 if __name__ == '__main__':
-    # TODO database youtube links
+    # TODO youtube link history
+    # TODO Resume in next session
+    # TODO Settings
+    # TODO Languages
+    # TODO Window layout
     # TODO upgrade youtube-dl, mutagen
     # https://stackoverflow.com/questions/2720014/upgrading-all-packages-with-pip
     main()
