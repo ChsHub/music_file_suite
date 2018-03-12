@@ -1,10 +1,10 @@
 from logging import info
 
-from resource.meta_tags import FileTypes
-from resource.meta_tags import MetaTags
+from src.resource.meta_tags import FileTypes
+from src.resource.meta_tags import MetaTags
 from utility.os_interface import get_dir_list
-from song import Song
-from resource.texts import SelectionAlbum, SelectionMeta
+from src.model.songs.song import Song
+from src.resource.texts import SelectionAlbum, SelectionMeta
 from utility.utilities import get_artist_and_album
 
 
@@ -82,6 +82,7 @@ class Album:
 
         self.set_all_view()
 
-    # Threading
+    # +++ Threading +++
+
     def set_inactive(self):
         self.active = False

@@ -6,7 +6,7 @@ from re import findall
 from utility.os_interface import get_cwd, change_dir, get_file_count
 from utility.encoding import decode
 from tempfile import TemporaryFile
-from resource.paths import downloader_command, path_to_download_dir
+from src.resource.paths import downloader_command, path_to_download_dir
 
 # TODO KILL/STOP
 class Downloader:

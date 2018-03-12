@@ -15,8 +15,8 @@ class SelectionMeta(Enum):
 
 class SelectionCodecs(Enum):
     EXTRACT = "Extract Audio only (Keep format)"
-    CODEC2 = "MP3 Best Quality"
-    CODEC3 = "Optimised MP3"
+    MP3 = "High quality mp3"
+    OPUS = "Opus transparent"
 
 
 SelectionTabs = ["Download", "Convert", "Meta", "Config"]

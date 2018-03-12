@@ -1,6 +1,6 @@
-from resource.meta_tags import MetaTags, FileTypes
-from tag_interface import Tag
-from tag_interface_mp3 import TagMP3
+from src.model.songs.meta_data.tag_interface import Tag
+from src.model.songs.meta_data.tag_interface_mp3 import TagMP3
+from src.resource.meta_tags import MetaTags, FileTypes
 from logging import error, info
 from utility.utilities import is_file_type
 

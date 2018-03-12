@@ -1,10 +1,10 @@
 # python 3.2+
 from concurrent.futures import ThreadPoolExecutor
 from logging import error
-from model.apps.downloader import Downloader
-from model.apps.converter import Converter
-from model.model import Model
-from view.window import Window
+from src.model.apps.downloader import Downloader
+from src.model.apps.converter import Converter
+from src.model.model import Model
+from src.view.window import Window
 
 
 class Controller:

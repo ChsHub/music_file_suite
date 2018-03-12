@@ -1,8 +1,10 @@
 # -*- coding: utf8 -*-
 from logging import info, error
-from file_data import File_data
-from resource.meta_tags import MetaTags
-from tag_data import Tag_data
+
+from src.model.songs.meta_data.file_data import File_data
+from src.model.songs.meta_data.tag_data import Tag_data
+from src.resource.meta_tags import MetaTags
+
 
 
 class Song:

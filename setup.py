@@ -22,12 +22,12 @@ setup(
     author='tsts',
     author_email='tst',
     license='Other',
-    packages=find_packages(exclude=['docs', 'tests', 'build']),
+    packages=find_packages(exclude=['docs', 'tests', 'build', 'documents', 'generate', 'generated_tests']),
     classifiers=[
         'Development Status :: 1 - Planning',
         'License :: OSI Approved :: Other',
     ],
-    install_requires=["utility", "mutagen", "youtube-dl"],
+    install_requires=["utility", "mutagen", "youtube-dl", "wxpython"],
     options={
         'app': {
             'formal_name': 'test',

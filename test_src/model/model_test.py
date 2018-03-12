@@ -1,10 +1,17 @@
 from hypothesis import given, example
 from hypothesis.strategies import text
-from model.model import Model
+from src.model.model import Model
 from tempfile import TemporaryDirectory
-from unittest import case
+from unittest import TestCase, main
 
-class TestModel:
+
+class TestModel(TestCase):
+    def setUp(self):
+        self.model = Model(None)
+
+    def tearDown(self):
+        self.model = None
+
     @given(None)
     def test_init__(self):
         self.model = Model(None)
@@ -48,3 +55,6 @@ class TestModel:
 
     def test_convert_file(self):
         pass
+
+if __name__ == '__main__':
+    main()

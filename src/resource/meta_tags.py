@@ -10,6 +10,11 @@ class MetaTags(Enum):
     Album = "Album"
 
 
+class SimpleTags(Enum):
+    File = "File"
+    Progress = "Progress"
+
+
 class FileTypes(Enum):
     MP3 = ".mp3"
     VIDEO = ".mp4,.webm,.flv"

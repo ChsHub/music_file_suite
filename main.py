@@ -18,5 +18,7 @@ if __name__ == '__main__':
     # TODO Languages
     # TODO Window layout
     # TODO upgrade youtube-dl, mutagen
+    # TODO click on links in download list
+    # TODO open directories from link
     # https://stackoverflow.com/questions/2720014/upgrading-all-packages-with-pip
     main()

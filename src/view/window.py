@@ -1,18 +1,16 @@
 from wx import App, Frame, Notebook, Panel, EXPAND, BoxSizer, VERTICAL, EVT_CLOSE, \
-    HORIZONTAL, GridSizer, StaticText
+    HORIZONTAL
 from wx.lib.agw.hyperlink import HyperLinkCtrl
+from wxwidgets.preview import Table, Preview
 
-from view.preview import Table
-
-from resource.texts import SelectionTabs, text_convert_input, text_download_input, text_preview_change, \
-    text_selction_meta, text_selction_album, SelectionCodecs
-from resource.texts import text_view_title, SelectionAlbum, SelectionMeta
-from view.file_input import FileInput
-from view.preview import Preview
-from view.standard_view.standard_input import StandardInput
-from view.standard_view.standard_selection import StandardSelection
-from resource.texts import text_preview_change, text_preview_playlist
-from view.standard_view.standard_button import StandardButton
+from src.resource.meta_tags import MetaTags, SimpleTags
+from src.resource.texts import SelectionTabs, text_download_input, text_selction_meta, text_selction_album, \
+    SelectionCodecs, text_open_file_title
+from src.resource.texts import text_preview_change, text_preview_playlist
+from src.resource.texts import text_view_title, SelectionAlbum, SelectionMeta
+from src.view.file_input import FileInput
+from wxwidgets.input_widget import InputWidget
+from src.view.standard_view.standard_selection import StandardSelection
 
 
 # TODO more Feedback (Apply change, convert, ect.)
@@ -57,25 +55,26 @@ class Window(App):
 
     def init_tab_meta(self, tab):
 
+        selections = Panel(tab)
+
         sizer = BoxSizer(VERTICAL)
-        sizer.Add(StandardInput(tab, self.analyze_files), 1, EXPAND)
-        sizer.Add(Preview(tab, [self._Controller.set_data, text_preview_change],
+        sizer.Add(FileInput(tab, text=text_open_file_title,callback=self.analyze_files))
+        sizer.Add(selections)
+        sizer.Add(Preview(tab, MetaTags, [self._Controller.set_data, text_preview_change],
                           [self._Controller.make_playlist, text_preview_playlist]), 1, EXPAND)
 
-        selections = Panel(tab)
-        sizer.Add(selections)
         sel_sizer = BoxSizer(HORIZONTAL)
-        sel_sizer.Add(
-            StandardSelection(parent=selections, radio_enum=SelectionAlbum, callback=self._Controller.set_is_album,
-                              title=text_selction_album))
-        sel_sizer.Add(
-            StandardSelection(parent=selections, radio_enum=SelectionMeta, callback=self._Controller.set_is_meta,
-                              title=text_selction_meta))
+        sel_sizer.Add(StandardSelection(parent=selections, radio_enum=SelectionAlbum,
+                                        callback=self._Controller.set_is_album, title=text_selction_album))
+        sel_sizer.Add(StandardSelection(parent=selections, radio_enum=SelectionMeta,
+                                        callback=self._Controller.set_is_meta, title=text_selction_meta))
         selections.SetSizer(sel_sizer)
+
         tab.SetSizer(sizer)
 
+    # TODO link ids for multiple downloads
     def init_tab_download(self, tab):
-        download_input = StandardInput(tab, button_text=text_download_input, callback=self._download)
+        download_input = InputWidget(tab, text=text_download_input, callback=self._download, reset=True)
         self._download_list = Table(tab, headers=["File", "Progress"])
 
         sizer = BoxSizer(VERTICAL)
@@ -83,15 +82,14 @@ class Window(App):
         sizer.Add(self._download_list, 1, EXPAND)
         tab.SetSizer(sizer)
 
+    # TODO remove all hard coded
     def init_tab_convert(self, tab):
-        convert_input = FileInput(tab, self._Controller.add_convert)
-        self._convert_list = Table(tab, headers=["File", "Progress"])
+        convert_input = FileInput(tab, text=text_open_file_title, callback=self._Controller.add_convert)
+        self._convert_list = Preview(tab, SimpleTags, [self.start_convert, "Start"])
         sizer = BoxSizer(VERTICAL)
         sizer.Add(convert_input, 1, EXPAND)
         self.codec_selection = StandardSelection(tab, callback=None, title="Codec", radio_enum=SelectionCodecs)
         sizer.Add(self.codec_selection)
-        sizer.Add(StandardButton(tab, text="Start",
-                                 callback=self.start_convert))
 
         sizer.Add(self._convert_list, 1, EXPAND)
         tab.SetSizer(sizer)
@@ -106,7 +104,7 @@ class Window(App):
     def start_convert(self, event):
         self._Controller.start_convert(self.codec_selection.get_selection())
 
-    #### CONTROLLER ####
+    # ++++ CONTROLLER ++++
     def analyze_files(self, path, files):
         self._Controller.analyze_files(path, files)
 

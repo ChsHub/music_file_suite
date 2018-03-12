@@ -1,6 +1,6 @@
 from threading import BoundedSemaphore
 
-from album import Album
+from src.model.songs.album import Album
 
 
 class Model:
@@ -12,6 +12,7 @@ class Model:
         self._Controller = controller
         self._album_sem = BoundedSemaphore(value=1)
 
+    # TODO refactor
     def analyze_files(self, path, files):
         if self._Album:
             self._Album.set_inactive()
