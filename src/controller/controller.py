@@ -22,6 +22,9 @@ class Controller:
         self.Main_view = Window(self)
 
     def submit(self, *args):
+        #f, *args = args
+        #f(*args)
+        #return # TODO remove debug
         future = self.executor.submit(*args)
         # called after execution of this task
         future.add_done_callback(self.error_log)
@@ -40,6 +43,7 @@ class Controller:
             self.submit(self._Main_model.analyze_files, path, files)
 
     def set_data(self):
+        print("SET DATA")
         if self._Main_model:
             self.submit(self._Main_model.set_data)
 
@@ -57,7 +61,7 @@ class Controller:
 
     def add_convert(self, path, files):
         if self._Converter:
-            self.submit(self._Converter.consume_element, path, files)
+            self.submit(self._Converter.add_job, path, files)
 
     def make_playlist(self):
         if self._Main_model:

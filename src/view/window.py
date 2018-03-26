@@ -1,15 +1,15 @@
 from wx import App, Frame, Notebook, Panel, EXPAND, BoxSizer, VERTICAL, EVT_CLOSE, \
     HORIZONTAL
 from wx.lib.agw.hyperlink import HyperLinkCtrl
+from wxwidgets.input_widget import InputWidget
 from wxwidgets.preview import Table, Preview
 
-from src.resource.meta_tags import MetaTags, SimpleTags
+from src.resource.meta_tags import MetaTags, SimpleTags, FileTypes
 from src.resource.texts import SelectionTabs, text_download_input, text_selction_meta, text_selction_album, \
     SelectionCodecs, text_open_file_title
 from src.resource.texts import text_preview_change, text_preview_playlist
 from src.resource.texts import text_view_title, SelectionAlbum, SelectionMeta
 from src.view.file_input import FileInput
-from wxwidgets.input_widget import InputWidget
 from src.view.standard_view.standard_selection import StandardSelection
 
 
@@ -58,10 +58,12 @@ class Window(App):
         selections = Panel(tab)
 
         sizer = BoxSizer(VERTICAL)
-        sizer.Add(FileInput(tab, text=text_open_file_title,callback=self.analyze_files))
+        sizer.Add(FileInput(tab, text=text_open_file_title, callback=self.analyze_files,
+                            file_type=FileTypes.MUSIC.value.replace(".", "*.").replace(",", ";")))
         sizer.Add(selections)
-        sizer.Add(Preview(tab, MetaTags, [self._Controller.set_data, text_preview_change],
-                          [self._Controller.make_playlist, text_preview_playlist]), 1, EXPAND)
+        self._preview = Preview(tab, MetaTags, [self.set_meta, text_preview_change],
+                                [self._Controller.make_playlist, text_preview_playlist])
+        sizer.Add(self._preview, 1, EXPAND)
 
         sel_sizer = BoxSizer(HORIZONTAL)
         sel_sizer.Add(StandardSelection(parent=selections, radio_enum=SelectionAlbum,
@@ -78,19 +80,21 @@ class Window(App):
         self._download_list = Table(tab, headers=["File", "Progress"])
 
         sizer = BoxSizer(VERTICAL)
-        sizer.Add(download_input, 1, EXPAND)
+        sizer.Add(download_input)
         sizer.Add(self._download_list, 1, EXPAND)
         tab.SetSizer(sizer)
+        download_input.Layout()  # Remove wrong initial value
 
     # TODO remove all hard coded
     def init_tab_convert(self, tab):
-        convert_input = FileInput(tab, text=text_open_file_title, callback=self._Controller.add_convert)
+        convert_input = FileInput(tab, text=text_open_file_title, callback=self.add_convert,
+                                  file_type=FileTypes.VIDEO.value.replace(".", "*.").replace(",", ";"))
         self._convert_list = Preview(tab, SimpleTags, [self.start_convert, "Start"])
-        sizer = BoxSizer(VERTICAL)
-        sizer.Add(convert_input, 1, EXPAND)
         self.codec_selection = StandardSelection(tab, callback=None, title="Codec", radio_enum=SelectionCodecs)
-        sizer.Add(self.codec_selection)
 
+        sizer = BoxSizer(VERTICAL)
+        sizer.Add(convert_input)
+        sizer.Add(self.codec_selection)
         sizer.Add(self._convert_list, 1, EXPAND)
         tab.SetSizer(sizer)
 
@@ -104,20 +108,32 @@ class Window(App):
     def start_convert(self, event):
         self._Controller.start_convert(self.codec_selection.get_selection())
 
+    def add_convert(self, path, files):
+        self._Controller.add_convert(path, files)
+
     # ++++ CONTROLLER ++++
+    def set_meta(self, event):
+        self._Controller.set_data()
+
     def analyze_files(self, path, files):
         self._Controller.analyze_files(path, files)
 
     def set_preview_data(self, data, type):
-        raise NotImplementedError
-        self._preview[type].update_view(data)
+        self._preview.clear()
+        self._preview.add_lines(data)
+
+    def set_meta_color(self, event):
+        self._preview.set_row_color(0, "#00FFFF")
+
+    def update_preview(self, data):
+        pass
 
     def _download(self, url):
         self._download_list.add_line([url, "0%"])
         self._Controller.download(url)
 
     def set_download_progress(self, percent):
-        self._download_list.update_cell(data=percent, column=1)
+        self._download_list.update_last_cell(data=percent, column=1)
 
     def set_convert_progress(self, id, percent):
         self._convert_list.update_cell(percent, 1, row=id)

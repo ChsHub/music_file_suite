@@ -16,5 +16,5 @@ class SimpleTags(Enum):
 
 
 class FileTypes(Enum):
-    MP3 = ".mp3"
+    MUSIC = ".ogg,.m4a,.mp3"
     VIDEO = ".mp4,.webm,.flv"

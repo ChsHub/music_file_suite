@@ -22,7 +22,7 @@ class Converter:
         self._convert_sem = BoundedSemaphore(value=1)
         self._controller = controller
 
-    def consume_element(self, path, files):
+    def add_job(self, path, files):
         with self._convert_sem:
             self._jobs.append((path, files))
         for file in files:
@@ -122,7 +122,6 @@ class Converter:
             info("FILE ALREADY EXISTS: " + file_path)
 
         return False
-
 
     def _strategy_high_opus(self, file_path, temp_path, path_to_convert_dir):
 

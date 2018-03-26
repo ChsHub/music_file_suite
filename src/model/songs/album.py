@@ -2,7 +2,6 @@ from logging import info
 
 from src.resource.meta_tags import FileTypes
 from src.resource.meta_tags import MetaTags
-from utility.os_interface import get_dir_list
 from src.model.songs.song import Song
 from src.resource.texts import SelectionAlbum, SelectionMeta
 from utility.utilities import get_artist_and_album
@@ -17,7 +16,7 @@ class Album:
     active = True
     meta_data = None
 
-    def __init__(self, album_path, set_view):
+    def __init__(self, album_path, files, set_view):
 
         if not album_path:
             raise ValueError
@@ -34,7 +33,7 @@ class Album:
         self.meta_data[MetaTags.Album] = album  # Album path
         info("ANALYZE: START")
 
-        for file in get_dir_list(self.album_path):
+        for file in files:
             self._Songs.add(Song(album_path, file, self))
 
             if not self.active:  # interupt by another process
@@ -47,14 +46,14 @@ class Album:
         return self.meta_data[item]
 
     def set_all_view(self):
-        self._set_view([[song[tag] for tag in MetaTags] for song in self._Songs], FileTypes.MP3)
+        self._set_view([[song[tag] for tag in MetaTags] for song in self._Songs], FileTypes.MUSIC)
 
     def set_data(self):
 
         for song in self._Songs:
             song.set_data()
 
-        self._set_view([[song[tag] for tag in MetaTags] for song in self._Songs], FileTypes.MP3)
+        self._set_view([[song[tag] for tag in MetaTags] for song in self._Songs], FileTypes.MUSIC)
         info("COMPLETE")
 
     def set_is_album(self, is_album):

@@ -27,7 +27,7 @@ setup(
         'Development Status :: 1 - Planning',
         'License :: OSI Approved :: Other',
     ],
-    install_requires=["utility", "mutagen", "youtube-dl", "wxpython"],
+    install_requires=["utility", "mutagen", "youtube-dl", "wxpython", "webcolors"],
     options={
         'app': {
             'formal_name': 'test',

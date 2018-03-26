@@ -18,10 +18,11 @@ class Model:
             self._Album.set_inactive()
 
         with self._album_sem:
-            self._Album = Album(path, self._Controller.set_view)
+            self._Album = Album(path, files, self._Controller.set_view)
 
     def set_data(self):
-        self._Album.set_data()
+        if self._Album:
+            self._Album.set_data()
 
     def set_is_album(self, is_album):
         with self._album_sem:

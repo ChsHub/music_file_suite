@@ -30,16 +30,15 @@ class Downloader:
 
             process = Popen(downloader_command + [url], stdin=None, stdout=PIPE, stderr=None, shell=False)
 
-            # process.stdout = StdOutput()
-            # err, out = process.communicate()
-            # return
-
             data = '0%'
             while data:
                 data = findall(match, data)
                 if data:
                     self.__model.set_download_progress(data[-1])
-                data = decode(process.stdout.read(108))
+                try:
+                    data = decode(process.stdout.read(108))
+                except Exception as e:
+                    pass
                 print(data)
 
             change_dir(os_dir)
