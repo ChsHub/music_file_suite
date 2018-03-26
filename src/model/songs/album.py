@@ -1,6 +1,5 @@
 from logging import info
 
-from src.resource.meta_tags import FileTypes
 from src.resource.meta_tags import MetaTags
 from src.model.songs.song import Song
 from src.resource.texts import SelectionAlbum, SelectionMeta
@@ -16,7 +15,7 @@ class Album:
     active = True
     meta_data = None
 
-    def __init__(self, album_path, files, set_view):
+    def __init__(self, album_path, files, controller):
 
         if not album_path:
             raise ValueError
@@ -24,7 +23,7 @@ class Album:
         self.meta_data = {}
         self._Songs = set()
         self.album_path = album_path
-        self._set_view = set_view
+        self._Controller = controller
 
         # gather data from path
         artist, album = get_artist_and_album(self.album_path)
@@ -46,18 +45,27 @@ class Album:
         return self.meta_data[item]
 
     def set_all_view(self):
-        self._set_view([[song[tag] for tag in MetaTags] for song in self._Songs], FileTypes.MUSIC)
+        result = [[song[tag] for tag in MetaTags] for song in self._Songs]
+        self._Controller.set_view(result)
+
+        # set error color
+        for i, song in enumerate(self._Songs):
+            if song.get_error():
+                self._Controller.set_meta_color_warning(i)
+            else:
+                self._Controller.set_meta_color_normal(i)
 
     def set_data(self):
 
-        for song in self._Songs:
-            song.set_data()
-
-        self._set_view([[song[tag] for tag in MetaTags] for song in self._Songs], FileTypes.MUSIC)
-        info("COMPLETE")
+        for i, song in enumerate(self._Songs):
+            if song.set_data():
+                self._Controller.set_meta_color_ok(i)
+            else:
+                self._Controller.set_meta_color_warning(i)
+        info('Set meta and rename complete')
 
     def set_is_album(self, is_album):
-
+        is_album = SelectionAlbum(is_album)
         if is_album == SelectionAlbum.ALBUM:
             for song in self._Songs:
                 song.set_album_strategy()
@@ -67,18 +75,21 @@ class Album:
         elif is_album == SelectionAlbum.DETECTED:
             for song in self._Songs:
                 song.set_detected_strategy()
-
+        else:
+            raise ValueError
         self.set_all_view()
 
-    def set_is_meta(self, is_meta):
+    def set_is_meta(self, use_meta):
 
-        if is_meta == SelectionMeta.NO_META:
+        use_meta = SelectionMeta(use_meta)
+        if use_meta == SelectionMeta.NO_META:
             for song in self._Songs:
                 song.set_ignore_meta()
-        elif is_meta == SelectionMeta.META:
+        elif use_meta == SelectionMeta.META:
             for song in self._Songs:
-                song.set_no_ignore_meta()
-
+                song.set_use_meta()
+        else:
+            raise ValueError
         self.set_all_view()
 
     # +++ Threading +++

@@ -6,9 +6,9 @@ from utility.utilities import get_file_type
 
 
 class File_data:
-    _track_num = None
-    _artist = None
-    _title = None
+    _track_num = ''
+    _artist = ''
+    _title = ''
     # decisions
     is_album = None
     _error = False
@@ -24,7 +24,7 @@ class File_data:
             self._error = True
             return
 
-        self.clean_title()
+        # self.clean_title() # TODO INCLUDE
 
     def clean_title(self):
         # TODO Regex
@@ -37,12 +37,12 @@ class File_data:
     def _read_song_title(self, file_name):
         #        if not self._artist:
         title = file_name.split(" - ")
-        if len(title) is 2:
+        if len(title) == 2:
             self._artist = title[0]
             self._title = title[1][:-4]
             return True
-
-        return False
+        else:
+            return False
 
     # 00 Song.mp3
     def _read_song_title_album(self, file_name):
@@ -51,14 +51,11 @@ class File_data:
             self._track_num = match[0][0]
             self._title = match[0][1][:-4]
             return True
-        return False
+        else:
+            return False
 
     def get_is_album(self):
         return self.is_album
 
-    def rename_file(self, album_path, new_name, file_name):
-
-        os_interface.rename_file(album_path, file_name, new_name + get_file_type(file_name))  # TODO non mp3
-
-        self._file_name = new_name
-        return 0
+    def rename_file(self, album_path, file_name, new_name):
+        os_interface.rename_file(album_path, file_name, new_name + get_file_type(file_name))

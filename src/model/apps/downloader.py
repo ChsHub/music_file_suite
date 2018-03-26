@@ -10,18 +10,18 @@ from src.resource.paths import downloader_command, path_to_download_dir
 
 # TODO KILL/STOP
 class Downloader:
-    __model = None
+    _Controller = None
 
-    def __init__(self, model):
-        self.__model = model
-        self.download_sem = BoundedSemaphore(value=1)
+    def __init__(self, controller):
+        self._Controller = controller
+        self._Download_sem = BoundedSemaphore(value=1)
 
     # TODO test directory delete
     def consume_element(self, url):
 
         match = r'(\d*\.?\d%)'
 
-        with self.download_sem:
+        with self._Download_sem:
             info("DOWNLOAD: " + url)
             os_dir = get_cwd()
             file_count = get_file_count(path_to_download_dir)
@@ -34,7 +34,7 @@ class Downloader:
             while data:
                 data = findall(match, data)
                 if data:
-                    self.__model.set_download_progress(data[-1])
+                    self._Controller.set_download_progress(data[-1])
                 try:
                     data = decode(process.stdout.read(108))
                 except Exception as e:

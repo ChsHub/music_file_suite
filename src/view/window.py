@@ -10,6 +10,7 @@ from src.resource.texts import SelectionTabs, text_download_input, text_selction
 from src.resource.texts import text_preview_change, text_preview_playlist
 from src.resource.texts import text_view_title, SelectionAlbum, SelectionMeta
 from src.view.file_input import FileInput
+from src.view.standard_view.colors import color_red, color_green, color_white
 from src.view.standard_view.standard_selection import StandardSelection
 
 
@@ -118,12 +119,18 @@ class Window(App):
     def analyze_files(self, path, files):
         self._Controller.analyze_files(path, files)
 
-    def set_preview_data(self, data, type):
+    def set_preview_data(self, data):
         self._preview.clear()
         self._preview.add_lines(data)
 
-    def set_meta_color(self, event):
-        self._preview.set_row_color(0, "#00FFFF")
+    def set_meta_color_normal(self, row):
+        self._preview.set_row_color(row, color_white)
+
+    def set_meta_color_warning(self, row):
+        self._preview.set_row_color(row, color_red)
+
+    def set_meta_color_ok(self, row):
+        self._preview.set_row_color(row, color_green)
 
     def update_preview(self, data):
         pass

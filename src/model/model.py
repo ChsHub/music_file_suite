@@ -18,7 +18,7 @@ class Model:
             self._Album.set_inactive()
 
         with self._album_sem:
-            self._Album = Album(path, files, self._Controller.set_view)
+            self._Album = Album(path, files, self._Controller)
 
     def set_data(self):
         if self._Album:
@@ -36,6 +36,3 @@ class Model:
 
     def make_playlist(self):
         pass  # TODO
-
-    def set_download_progress(self, percent):
-        self._Controller.set_download_progress(percent)

@@ -9,8 +9,9 @@ class SelectionAlbum(Enum):
 
 
 class SelectionMeta(Enum):
-    META = "Use meta data"
     NO_META = "Ignore/overwrite meta data"
+    META = "Use meta data"
+
 
 
 class SelectionCodecs(Enum):
@@ -23,7 +24,7 @@ SelectionTabs = ["Download", "Convert", "Meta", "Config"]
 
 text_preview_change = "Apply Change"
 text_preview_playlist = "Create Playlist"
-text_download_input = "Download YT"
+text_download_input = "Download YouTube"
 text_convert_input = "Convert"
 text_file_input = "Open File"
 text_view_title = 'Music Suite'

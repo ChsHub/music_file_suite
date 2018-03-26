@@ -6,26 +6,24 @@ from src.model.songs.meta_data.tag_data import Tag_data
 from src.resource.meta_tags import MetaTags
 
 
-
 class Song:
-    _file_name = None
-    _file_type = None
+    file_name = None
     _tag_data = None
     _file_data = None
     _ignore_meta = True
     _data_strategy = None
     _Album = None
+    _error = False
 
     def __init__(self, album_path, file_name, album):
 
-        self._file_name = file_name
-        self._file_type = file_name.split(".")[-1]
+        self.file_name = file_name
         self._error = False
         self._Album = album
 
         # READ
-        self._tag_data = Tag_data(album_path, self._file_name)  # Meta
-        self._file_data = File_data(self._file_name)
+        self._tag_data = Tag_data(album_path, self.file_name)  # Meta
+        self._file_data = File_data(self.file_name)
         # self.read_playlist(nr_in_playlist)  # Playlist
         self.set_detected_strategy()
 
@@ -45,9 +43,18 @@ class Song:
 
         if self._error:
             error("INVALID NAME: SONG: " + self[MetaTags.FileName])
-            return
-        self._tag_data._set_new_tag(self)
-        self._file_data.rename_file(self._Album.album_path, self[MetaTags.FileName], self._file_name)
+            return False
+        else:
+            if not self._tag_data.set_new_tag(self):
+                error('Apply Tag Error')
+                raise ValueError
+            # no else
+            self._file_data.rename_file(album_path=self._Album.album_path,
+                                        file_name=self.file_name,
+                                        new_name=self[MetaTags.FileName])
+            return True
+
+    # +++Strategy setter+++
 
     def set_detected_strategy(self):
         if self._file_data.get_is_album():
@@ -64,8 +71,8 @@ class Song:
     def set_ignore_meta(self):
         self._data_strategy.set_meta_ignore_strategy()
 
-    def set_no_ignore_meta(self):
-        self._data_strategy.set_meta_no_ignore_strategy()
+    def set_use_meta(self):
+        self._data_strategy.set_meta_use_strategy()
 
     # STRATEGIES
 
@@ -81,16 +88,17 @@ class Song:
 
             self.set_meta_ignore_strategy()
             # track_nr = utilities.track_nr_int_to_str(track_num)
-            self._getter[MetaTags.FileName] = self.get_title
+            self._getter[MetaTags.FileName] = self.get_file_name
 
-        def get_title(self):
+        def get_file_name(self):
             title = self._getter[MetaTags.Title]()
             track_num = self._getter[MetaTags.TrackNum]()
-            if not title:
-                title = "NONE"
-            if not track_num:
-                track_num = "NONE"
-            return track_num + u' ' + title
+            if title and track_num:
+                self._song._error = False  # TODO refactor error management
+                return track_num + ' ' + title
+            else:
+                self._song._error = True
+                return self._song.file_name
 
         def set_meta_ignore_strategy(self):
             self._getter[MetaTags.Title] = lambda: self._song._file_data._title
@@ -115,22 +123,24 @@ class Song:
             self._getter[MetaTags.AlbumArtist] = lambda: ""
 
             self.set_meta_ignore_strategy()
-            self._getter[MetaTags.FileName] = self.get_title
+            self._getter[MetaTags.FileName] = self.get_file_name
 
-        def get_title(self):
+        def get_file_name(self):
             artist = self._getter[MetaTags.Artist]()
             title = self._getter[MetaTags.Title]()
-            if not artist:
-                artist = "NONE"
-            if not title:
-                title = "NONE"
-            return artist + ' - ' + title
+
+            if artist and title:
+                self._song._error = False
+                return artist + ' - ' + title
+            else:
+                self._song._error = True
+                return self._song.file_name
 
         def set_meta_ignore_strategy(self):
             self._getter[MetaTags.Title] = lambda: self._song._file_data._title
             self._getter[MetaTags.Artist] = lambda: self._song._file_data._artist
 
-        def set_meta_no_ignore_strategy(self):
+        def set_meta_use_strategy(self):
             self._getter[MetaTags.Title] = lambda: self._song._tag_data.title
             self._getter[MetaTags.Artist] = lambda: self._song._tag_data._artist
 

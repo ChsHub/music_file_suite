@@ -43,7 +43,6 @@ class Controller:
             self.submit(self._Main_model.analyze_files, path, files)
 
     def set_data(self):
-        print("SET DATA")
         if self._Main_model:
             self.submit(self._Main_model.set_data)
 
@@ -74,9 +73,10 @@ class Controller:
     # +++Model+++
 
     # called: Model -> Album -> Controller -> Window
-    def set_view(self, data, type):
+    def set_view(self, data):
         if self.Main_view:
-            self.Main_view.set_preview_data(data, type)
+            self.Main_view.set_preview_data(data)
+
 
     def set_download_progress(self, percent):
         self.Main_view.set_download_progress(percent)
@@ -86,3 +86,14 @@ class Controller:
 
     def add_convert_line(self, line):
         self.Main_view.add_convert_line(line)
+
+    def set_meta_color_normal(self, id):
+        self.Main_view.set_meta_color_normal(id)
+
+    def set_meta_color_warning(self, row):
+        if self.Main_view:
+            self.Main_view.set_meta_color_warning(row)
+
+    def set_meta_color_ok(self, row):
+        if self.Main_view:
+            self.Main_view.set_meta_color_ok(row)
