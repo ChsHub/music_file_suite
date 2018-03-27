@@ -21,7 +21,7 @@ class Album:
             raise ValueError
 
         self.meta_data = {}
-        self._Songs = set()
+        self._Songs = []
         self.album_path = album_path
         self._Controller = controller
 
@@ -33,7 +33,7 @@ class Album:
         info("ANALYZE: START")
 
         for file in files:
-            self._Songs.add(Song(album_path, file, self))
+            self._Songs.append(Song(album_path, file, self))
 
             if not self.active:  # interupt by another process
                 return
@@ -48,9 +48,11 @@ class Album:
         result = [[song[tag] for tag in MetaTags] for song in self._Songs]
         self._Controller.set_view(result)
 
-        # set error color
-        for i, song in enumerate(self._Songs):
-            if song.get_error():
+        for i in range(len(self._Songs)):
+            self.set_error_color(i)
+
+    def set_error_color(self, i):
+            if self._Songs[i].get_error():
                 self._Controller.set_meta_color_warning(i)
             else:
                 self._Controller.set_meta_color_normal(i)
@@ -91,6 +93,16 @@ class Album:
         else:
             raise ValueError
         self.set_all_view()
+
+    def edit_song(self, row, column, data):
+        self._Songs[row].edit(column, data)
+        self.update_song_view(row)
+
+    def update_song_view(self, row):
+
+        result = [self._Songs[row][tag] for tag in MetaTags]
+        self._Controller.update_meta_line(row, result)
+        self.set_error_color(row)
 
     # +++ Threading +++
 

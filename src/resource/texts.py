@@ -20,7 +20,7 @@ class SelectionCodecs(Enum):
     OPUS = "Opus transparent"
 
 
-SelectionTabs = ["Download", "Convert", "Meta", "Config"]
+SelectionTabs = ["Download", "Convert", "Meta", "Config", "About"]
 
 text_preview_change = "Apply Change"
 text_preview_playlist = "Create Playlist"

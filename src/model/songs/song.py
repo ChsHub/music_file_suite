@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from logging import info, error
-
+from utility.utilities import remove_file_type, get_file_type
 from src.model.songs.meta_data.file_data import File_data
 from src.model.songs.meta_data.tag_data import Tag_data
 from src.resource.meta_tags import MetaTags
@@ -17,12 +17,13 @@ class Song:
 
     def __init__(self, album_path, file_name, album):
 
-        self.file_name = file_name
+        self._file_type = get_file_type(file_name)
+        self.file_name = remove_file_type(file_name)
         self._error = False
         self._Album = album
 
         # READ
-        self._tag_data = Tag_data(album_path, self.file_name)  # Meta
+        self._tag_data = Tag_data(album_path, file_name)  # Meta
         self._file_data = File_data(self.file_name)
         # self.read_playlist(nr_in_playlist)  # Playlist
         self.set_detected_strategy()
@@ -39,8 +40,11 @@ class Song:
 
     # SETTER #
 
-    def set_data(self):
+    def __setitem__(self, key, value):
+        if key == MetaTags.FileName:
+            self._file_data = File_data(value)
 
+    def set_data(self):
         if self._error:
             error("INVALID NAME: SONG: " + self[MetaTags.FileName])
             return False
@@ -50,9 +54,13 @@ class Song:
                 raise ValueError
             # no else
             self._file_data.rename_file(album_path=self._Album.album_path,
-                                        file_name=self.file_name,
-                                        new_name=self[MetaTags.FileName])
+                                        file_name=self.file_name + self._file_type,
+                                        new_name=self[MetaTags.FileName] + self._file_type)
             return True
+
+    def edit(self, column, data):
+        tag = list(MetaTags)[column]
+        self[tag] = data
 
     # +++Strategy setter+++
 
@@ -75,7 +83,7 @@ class Song:
         self._data_strategy.set_meta_use_strategy()
 
     # STRATEGIES
-
+    # TODO make getter normally usable without calling
     class AlbumStrategy:
         _getter = None
 

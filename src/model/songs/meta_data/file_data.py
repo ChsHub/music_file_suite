@@ -24,9 +24,9 @@ class File_data:
             self._error = True
             return
 
-        # self.clean_title() # TODO INCLUDE
+        self._clean_title()
 
-    def clean_title(self):
+    def _clean_title(self):
         # TODO Regex
         self._title = self._title.replace(":", "").replace("*", "").replace("/", " ").replace('"', "").replace(
             '#', "")
@@ -39,7 +39,7 @@ class File_data:
         title = file_name.split(" - ")
         if len(title) == 2:
             self._artist = title[0]
-            self._title = title[1][:-4]
+            self._title = title[1]
             return True
         else:
             return False
@@ -58,4 +58,4 @@ class File_data:
         return self.is_album
 
     def rename_file(self, album_path, file_name, new_name):
-        os_interface.rename_file(album_path, file_name, new_name + get_file_type(file_name))
+        os_interface.rename_file(album_path, file_name, new_name)

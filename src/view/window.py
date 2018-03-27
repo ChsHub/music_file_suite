@@ -1,5 +1,5 @@
 from wx import App, Frame, Notebook, Panel, EXPAND, BoxSizer, VERTICAL, EVT_CLOSE, \
-    HORIZONTAL
+    HORIZONTAL, TOP, ALL, RIGHT, LEFT, BITMAP_TYPE_ANY, Bitmap, Icon, StaticText
 from wx.lib.agw.hyperlink import HyperLinkCtrl
 from wxwidgets.input_widget import InputWidget
 from wxwidgets.preview import Table, Preview
@@ -26,12 +26,18 @@ class Window(App):
     _selection = None
     _frame = None
     _convert_list = None
+    _border_size = 10
 
     def __init__(self, controller):
         super().__init__()
         self._Controller = controller
 
-        frame = Frame(None, title=text_view_title, size=(600, 300))  # Create a Window
+        frame = Frame(None, title=text_view_title, size=(1300, 800))  # Create a Window
+
+        loc = Icon()
+        loc.CopyFromBitmap(Bitmap('./src/resource/icons/icon.jpg', BITMAP_TYPE_ANY))
+        frame.SetIcon(loc)
+
         self._frame = frame
         frame.Bind(EVT_CLOSE, lambda x: frame.Destroy())  # Close Window
 
@@ -46,11 +52,12 @@ class Window(App):
         self.init_tab_convert(tabs[1])
         self.init_tab_meta(tabs[2])
         self._init_tab_config(tabs[3])
+        self._init_tab_about(tabs[4])
 
         for i, label in enumerate(SelectionTabs):
             self.notebook.AddPage(tabs[i], label)
 
-        frame.Layout()  # Update Layout to fix black square
+        # frame.Layout()  # Update Layout to fix black square
         frame.Show()
         return
 
@@ -60,56 +67,72 @@ class Window(App):
 
         sizer = BoxSizer(VERTICAL)
         sizer.Add(FileInput(tab, text=text_open_file_title, callback=self.analyze_files,
-                            file_type=FileTypes.MUSIC.value.replace(".", "*.").replace(",", ";")))
-        sizer.Add(selections)
-        self._preview = Preview(tab, MetaTags, [self.set_meta, text_preview_change],
-                                [self._Controller.make_playlist, text_preview_playlist])
-        sizer.Add(self._preview, 1, EXPAND)
+                            file_type=FileTypes.MUSIC.value.replace(".", "*.").replace(",", ";")),
+                  flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
+
+        sizer.Add(selections,
+                  flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
+
+        self._preview = Preview(tab, MetaTags, border=self._border_size, buttons=[[self.set_meta, text_preview_change],
+                                [self._Controller.make_playlist, text_preview_playlist]],
+                                edit_callback=self._Controller.edit_song)
+        sizer.Add(self._preview, 1,
+                  flag=EXPAND | ALL, border=self._border_size)
 
         sel_sizer = BoxSizer(HORIZONTAL)
         sel_sizer.Add(StandardSelection(parent=selections, radio_enum=SelectionAlbum,
-                                        callback=self._Controller.set_is_album, title=text_selction_album))
+                                        callback=self._Controller.set_is_album, title=text_selction_album),
+                      flag=RIGHT | TOP, border=self._border_size)
         sel_sizer.Add(StandardSelection(parent=selections, radio_enum=SelectionMeta,
-                                        callback=self._Controller.set_is_meta, title=text_selction_meta))
+                                        callback=self._Controller.set_is_meta, title=text_selction_meta),
+                      flag=TOP, border=self._border_size)
         selections.SetSizer(sel_sizer)
 
         tab.SetSizer(sizer)
 
     # TODO link ids for multiple downloads
     def init_tab_download(self, tab):
+
         download_input = InputWidget(tab, text=text_download_input, callback=self._download, reset=True)
-        self._download_list = Table(tab, headers=["File", "Progress"])
+        self._download_list = Table(tab, headers=["File", "Progress"])  # TODO remove hard code
 
         sizer = BoxSizer(VERTICAL)
-        sizer.Add(download_input)
-        sizer.Add(self._download_list, 1, EXPAND)
+        sizer.Add(download_input, flag=TOP | LEFT | RIGHT, border=10)
+        sizer.Add(self._download_list, 1, EXPAND | ALL, border=10)
         tab.SetSizer(sizer)
+
         download_input.Layout()  # Remove wrong initial value
 
+    # TODO BUG intial selection not applied
     # TODO remove all hard coded
     def init_tab_convert(self, tab):
-        convert_input = FileInput(tab, text=text_open_file_title, callback=self.add_convert,
+        convert_input = FileInput(tab, text=text_open_file_title, callback=self._add_convert,
                                   file_type=FileTypes.VIDEO.value.replace(".", "*.").replace(",", ";"))
-        self._convert_list = Preview(tab, SimpleTags, [self.start_convert, "Start"])
+        self._convert_list = Preview(tab, SimpleTags, border=self._border_size, buttons=[[self._start_convert, "Start"]])
         self.codec_selection = StandardSelection(tab, callback=None, title="Codec", radio_enum=SelectionCodecs)
 
         sizer = BoxSizer(VERTICAL)
-        sizer.Add(convert_input)
-        sizer.Add(self.codec_selection)
-        sizer.Add(self._convert_list, 1, EXPAND)
+        sizer.Add(convert_input, flag=ALL, border=self._border_size)
+        sizer.Add(self.codec_selection, flag=TOP | LEFT, border=self._border_size)
+        sizer.Add(self._convert_list, 1, flag=EXPAND | ALL, border=self._border_size)
         tab.SetSizer(sizer)
 
     def _init_tab_config(self, tab):
+        pass
+
+    def _init_tab_about(self, tab):
         sizer = BoxSizer(VERTICAL)
         text = HyperLinkCtrl(tab, label="https://www.youtube.com/")
-        sizer.Add(text, 1, EXPAND)
+        sizer.Add(text, flag=TOP, border=self._border_size)
+        text = StaticText(tab, label="This software uses libraries from the FFmpeg project under the LGPLv2.1")
+        sizer.Add(text, flag=TOP, border=self._border_size)
         tab.SetSizer(sizer)
         # text.GotoURL(URL="") TODO BUTTONS FOR LIBS
 
-    def start_convert(self, event):
+    def _start_convert(self, event):
         self._Controller.start_convert(self.codec_selection.get_selection())
 
-    def add_convert(self, path, files):
+    def _add_convert(self, path, files):
         self._Controller.add_convert(path, files)
 
     # ++++ CONTROLLER ++++
@@ -132,8 +155,8 @@ class Window(App):
     def set_meta_color_ok(self, row):
         self._preview.set_row_color(row, color_green)
 
-    def update_preview(self, data):
-        pass
+    def update_preview_row(self, row, data):
+        self._preview.update_row(data, row)
 
     def _download(self, url):
         self._download_list.add_line([url, "0%"])

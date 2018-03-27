@@ -13,4 +13,4 @@ def main():
     logger = Logger(5)
     controller = Controller()
     #logger.shutdown()
-    return controller.Main_view
+    return controller._Main_view

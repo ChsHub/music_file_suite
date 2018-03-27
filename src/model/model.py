@@ -34,5 +34,13 @@ class Model:
             if self._Album:
                 self._Album.set_is_meta(is_meta)
 
+    def edit_song(self, row, column, data):
+        with self._album_sem:
+            if self._Album:
+                self._Album.edit_song(row, column, data)
+
+    def update_song_view(self, row, data):
+        self._Controller.update_meta_line(row, data)
+
     def make_playlist(self):
         pass  # TODO

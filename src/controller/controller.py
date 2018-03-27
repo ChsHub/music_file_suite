@@ -8,7 +8,7 @@ from src.view.window import Window
 
 
 class Controller:
-    Main_view = None
+    _Main_view = None
     _Main_model = None
     _Converter = None
     _Downloader = None
@@ -19,7 +19,7 @@ class Controller:
         self._Main_model = Model(self)
         self._Converter = Converter(self)
         self._Downloader = Downloader(self)
-        self.Main_view = Window(self)
+        self._Main_view = Window(self)
 
     def submit(self, *args):
         #f, *args = args
@@ -70,30 +70,38 @@ class Controller:
         if self._Converter:
             self.submit(self._Converter.start_convert, selection)
 
+    def edit_song(self, row, column, data):
+        if self._Main_model:
+            self.submit(self._Main_model.edit_song, row, column, data)
+
     # +++Model+++
 
     # called: Model -> Album -> Controller -> Window
     def set_view(self, data):
-        if self.Main_view:
-            self.Main_view.set_preview_data(data)
-
+        if self._Main_view:
+            self._Main_view.set_preview_data(data)
 
     def set_download_progress(self, percent):
-        self.Main_view.set_download_progress(percent)
+        self._Main_view.set_download_progress(percent)
 
     def set_convert_progress(self, id, percent):
-        self.Main_view.set_convert_progress(id, percent)
+        self._Main_view.set_convert_progress(id, percent)
 
     def add_convert_line(self, line):
-        self.Main_view.add_convert_line(line)
+        self._Main_view.add_convert_line(line)
+
+    def update_meta_line(self, row, data):
+        if self._Main_view:
+            self._Main_view.update_preview_row(row, data)
 
     def set_meta_color_normal(self, id):
-        self.Main_view.set_meta_color_normal(id)
+        if self._Main_view:
+            self._Main_view.set_meta_color_normal(id)
 
     def set_meta_color_warning(self, row):
-        if self.Main_view:
-            self.Main_view.set_meta_color_warning(row)
+        if self._Main_view:
+            self._Main_view.set_meta_color_warning(row)
 
     def set_meta_color_ok(self, row):
-        if self.Main_view:
-            self.Main_view.set_meta_color_ok(row)
+        if self._Main_view:
+            self._Main_view.set_meta_color_ok(row)
