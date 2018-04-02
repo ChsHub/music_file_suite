@@ -47,7 +47,6 @@ setup(
         },
         'windows': {
             'app_requires': [
-                'kivy'
             ]
         },
 
@@ -77,4 +76,3 @@ setup(
 
 # python setup.py windows -s
 # C:\\Python36-32\\python.exe setup.py windows -s
-# C:\\Python35\\python.exe setup.py windows -s

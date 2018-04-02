@@ -3,16 +3,16 @@ from wx import App, Frame, Notebook, Panel, EXPAND, BoxSizer, VERTICAL, EVT_CLOS
 from wx.lib.agw.hyperlink import HyperLinkCtrl
 from wxwidgets.input_widget import InputWidget
 from wxwidgets.preview import Table, Preview
+from wxwidgets.file_input import FileInput
 
 from src.resource.meta_tags import MetaTags, SimpleTags, FileTypes
 from src.resource.texts import SelectionTabs, text_download_input, text_selction_meta, text_selction_album, \
-    SelectionCodecs, text_open_file_title
+    SelectionCodecs, text_open_file
 from src.resource.texts import text_preview_change, text_preview_playlist
 from src.resource.texts import text_view_title, SelectionAlbum, SelectionMeta
-from src.view.file_input import FileInput
 from src.view.standard_view.colors import color_red, color_green, color_white
 from src.view.standard_view.standard_selection import StandardSelection
-
+from src.resource.texts import text_open_file_title
 
 # TODO more Feedback (Apply change, convert, ect.)
 
@@ -35,7 +35,7 @@ class Window(App):
         frame = Frame(None, title=text_view_title, size=(1300, 800))  # Create a Window
 
         loc = Icon()
-        loc.CopyFromBitmap(Bitmap('./src/resource/icons/icon.jpg', BITMAP_TYPE_ANY))
+        loc.CopyFromBitmap(Bitmap('./src/resource/icons/icon.png', BITMAP_TYPE_ANY))
         frame.SetIcon(loc)
 
         self._frame = frame
@@ -67,7 +67,8 @@ class Window(App):
 
         sizer = BoxSizer(VERTICAL)
         sizer.Add(FileInput(tab, text=text_open_file_title, callback=self.analyze_files,
-                            file_type=FileTypes.MUSIC.value.replace(".", "*.").replace(",", ";")),
+                            file_type=FileTypes.MUSIC.value.replace(".", "*.").replace(",", ";"),
+                            text_open_file_title=text_open_file_title, text_open_file=text_open_file),
                   flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
 
         sizer.Add(selections,
@@ -107,7 +108,8 @@ class Window(App):
     # TODO remove all hard coded
     def init_tab_convert(self, tab):
         convert_input = FileInput(tab, text=text_open_file_title, callback=self._add_convert,
-                                  file_type=FileTypes.VIDEO.value.replace(".", "*.").replace(",", ";"))
+                                  file_type=FileTypes.VIDEO.value.replace(".", "*.").replace(",", ";"),
+                                  text_open_file_title=text_open_file_title, text_open_file=text_open_file)
         self._convert_list = Preview(tab, SimpleTags, border=self._border_size, buttons=[[self._start_convert, "Start"]])
         self.codec_selection = StandardSelection(tab, callback=None, title="Codec", radio_enum=SelectionCodecs)
 

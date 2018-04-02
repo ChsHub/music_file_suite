@@ -21,7 +21,7 @@ class Controller:
         self._Downloader = Downloader(self)
         self._Main_view = Window(self)
 
-    def submit(self, *args):
+    def _submit(self, *args):
         #f, *args = args
         #f(*args)
         #return # TODO remove debug
@@ -40,39 +40,39 @@ class Controller:
     # +++View+++
     def analyze_files(self, path, files):
         if self._Main_model:
-            self.submit(self._Main_model.analyze_files, path, files)
+            self._submit(self._Main_model.analyze_files, path, files)
 
     def set_data(self):
         if self._Main_model:
-            self.submit(self._Main_model.set_data)
+            self._submit(self._Main_model.set_data)
 
     def set_is_meta(self, is_meta):
         if self._Main_model:
-            self.submit(self._Main_model.set_is_meta, is_meta)
+            self._submit(self._Main_model.set_is_meta, is_meta)
 
     def set_is_album(self, is_album):
         if self._Main_model:
-            self.submit(self._Main_model.set_is_album, is_album)
+            self._submit(self._Main_model.set_is_album, is_album)
 
     def download(self, url):
         if self._Downloader:
-            self.submit(self._Downloader.consume_element, url)
+            self._submit(self._Downloader.consume_element, url)
 
     def add_convert(self, path, files):
         if self._Converter:
-            self.submit(self._Converter.add_job, path, files)
+            self._submit(self._Converter.add_job, path, files)
 
     def make_playlist(self):
         if self._Main_model:
-            self.submit(self._Main_model.make_playlist)
+            self._submit(self._Main_model.make_playlist)
 
     def start_convert(self, selection):
         if self._Converter:
-            self.submit(self._Converter.start_convert, selection)
+            self._submit(self._Converter.start_convert, selection)
 
     def edit_song(self, row, column, data):
         if self._Main_model:
-            self.submit(self._Main_model.edit_song, row, column, data)
+            self._submit(self._Main_model.edit_song, row, column, data)
 
     # +++Model+++
 

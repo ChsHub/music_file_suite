@@ -1,8 +1,16 @@
 # -*- coding: utf8 -*-
-from utility.os_interface import get_absolute_path
+from logging import error
+from utility.os_interface import get_absolute_path,exists
+
 
 ffmpeg_path = get_absolute_path('lib\\ffmpeg\\bin\\ffmpeg.exe')
+if not exists(ffmpeg_path):
+    error('ffmpeg not found')
+
 ffprobe_path = get_absolute_path('lib\\ffmpeg\\bin\\ffprobe.exe')
+if not exists(ffprobe_path):
+    error('ffprobe not found')
+
 downloader_command = ['youtube-dl', '--no-check-certificate']  # , '-U'
 path_to_download_dir = 'D:\\Downloads\\Downloader\\Neu mp4'
 
