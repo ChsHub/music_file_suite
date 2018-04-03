@@ -92,7 +92,9 @@ class Converter:
     def get_file_extension(file_path):
 
         # get codec with probe
-        audio_codec = getoutput(input_command.replace("input", file_path))
+        command = input_command.replace("input", file_path)
+        info("PROBING: " + command)
+        audio_codec = getoutput(command)
         audio_codec = audio_codec.replace("\r", "").replace("\n", "")
         info("AUDIO CODEC: " + audio_codec)
         resolve = {'vorbis': 'ogg', 'aac': 'm4a', 'mp3': 'mp3'}

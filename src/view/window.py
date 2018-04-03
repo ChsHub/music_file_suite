@@ -6,6 +6,7 @@ from wxwidgets.preview import Table, Preview
 from wxwidgets.file_input import FileInput
 
 from src.resource.meta_tags import MetaTags, SimpleTags, FileTypes
+from src.resource.paths import icon_path
 from src.resource.texts import SelectionTabs, text_download_input, text_selction_meta, text_selction_album, \
     SelectionCodecs, text_open_file
 from src.resource.texts import text_preview_change, text_preview_playlist
@@ -28,6 +29,7 @@ class Window(App):
     _convert_list = None
     _border_size = 10
 
+    # TODO config download location
     def __init__(self, controller):
         super().__init__()
         self._Controller = controller
@@ -35,7 +37,7 @@ class Window(App):
         frame = Frame(None, title=text_view_title, size=(1300, 800))  # Create a Window
 
         loc = Icon()
-        loc.CopyFromBitmap(Bitmap('./src/resource/icons/icon.png', BITMAP_TYPE_ANY))
+        loc.CopyFromBitmap(Bitmap(icon_path, BITMAP_TYPE_ANY))
         frame.SetIcon(loc)
 
         self._frame = frame

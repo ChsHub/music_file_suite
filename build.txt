@@ -1,1 +1,0 @@
-cxfreeze D:\Making\Python\music_file_suite\setup.py --target-dir D:\Making\Python\music_file_suite\build

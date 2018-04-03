@@ -1,3 +1,0 @@
-python cxfreeze-postinstall
-set TK_LIBRARY=C:\Python36-32\tcl\tk8.6
-set TCL_LIBRARY=C:\Python36-32\tcl\tlc8.6
