@@ -1,5 +1,9 @@
 # -*- coding: utf8 -*-
 # python-3.5
+from logging import info
+
+from utility.os_interface import get_cwd, exists
+
 from src.controller import Controller
 from utility.logger import Logger
 
@@ -8,6 +12,7 @@ from utility.logger import Logger
 
 def main():
     logger = Logger(5)
+
     controller = Controller()
     logger.shutdown()
 

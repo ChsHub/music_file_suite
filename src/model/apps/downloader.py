@@ -7,7 +7,8 @@ from utility.os_interface import get_cwd, change_dir, get_file_count
 from utility.encoding import decode
 from tempfile import TemporaryFile
 from src.resource.paths import downloader_command, path_to_download_dir
-
+from utility.os_interface import rename_file, remove_file_ending
+from utility.utilities import get_file_type
 # TODO KILL/STOP
 class Downloader:
     _Controller = None
@@ -27,8 +28,13 @@ class Downloader:
             file_count = get_file_count(path_to_download_dir)
 
             change_dir(path_to_download_dir)
-
             process = Popen(downloader_command + [url], stdin=None, stdout=PIPE, stderr=None, shell=False)
+
+            file_name = ""
+            for line in process.stdout:
+                if "Destination: " in decode(line):
+                    file_name = decode(line).split("Destination: ")[-1]
+                    break
 
             data = '0%'
             while data:
@@ -41,6 +47,11 @@ class Downloader:
                     pass
                 print(data)
 
+            # TODO playlists
+            rename_file(path=".",
+                        old_file=file_name,
+                        new_file=remove_file_ending(file_name)[:-12]+get_file_type(file_name))
             change_dir(os_dir)
+
 
         info("FINISH DOWNLOAD")

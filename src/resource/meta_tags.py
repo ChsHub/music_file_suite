@@ -14,6 +14,10 @@ class SimpleTags(Enum):
     File = "File"
     Progress = "Progress"
 
+class DownloadTags(Enum):
+    File = "File"
+    Title = 'Title'
+    Progress = "Progress"
 
 class FileTypes(Enum):
     MUSIC = ".ogg,.m4a,.mp3"

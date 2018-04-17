@@ -16,25 +16,29 @@ def get_tuples():
     return files
 
 
+# TODO RUN TESTS
+
 # Search project version
 # TODO def method with setup.py
-version_match = search(r"^__version__ = ['\"]([^'\"]*)['\"]", read_file_data('./__init__.py'), M)
-if version_match:
-    version = version_match.group(1)
-else:
-    raise RuntimeError("Unable to find version string.")
+def get_version():
+    version_match = search(r"^__version__ = ['\"]([^'\"]*)['\"]", read_file_data('./__init__.py'), M)
+    if version_match:
+        return version_match.group(1)
+    else:
+        raise RuntimeError("Unable to find version string.")
+
 
 # generate .spec file
 spec_file = text_view_title + '.spec'
 if not exists(spec_file):
     # generate dist --noconsole
-    Popen('pyinstaller __main__.py  --noconfirm --onedir --name "' + text_view_title + '" --icon "' + icon_path.replace(
-        "png", "ico") + '"').communicate()
+    Popen('pyinstaller __main__.py  --noconfirm --onedir --name "' + text_view_title +
+          '" --icon "' + icon_path + '"').communicate()
 
     spec_data = read_file_data(spec_file)
     spec_data = spec_data.replace("datas=[",
-                                  "datas=[" + get_tuples() + ",('./src/resource/icons/icon.png','./src/resource/icons')"
-                                                             ",('./log_files','./log_files')")
+                                  "datas=[" + get_tuples() + ",('" + icon_path + "','./src/resource/icons')"
+                                                                                 ",('./log_files','./log_files')")
     write_file_data(".", spec_file, spec_data)
 # no else
 
@@ -45,3 +49,5 @@ Popen('pyinstaller "' + text_view_title + '.spec" --noconfirm').communicate()
 command = '"' + get_absolute_path(get_full_path('./dist', text_view_title, text_view_title + '.exe')) + '"'
 # print(command)
 # Popen(command).communicate()
+
+# TODO refactor, remove hard coded
