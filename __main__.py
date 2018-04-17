@@ -1,11 +1,12 @@
-from logging import info
-
-from utility.os_interface import get_cwd, exists
-
+# python-3.5
 from app import main
-from src.resource.paths import icon_path
 
 if __name__ == '__main__':
-    print(get_cwd())
-    print(exists(icon_path))
-    main().MainLoop()
+    main()
+    # TODO youtube link history
+    # TODO Resume in next session
+    # TODO Settings
+    # TODO Languages
+    # TODO upgrade youtube-dl, mutagen
+    # TODO click on links in download list
+    # TODO open directories from link

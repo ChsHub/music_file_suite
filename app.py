@@ -3,6 +3,10 @@
 # python-3.5
 from src.controller.controller import Controller
 from utility.logger import Logger
+from logging import info
+
+from utility.os_interface import get_cwd, exists
+from src.resource.paths import icon_path
 
 
 # pip install youtube-dl
@@ -10,7 +14,11 @@ from utility.logger import Logger
 
 
 def main():
+
     logger = Logger(5)
+    info(get_cwd())
+    info(exists(icon_path))
     controller = Controller()
-    #logger.shutdown()
-    return controller._Main_view
+    controller._Main_view.MainLoop()
+    logger.shutdown()
+
