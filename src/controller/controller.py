@@ -22,9 +22,6 @@ class Controller:
         self._Main_view = Window(self)
 
     def _submit(self, *args):
-        #f, *args = args
-        #f(*args)
-        #return # TODO remove debug
         future = self.executor.submit(*args)
         # called after execution of this task
         future.add_done_callback(self.error_log)

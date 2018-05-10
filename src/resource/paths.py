@@ -14,7 +14,6 @@ if not exists(ffprobe_path):
 downloader_command = ['youtube-dl', '--no-check-certificate']  # , '-U'
 path_to_download_dir = 'D:\\Downloads\\Downloader\\Neu mp4'
 
-# TODO convert music to music
 command_extract = '"'+ffmpeg_path+'" -i "input" -vn -sn ' \
                   '-c:a copy -map_metadata 0 -id3v2_version 3  "output"'
 

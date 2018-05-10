@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from logging import info, error
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
@@ -10,7 +8,7 @@ from utility.path_str import get_full_path
 
 # mutagen-1.37
 # TODO test if set is successful
-
+# TODO tests for upgrade
 
 class Tag:
     _tag = None

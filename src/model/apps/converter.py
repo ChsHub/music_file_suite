@@ -2,15 +2,15 @@
 
 from logging import error, info
 from re import sub
-from subprocess import getoutput, Popen
+from subprocess import getoutput, Popen, check_call
 from threading import BoundedSemaphore
-# TODO TEST for UTF-8 safety
-from utility.encoding import decode
-from utility.os_interface import exists, get_cwd, make_directory, change_dir, get_file_list
+
+from utility.os_interface import exists, make_directory
 from utility.path_str import get_full_path
-from src.resource.texts import convert_directory
+
 from src.resource.paths import command_extract, input_command, command_best_mp3, command_best_opus
 from src.resource.texts import SelectionCodecs
+from src.resource.texts import convert_directory
 
 
 class Converter:
@@ -79,8 +79,7 @@ class Converter:
             output_f = self._get_output_file_path(path_to_convert_dir, file_extension, file_path)
 
             if not exists(output_f):
-                Popen(command_extract.replace("input", file_path).replace("output", output_f),
-                      stdout=None, stderr=None, shell=False)
+                err, out = Popen(command_extract.replace("input", file_path).replace("output", output_f)).communicate()
                 return True
             else:
                 info("FILE ALREADY EXISTS: " + file_path)
@@ -118,7 +117,7 @@ class Converter:
 
         if not exists(output_f):
             Popen(command_best_mp3.replace("input", file_path).replace("output", output_f),
-                  stdout=None, stderr=None, shell=False)
+                  stdin=None, stdout=None, stderr=None, shell=False)
             return True
         else:
             info("FILE ALREADY EXISTS: " + file_path)
@@ -131,7 +130,7 @@ class Converter:
 
         if not exists(output_f):
             Popen(command_best_opus.replace("input", file_path).replace("output", output_f),
-                  stdout=None, stderr=None, shell=False)
+                  stdin=None, stdout=None, stderr=None, shell=False)
             return True
         else:
             info("FILE ALREADY EXISTS: " + file_path)

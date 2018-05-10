@@ -1,3 +1,5 @@
+from logging import info
+
 from wx import App, Frame, Notebook, Panel, EXPAND, BoxSizer, VERTICAL, EVT_CLOSE, \
     HORIZONTAL, TOP, ALL, RIGHT, LEFT, BITMAP_TYPE_ANY, Bitmap, Icon, StaticText
 from wx.lib.agw.hyperlink import HyperLinkCtrl
@@ -16,8 +18,7 @@ from src.view.standard_view.standard_selection import StandardSelection
 from src.resource.texts import text_open_file_title
 
 
-# TODO more Feedback (Apply change, convert, ect.)
-
+# TODO file types open
 
 class Window(App):
     # class
@@ -30,6 +31,8 @@ class Window(App):
     _convert_list = None
     _border_size = 10
 
+    # TODO RESET CONVERT LIST
+    # TODO BUG set wrong song on META RENAME
     # TODO config download location
     def __init__(self, controller):
         super().__init__()
@@ -60,6 +63,8 @@ class Window(App):
         for i, label in enumerate(SelectionTabs):
             self.notebook.AddPage(tabs[i], label)
 
+        info("WINDOW BUILT")
+
     def init_tab_meta(self, tab):
 
         selections = Panel(tab)
@@ -70,15 +75,13 @@ class Window(App):
                             text_open_file_title=text_open_file_title, text_open_file=text_open_file),
                   flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
 
-        sizer.Add(selections,
-                  flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
+        sizer.Add(selections, flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
 
         self._preview = Preview(tab, MetaTags, border=self._border_size, buttons=[[self.set_meta, text_preview_change],
                                                                                   [self._Controller.make_playlist,
                                                                                    text_preview_playlist]],
-                                edit_callback=self._Controller.edit_song)
-        sizer.Add(self._preview, 1,
-                  flag=EXPAND | ALL, border=self._border_size)
+                                edit_callback=self._edit_song)
+        sizer.Add(self._preview, 1, flag=EXPAND | ALL, border=self._border_size)
 
         sel_sizer = BoxSizer(HORIZONTAL)
         sel_sizer.Add(StandardSelection(parent=selections, radio_enum=SelectionAlbum,
@@ -109,7 +112,7 @@ class Window(App):
     # TODO remove all hard coded
     def init_tab_convert(self, tab):
         convert_input = FileInput(tab, text=text_open_file_title, callback=self._add_convert,
-                                  file_type=FileTypes.VIDEO.value.replace(".", "*.").replace(",", ";"),
+                                  file_type=FileTypes.VIDEO.value+FileTypes.MUSIC.value.replace(".", "*.").replace(",", ";"),
                                   text_open_file_title=text_open_file_title, text_open_file=text_open_file)
         self._convert_list = Preview(tab, SimpleTags, border=self._border_size,
                                      buttons=[[self._start_convert, "Start"]])
@@ -139,6 +142,10 @@ class Window(App):
     def _add_convert(self, path, files):
         self._Controller.add_convert(path, files)
 
+    def _edit_song(self, row, column, data):
+        info("EDIT SONG: " + str(row) + " " + str(column) + " " + str(data))
+        self._Controller.edit_song(row, column, data)
+
     # ++++ CONTROLLER ++++
     def set_meta(self, event):
         self._Controller.set_data()
@@ -160,6 +167,7 @@ class Window(App):
         self._preview.set_row_color(row, color_green)
 
     def update_preview_row(self, row, data):
+        info("UPDATE PREVIEW ROW: " + str(row) + " " + str(data))
         self._preview.update_row(data, row)
 
     def _download(self, url):

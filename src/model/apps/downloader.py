@@ -1,14 +1,18 @@
 # -*- coding: utf8 -*-
-from logging import info, error
-from subprocess import PIPE, Popen
-from threading import BoundedSemaphore
+from logging import info
 from re import findall
-from utility.os_interface import get_cwd, change_dir, get_file_count
+from subprocess import PIPE, Popen, DEVNULL
+from threading import BoundedSemaphore
+from shlex import quote
+
 from utility.encoding import decode
-from tempfile import TemporaryFile
-from src.resource.paths import downloader_command, path_to_download_dir
+from utility.os_interface import get_cwd, change_dir, get_file_count
 from utility.os_interface import rename_file, remove_file_ending
 from utility.utilities import get_file_type
+
+from src.resource.paths import downloader_command, path_to_download_dir
+
+
 # TODO KILL/STOP
 class Downloader:
     _Controller = None
@@ -28,7 +32,7 @@ class Downloader:
             file_count = get_file_count(path_to_download_dir)
 
             change_dir(path_to_download_dir)
-            process = Popen(downloader_command + [url], stdin=None, stdout=PIPE, stderr=None, shell=False)
+            process = Popen(downloader_command + [url], stdin=DEVNULL, stdout=PIPE, stderr=DEVNULL, shell=True)
 
             file_name = ""
             for line in process.stdout:
@@ -50,8 +54,7 @@ class Downloader:
             # TODO playlists
             rename_file(path=".",
                         old_file=file_name,
-                        new_file=remove_file_ending(file_name)[:-12]+get_file_type(file_name))
+                        new_file=remove_file_ending(file_name)[:-12] + get_file_type(file_name))
             change_dir(os_dir)
-
 
         info("FINISH DOWNLOAD")
