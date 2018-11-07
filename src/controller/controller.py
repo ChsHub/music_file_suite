@@ -1,6 +1,6 @@
 # python 3.2+
 from concurrent.futures import ThreadPoolExecutor
-from logging import error, exception
+from logging import exception
 from src.model.apps.downloader import Downloader
 from src.model.apps.converter import Converter
 from src.model.model import Model
@@ -47,7 +47,7 @@ class Controller:
 
     def download(self, url):
         if self._Downloader:
-            self._submit(self._Downloader.consume_element, url)
+            self._submit(self._Downloader.download, url)
 
     def make_playlist(self):
         if self._Main_model:
