@@ -96,7 +96,7 @@ class Converter:
         audio_codec = getoutput(command)
         audio_codec = audio_codec.replace("\r", "").replace("\n", "")
         info("AUDIO CODEC: " + audio_codec)
-        resolve = {'vorbis': 'ogg', 'aac': 'm4a', 'mp3': 'mp3'}
+        resolve = {'vorbis': 'ogg', 'aac': 'm4a', 'mp3': 'mp3', 'opus': 'opus'}
 
         if audio_codec in resolve.keys():
             return resolve[audio_codec]
@@ -117,7 +117,7 @@ class Converter:
 
         if not exists(output_f):
             Popen(command_best_mp3.replace("input", file_path).replace("output", output_f),
-                  stdin=None, stdout=None, stderr=None, shell=False)
+                  stdin=None, stdout=None, stderr=None, shell=False).communicate()
             return True
         else:
             info("FILE ALREADY EXISTS: " + file_path)
@@ -130,7 +130,7 @@ class Converter:
 
         if not exists(output_f):
             Popen(command_best_opus.replace("input", file_path).replace("output", output_f),
-                  stdin=None, stdout=None, stderr=None, shell=False)
+                  stdin=None, stdout=None, stderr=None, shell=False).communicate()
             return True
         else:
             info("FILE ALREADY EXISTS: " + file_path)

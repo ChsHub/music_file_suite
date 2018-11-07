@@ -77,9 +77,9 @@ class Window(App):
 
         sizer.Add(selections, flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
 
-        self._preview = Preview(tab, MetaTags, border=self._border_size, buttons=[[self.set_meta, text_preview_change],
-                                                                                  [self._Controller.make_playlist,
-                                                                                   text_preview_playlist]],
+        self._preview = Preview(tab, MetaTags, border=self._border_size,
+                                buttons=[[self.set_meta, text_preview_change],
+                                         [self._Controller.make_playlist, text_preview_playlist]],
                                 edit_callback=self._edit_song)
         sizer.Add(self._preview, 1, flag=EXPAND | ALL, border=self._border_size)
 
@@ -112,7 +112,7 @@ class Window(App):
     # TODO remove all hard coded
     def init_tab_convert(self, tab):
         convert_input = FileInput(tab, text=text_open_file_title, callback=self._add_convert,
-                                  file_type=FileTypes.VIDEO.value+FileTypes.MUSIC.value.replace(".", "*.").replace(",", ";"),
+                                  file_type=("*.*"),
                                   text_open_file_title=text_open_file_title, text_open_file=text_open_file)
         self._convert_list = Preview(tab, SimpleTags, border=self._border_size,
                                      buttons=[[self._start_convert, "Start"]])
