@@ -75,8 +75,8 @@ class Controller:
         if self._Main_view:
             self._Main_view.set_preview_data(data)
 
-    def set_download_progress(self, percent):
-        self._Main_view.set_download_progress(percent)
+    def set_download_progress(self, id, percent):
+        self._Main_view.set_download_progress(id, percent)
 
     def set_convert_progress(self, id, percent):
         self._Main_view.set_convert_progress(id, percent)

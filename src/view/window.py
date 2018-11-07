@@ -174,8 +174,8 @@ class Window(App):
         self._download_list.add_line([url, "0%"])
         self._Controller.download(url)
 
-    def set_download_progress(self, percent):
-        self._download_list.update_last_cell(data=percent, column=1)
+    def set_download_progress(self, id, percent):
+        self._download_list.update_cell(data=percent, column=1, row=id)
 
     def set_convert_progress(self, id, percent):
         self._convert_list.update_cell(percent, 1, row=id)

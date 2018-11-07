@@ -18,8 +18,10 @@ class Downloader:
     def __init__(self, controller):
         self._Controller = controller
         self._Download_sem = BoundedSemaphore(value=1)
+        self._counter = 0
 
     # TODO test directory delete
+    # TODO playlists
     def consume_element(self, url):
 
         with self._Download_sem:
@@ -30,26 +32,21 @@ class Downloader:
             change_dir(path_to_download_dir)
             process = Popen(downloader_command + [url], stdin=DEVNULL, stdout=PIPE, stderr=PIPE, shell=True)
 
-            file_name = ""
-            data = '0%'
-            match = r'(\d*\.?\d%)'
-            while data:
-                if "Destination: " in data:
-                    file_name = data.split("Destination: ")[-1].split('\n')[-1]  # TODO improve
-                data = findall(match, data)
-                if data:
-                    self._Controller.set_download_progress(data[-1])
-                try:
-                    data = decode(process.stdout.read(114))
-                except Exception as e:
-                    exception(e)
 
-                print(data)
+            file_name = ''
+            for line in process.stdout:
+                if "Destination: " in line:
+                    file_name = decode(line).split("Destination: ")[-1].strip()
+                    break
 
-            # TODO playlists
-            rename_file(path=".",
-                        old_file=file_name,
-                        new_file=remove_file_ending(file_name)[:-12] + get_file_type(file_name))
+            for line in process.stdout:
+                progress = findall(r'(\d*\.?\d%)', decode(line))
+                if progress:
+                    self._Controller.set_download_progress(self._counter, progress[-1])
+
             change_dir(os_dir)
+
+            self._Controller.set_download_progress(self._counter, '100%')
+            self._counter += 1
 
         info("FINISH DOWNLOAD")
