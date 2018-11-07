@@ -35,12 +35,14 @@ class Downloader:
 
             file_name = ''
             for line in process.stdout:
+                line = decode(line)
                 if "Destination: " in line:
-                    file_name = decode(line).split("Destination: ")[-1].strip()
+                    file_name = line.split("Destination: ")[-1].strip()
                     break
 
             for line in process.stdout:
-                progress = findall(r'(\d*\.?\d%)', decode(line))
+                line = decode(line)
+                progress = findall(r'(\d*\.?\d%)', line)
                 if progress:
                     self._Controller.set_download_progress(self._counter, progress[-1])
 
@@ -49,4 +51,4 @@ class Downloader:
             self._Controller.set_download_progress(self._counter, '100%')
             self._counter += 1
 
-        info("FINISH DOWNLOAD")
+        info("Download: DONE")

@@ -1,6 +1,6 @@
 # python 3.2+
 from concurrent.futures import ThreadPoolExecutor
-from logging import error
+from logging import error, exception
 from src.model.apps.downloader import Downloader
 from src.model.apps.converter import Converter
 from src.model.model import Model
@@ -24,10 +24,9 @@ class Controller:
     @staticmethod
     def error_log(future):
         # returns None if no exception occurred
-        exception = future.exception()
-        if exception:
-            error(type(exception))
-            error(exception)
+        result = future.exception()
+        if result:
+            exception(result)
 
     # +++View+++
     def analyze_files(self, path, files):
