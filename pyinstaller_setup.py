@@ -3,6 +3,7 @@
 # https://stackoverflow.com/questions/2720014/upgrading-all-packages-with-pip
 # pyinstaller __main__.py --noconsole --onedir
 # pyinstaller __main__.spec --noconsole
+# C:\Python36-32\python.exe -m pip install youtube-dl --upgrade
 
 # GENERATES build/dist/.EXE
 from re import search, M

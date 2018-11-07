@@ -8,21 +8,16 @@ from src.view.window import Window
 
 
 class Controller:
-    _Main_view = None
-    _Main_model = None
-    _Converter = None
-    _Downloader = None
 
     def __init__(self):
-        self.executor = ThreadPoolExecutor()
-
+        self._executor = ThreadPoolExecutor()
         self._Main_model = Model(self)
         self._Converter = Converter(self)
         self._Downloader = Downloader(self)
         self._Main_view = Window(self)
 
     def _submit(self, *args):
-        future = self.executor.submit(*args)
+        future = self._executor.submit(*args)
         # called after execution of this task
         future.add_done_callback(self.error_log)
 
@@ -55,23 +50,25 @@ class Controller:
         if self._Downloader:
             self._submit(self._Downloader.consume_element, url)
 
-    def add_convert(self, path, files):
-        if self._Converter:
-            self._submit(self._Converter.add_job, path, files)
-
     def make_playlist(self):
         if self._Main_model:
             self._submit(self._Main_model.make_playlist)
-
-    def start_convert(self, selection):
-        if self._Converter:
-            self._submit(self._Converter.start_convert, selection)
 
     def edit_song(self, row, column, data):
         if self._Main_model:
             self._submit(self._Main_model.edit_song, row, column, data)
 
-    # +++Model+++
+    # +++ Converter +++
+
+    def add_convert(self, path, files):
+        if self._Converter:
+            self._submit(self._Converter.add_job, path, files)
+
+    def start_convert(self, selection):
+        if self._Converter:
+            self._submit(self._Converter.start_convert, selection)
+
+    # +++ Model +++
 
     # called: Model -> Album -> Controller -> Window
     def set_view(self, data):
