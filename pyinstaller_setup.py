@@ -40,11 +40,9 @@ def generate_dist():
               '" --icon "' + icon_path + '"').communicate()
 
         spec_data = read_file_data(spec_file)
-        lib_data = get_tuples('./lib/', types='') + ',' + \
-                   get_tuples('resources', types=['.ico', '.cfg'])
-        print(lib_data)
         spec_data = spec_data.replace('datas=[',
-                                      'datas=[' + lib_data)
+                                      'datas=[' + get_tuples('./lib/', types='') + ','
+                                      + get_tuples('resources', types=['.ico', '.cfg']))
         write_file_data(".", spec_file, spec_data)
     # no else
 

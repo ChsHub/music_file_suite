@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from logging import exception
 from src.model.apps.downloader import Downloader
 from src.model.apps.converter import Converter
-from src.model.model import Model
+from src.model.songs.album import Album
 from src.view.window import Window
 
 
@@ -11,7 +11,7 @@ class Controller:
 
     def __init__(self):
         self._executor = ThreadPoolExecutor()
-        self._Main_model = Model(self)
+        self._Album = Album(self)
         self._Converter = Converter(self)
         self._Downloader = Downloader(self)
         self._Main_view = Window(self)
@@ -30,32 +30,32 @@ class Controller:
 
     # +++View+++
     def analyze_files(self, path, files):
-        if self._Main_model:
-            self._submit(self._Main_model.analyze_files, path, files)
+        if self._Album:
+            self._submit(self._Album.set_files, path, files)
 
     def set_data(self):
-        if self._Main_model:
-            self._submit(self._Main_model.set_data)
+        if self._Album:
+            self._submit(self._Album.set_data)
 
     def set_is_meta(self, is_meta):
-        if self._Main_model:
-            self._submit(self._Main_model.set_is_meta, is_meta)
+        if self._Album:
+            self._submit(self._Album.set_is_meta, is_meta)
 
     def set_is_album(self, is_album):
-        if self._Main_model:
-            self._submit(self._Main_model.set_is_album, is_album)
+        if self._Album:
+            self._submit(self._Album.set_is_album, is_album)
 
     def download(self, url):
         if self._Downloader:
             self._submit(self._Downloader.download, url)
 
     def make_playlist(self):
-        if self._Main_model:
-            self._submit(self._Main_model.make_playlist)
+        if self._Album:
+            self._submit(self._Album.make_playlist)
 
     def edit_song(self, row, column, data):
-        if self._Main_model:
-            self._submit(self._Main_model.edit_song, row, column, data)
+        if self._Album:
+            self._submit(self._Album.edit_song, row, column, data)
 
     # +++ Converter +++
 

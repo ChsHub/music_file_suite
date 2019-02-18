@@ -21,6 +21,9 @@ class Downloader:
     # TODO playlists
     def download(self, url):
 
+        if not url:
+            return
+
         with self._Download_sem:
             self._counter += 1
             info("DOWNLOAD: " + url)
@@ -32,11 +35,11 @@ class Downloader:
             line0, line1 = ' ', ''
             while line0 != line1:
 
-                err = process.stderr.readlines()
-                if err:
-                    self._Controller.set_download_progress(self._counter, 'Error: update youtube-dl version')
-                    error(str(err))
-                    return
+                #err = process.stderr.readlines()
+                #if err:
+                #    self._Controller.set_download_progress(self._counter, 'Error: update youtube-dl version')
+                #    error(str(err))
+                #    return # TODO use async to read err and out simultaneously
                 line1 = line0
                 line0 += decode(process.stdout.read(100))
                 progress = line0.split('\r')

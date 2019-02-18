@@ -38,9 +38,8 @@ config.read(settings_path)
 
 
 class SelectionAlbum(Enum):
-    DETECTED = config['SelectionAlbum']['DETECTED']
-    ALBUM = config['SelectionAlbum']['ALBUM']
     RANDOM = config['SelectionAlbum']['RANDOM']
+    ALBUM = config['SelectionAlbum']['ALBUM']
 
 
 class SelectionMeta(Enum):

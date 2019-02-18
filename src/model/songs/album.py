@@ -1,4 +1,7 @@
 from logging import info
+from threading import BoundedSemaphore
+
+from utility.os_interface import exists
 
 from src.resource.meta_tags import MetaTags
 from src.model.songs.song import Song
@@ -12,34 +15,41 @@ class Album:
     _Songs = {}
     _failed_Songs = None
     # Threading
-    active = True
+    _active = True
     meta_data = None
 
-    def __init__(self, album_path, files, controller):
+    def __init__(self, controller):
 
-        if not album_path:
-            raise ValueError
-
-        self.meta_data = {}
-        self._Songs = []
-        self.album_path = album_path
         self._Controller = controller
+        self._album_sem = BoundedSemaphore(value=1)
 
-        # gather data from path
-        artist, album = get_artist_and_album(self.album_path)
-        self.meta_data[MetaTags.Artist] = artist
-        self.meta_data[MetaTags.AlbumArtist] = artist  # Album path
-        self.meta_data[MetaTags.Album] = album  # Album path
-        info("ANALYZE: START")
+    def set_files(self, album_path, files):
+        self._active = False  # join everything / wait
 
-        for file in files:
-            self._Songs.append(Song(album_path, file, self))
-
-            if not self.active:  # interupt by another process
+        with self._album_sem:
+            self._active = True
+            if not exists(album_path):
+                info('Not a valid path')
                 return
 
-        info("ANALISE: DONE")
-        self.set_all_view()
+            self.album_path = album_path
+            self.meta_data = {}
+            self._Songs = []
+
+            # gather data from path
+            artist, album = get_artist_and_album(self.album_path)
+            self.meta_data[MetaTags.Artist] = artist
+            self.meta_data[MetaTags.AlbumArtist] = artist  # Album path
+            self.meta_data[MetaTags.Album] = album  # Album path
+
+            for file in files:
+                self._Songs.append(Song(album_path, file, self))
+
+                if not self._active:  # interupt by another process
+                    return
+
+            info("ANALISE: DONE")
+            self.set_all_view()
 
     def __getitem__(self, item):
         return self.meta_data[item]
@@ -52,10 +62,10 @@ class Album:
             self.set_error_color(i)
 
     def set_error_color(self, i):
-            if self._Songs[i].get_error():
-                self._Controller.set_meta_color_warning(i)
-            else:
-                self._Controller.set_meta_color_normal(i)
+        if self._Songs[i].get_error():
+            self._Controller.set_meta_color_warning(i)
+        else:
+            self._Controller.set_meta_color_normal(i)
 
     def set_data(self):
 
@@ -67,36 +77,37 @@ class Album:
         info('Set meta and rename complete')
 
     def set_is_album(self, is_album):
-        is_album = SelectionAlbum(is_album)
-        if is_album == SelectionAlbum.ALBUM:
-            for song in self._Songs:
-                song.set_album_strategy()
-        elif is_album == SelectionAlbum.RANDOM:
-            for song in self._Songs:
-                song.set_common_strategy()
-        elif is_album == SelectionAlbum.DETECTED:
-            for song in self._Songs:
-                song.set_detected_strategy()
-        else:
-            raise ValueError
-        self.set_all_view()
+        with self._album_sem:
+
+            is_album = SelectionAlbum(is_album)
+            if is_album == SelectionAlbum.ALBUM:
+                for song in self._Songs:
+                    song.set_album_strategy()
+            elif is_album == SelectionAlbum.RANDOM:
+                for song in self._Songs:
+                    song.set_common_strategy()
+            else:
+                raise ValueError
+            self.set_all_view()
 
     def set_is_meta(self, use_meta):
+        with self._album_sem:
 
-        use_meta = SelectionMeta(use_meta)
-        if use_meta == SelectionMeta.NO_META:
-            for song in self._Songs:
-                song.set_ignore_meta()
-        elif use_meta == SelectionMeta.META:
-            for song in self._Songs:
-                song.set_use_meta()
-        else:
-            raise ValueError
-        self.set_all_view()
+            use_meta = SelectionMeta(use_meta)
+            if use_meta == SelectionMeta.NO_META:
+                for song in self._Songs:
+                    song.set_ignore_meta()
+            elif use_meta == SelectionMeta.META:
+                for song in self._Songs:
+                    song.set_use_meta()
+            else:
+                raise ValueError
+            self.set_all_view()
 
     def edit_song(self, row, column, data):
-        self._Songs[row].edit(column, data)
-        self.update_song_view(row)
+        with self._album_sem:
+            self._Songs[row].edit(column, data)
+            self.update_song_view(row)
 
     def update_song_view(self, row):
 
@@ -104,7 +115,4 @@ class Album:
         self._Controller.update_meta_line(row, result)
         self.set_error_color(row)
 
-    # +++ Threading +++
 
-    def set_inactive(self):
-        self.active = False
