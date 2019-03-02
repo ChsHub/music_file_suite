@@ -27,7 +27,7 @@ class Converter:
         with self._convert_sem:
             self._jobs.append((path, files))
         for file in files:
-            self._controller.add_convert_line([file, "0%"])
+            self._controller.add_convert_line([file, ""])
 
     def start_convert(self, selection):
         info(selection)
@@ -45,8 +45,8 @@ class Converter:
 
         # Receive command based on strategy
         command = commands[strategy]
-
-        for i, (path, files) in enumerate(jobs):
+        i = 0
+        for path, files in jobs:
 
             make_directory(get_full_path(path, convert_directory))
             info("Convert: " + str(len(files)) + " files")
@@ -65,7 +65,7 @@ class Converter:
                 elif extension:
                     run(command.replace("input", file_path).replace("output", output_file))
                     self._controller.set_convert_progress(i, "100%")
-
+                i += 1
         info("Convert: DONE")
 
     # +++ CONVERT STRATEGIES +++
@@ -85,7 +85,6 @@ class Converter:
         """
         command = input_command.replace("input", file_path)
         info("PROBING: " + command)
-
         audio_codec = getoutput(command)
         info("AUDIO CODEC: " + audio_codec)
 

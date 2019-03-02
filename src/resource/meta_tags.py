@@ -22,5 +22,5 @@ class DownloadTags(Enum):
 
 
 class FileTypes(Enum):
-    MUSIC = ".ogg,.m4a,.mp3,.opus"
+    MUSIC = ".ogg,.m4a,.mp3,.opus,.flac"
     VIDEO = ".mp4,.webm,.flv"

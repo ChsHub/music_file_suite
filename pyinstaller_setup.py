@@ -6,29 +6,12 @@
 # C:\Python36-32\python.exe -m pip install youtube-dl --upgrade
 
 # GENERATES build/dist/.EXE
-from re import search, M
 from subprocess import Popen
 from utility.os_interface import delete_file, exists, get_full_path, read_file_data, write_file_data, \
-    get_absolute_path, depth_search_files, make_directory
-
+    get_absolute_path
+from utility.setup_lib import get_tuples
 from src.resource.paths import icon_path
 from src.resource.texts import text_view_title
-
-
-def get_tuples(path, types):
-    files = depth_search_files(path=path, types=types)
-    files = [str(((get_full_path(directory, file)), directory)) for directory, file in files]
-    files = ",".join(files)
-    return files
-
-
-# Search project version
-def get_version():
-    version_match = search(r"^__version__ = ['\"]([^'\"]*)['\"]", read_file_data('./__init__.py'), M)
-    if version_match:
-        return version_match.group(1)
-    else:
-        raise RuntimeError('Unable to find version string.')
 
 
 def generate_dist():

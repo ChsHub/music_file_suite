@@ -69,13 +69,19 @@ class Controller:
 
     # +++ Model +++
 
-    # called: Model -> Album -> Controller -> Window
+    # +++ Downloader +++
+    # called: Album -> Controller -> Window
     def set_view(self, data):
         if self._Main_view:
             self._Main_view.set_preview_data(data)
 
     def set_download_progress(self, id, percent):
         self._Main_view.set_download_progress(id, percent)
+
+    def set_download_title(self, id, title):
+        self._Main_view.set_download_title(id, title)
+
+    # +++ CONVERTER +++
 
     def set_convert_progress(self, id, percent):
         self._Main_view.set_convert_progress(id, percent)

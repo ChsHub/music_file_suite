@@ -17,7 +17,7 @@ from src.view.standard_view.colors import color_red, color_green, color_white
 from src.view.standard_view.standard_selection import StandardSelection
 from src.resource.texts import text_open_file_title
 
-
+from src import __version__
 # TODO file types open
 
 class Window(App):
@@ -38,7 +38,7 @@ class Window(App):
         super().__init__()
         self._Controller = controller
 
-        window = Frame(None, title=text_view_title, size=(1300, 800))  # Create a Window
+        window = Frame(None, title=text_view_title+' '+ __version__, size=(1300, 800))  # Create a Window
 
         loc = Icon()
         loc.CopyFromBitmap(Bitmap(icon_path, BITMAP_TYPE_ANY))
@@ -170,15 +170,24 @@ class Window(App):
         info("UPDATE PREVIEW ROW: " + str(row) + " " + str(data))
         self._preview.update_row(data, row)
 
+
+    # +++ Downloader +++
+
     def _download(self, url):
-        self._download_list.add_line([url, "0%"])
+        self._download_list.add_line([url, ""])
         self._Controller.download(url)
 
     def set_download_progress(self, id, percent):
-        self._download_list.update_cell(data=percent, column=1, row=id)
+        self._download_list.update_cell(data=percent, column=2, row=id)
+
+    def set_download_title(self, id, title):
+        self._download_list.update_cell(data=title, column=1, row=id)
+
+    # +++ CONVERTER +++
 
     def set_convert_progress(self, id, percent):
         self._convert_list.update_cell(percent, 1, row=id)
+
 
     def add_convert_line(self, line):
         self._convert_list.add_line(line)
