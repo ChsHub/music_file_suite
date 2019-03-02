@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from logging import info, error
+from logging import info, error, exception
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 from mutagen._file import File
@@ -26,10 +26,10 @@ class TagMP3:
         try:
             self._tag = MP3(self.file_path)  # , ID3=EasyID3, encoding=3)
         except Exception as e:
-            error("READ MP3 META " + self.file_path + " " + str(e))
+            exception("READ MP3 META " + self.file_path + " " + str(e))
 
         if self._tag is None:
-            error("READ MP3 META : " + self.file_path + " is none")
+            exception("READ MP3 META : " + self.file_path + " is none")
 
     def save_tag(self):
         try:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from logging import info, error
+from logging import info, error, exception
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 from mutagen._file import File
@@ -27,10 +27,10 @@ class Tag(Tag):
         try:
             self._tag = File(self.file_path)
         except Exception as e:
-            error("get audio_file " + self.file_path)
+            exception("get audio_file " + self.file_path)
 
         if self._tag is None:
-            error("get_audiofile audio_file is none: " + self.file_path)
+            exception("get_audiofile audio_file is none: " + self.file_path)
 
         print(type(self._tag))
 

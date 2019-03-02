@@ -115,4 +115,6 @@ class Album:
         self._Controller.update_meta_line(row, result)
         self.set_error_color(row)
 
-
+    def create_playlist(self):
+        raise NotImplementedError
+        # TODO playlist

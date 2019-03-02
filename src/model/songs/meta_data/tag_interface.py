@@ -1,4 +1,4 @@
-from logging import info, error
+from logging import info, error, exception
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 from mutagen._file import File
@@ -41,7 +41,7 @@ class Tag:
         except Warning as e:
             error("reset_tag corrupted file", self.file_path, e)
         except Exception as e:
-            error(str(e))
+            exception(e)
 
     # GETTER
     def get_attribute(self, attribute_str):

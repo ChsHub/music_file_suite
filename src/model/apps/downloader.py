@@ -6,7 +6,8 @@ from threading import BoundedSemaphore
 from utility.encoding import decode
 from utility.os_interface import get_cwd, change_dir
 
-from src.resource.paths import downloader_command, path_to_download_dir
+from src.resource.paths import downloader_command
+from src.resource.settings import download_path
 
 # TODO KILL/STOP
 class Downloader:
@@ -30,7 +31,7 @@ class Downloader:
         info("DOWNLOAD: " + url)
         os_dir = get_cwd()
 
-        change_dir(path_to_download_dir)
+        change_dir(download_path)
         process = Popen(downloader_command + [url], stdin=DEVNULL, stdout=PIPE, stderr=PIPE, shell=True)
 
 

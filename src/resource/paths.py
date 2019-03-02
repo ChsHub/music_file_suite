@@ -12,7 +12,7 @@ if not exists(_ffprobe_path):
     error('ffprobe not found')
 
 downloader_command = ['youtube-dl', '--no-check-certificate']  # , '-U'
-path_to_download_dir = 'D:\\Downloads\\Downloader\\Neu mp4'
+
 
 _command_input = '"' + _ffmpeg_path + '" -i "input" -vn -sn -c:a '
 

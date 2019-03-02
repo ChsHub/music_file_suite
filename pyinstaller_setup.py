@@ -16,7 +16,7 @@ from src.resource.texts import text_view_title
 
 def generate_dist():
     # TODO RUN TESTS
-    # generate .spec file
+    # Generate .spec file
     spec_file = text_view_title + '.spec'
     if not exists(spec_file): #
         Popen('pyinstaller __main__.py --noconfirm --onedir --noconsole --name "' + text_view_title +
@@ -29,16 +29,14 @@ def generate_dist():
         write_file_data(".", spec_file, spec_data)
     # no else
 
-    # generate dist
-    # no confirm -> overwrite last dist
+    # Generate dist
+    # No confirm -> overwrite last dist
     Popen('pyinstaller "' + spec_file + '" --noconfirm').communicate()
     delete_file(spec_file)
-    # run application
+    # Run application
     command = '"' + get_absolute_path(get_full_path('./dist', text_view_title, text_view_title + '.exe')) + '"'
     print(command)
     Popen(command).communicate()
-
-    # TODO refactor, remove hard coded
 
 
 if __name__ == '__main__':

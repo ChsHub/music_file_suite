@@ -3,9 +3,11 @@ from enum import Enum
 from configparser import ConfigParser
 from utility.os_interface import exists
 
-settings_path = 'resources/settings.cfg'
-if not exists(settings_path):
-    config = ConfigParser()
+texts_path = 'resources/texts.cfg'
+config = ConfigParser()
+
+# Write default settings, if missing
+if not exists(texts_path):
     config['SelectionAlbum'] = {'DETECTED': 'as detected',
                                 'ALBUM': 'is Album',
                                 'RANDOM': 'is random'}
@@ -22,6 +24,7 @@ if not exists(settings_path):
                       'text_convert_input': 'Convert',
                       'text_file_input': 'Open File',
                       'text_view_title': 'Music Suite',
+                      'text_set_download': 'Set Download Directory',
                       'text_open_file_title': 'Open Files',
                       'text_open_file': 'Music or Video',
 
@@ -30,12 +33,11 @@ if not exists(settings_path):
 
                       'convert_directory': 'CONVERTED'}
 
-    with open(settings_path, 'w') as configfile:
+    with open(texts_path, 'w') as configfile:
         config.write(configfile)
 
-config = ConfigParser()
-config.read(settings_path)
-
+# Read settings
+config.read(texts_path)
 
 class SelectionAlbum(Enum):
     RANDOM = config['SelectionAlbum']['RANDOM']
@@ -61,6 +63,7 @@ text_download_input = config['Text']['text_download_input']
 text_convert_input = config['Text']['text_convert_input']
 text_file_input = config['Text']['text_file_input']
 text_view_title = config['Text']['text_view_title']
+text_set_download = config['Text']['text_set_download']
 text_open_file_title = config['Text']['text_open_file_title']
 text_open_file = config['Text']['text_open_file']
 
