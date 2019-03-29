@@ -15,6 +15,7 @@ class Controller:
         self._Converter = Converter(self)
         self._Downloader = Downloader(self)
         self._Main_view = Window(self)
+        self._submit(self._Downloader.load_queue)
 
     def _submit(self, *args):
         future = self._executor.submit(*args)
@@ -78,8 +79,8 @@ class Controller:
     def set_download_progress(self, id, percent):
         self._Main_view.set_download_progress(id, percent)
 
-    def set_download_title(self, id, title):
-        self._Main_view.set_download_title(id, title)
+    def set_download_title(self, id, title, url):
+        self._Main_view.set_download_title(id, title, url)
 
     # +++ CONVERTER +++
 

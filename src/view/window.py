@@ -167,13 +167,13 @@ class Window(App):
     # +++ Downloader +++
 
     def _download(self, url):
-        self._download_list.add_line([url, ""])
         self._Controller.download(url)
 
     def set_download_progress(self, id, percent):
         self._download_list.update_cell(data=percent, column=2, row=id)
 
-    def set_download_title(self, id, title):
+    def set_download_title(self, id, title, url):
+        self._download_list.add_line([url, ""])
         self._download_list.update_cell(data=title, column=1, row=id)
 
     # +++ CONVERTER +++

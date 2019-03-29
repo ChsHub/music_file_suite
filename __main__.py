@@ -18,6 +18,4 @@ if __name__ == '__main__':
         except Exception as e:
             exception(e)
 
-    # TODO youtube link history
-    # TODO Resume in next session
     # TODO click on links in download list,  open directories from link
