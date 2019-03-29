@@ -1,8 +1,8 @@
 from logging import info
 
 from utility.timer import Timer
-from wx import App, Frame, Notebook, Panel, EXPAND, BoxSizer, VERTICAL, EVT_CLOSE, \
-    HORIZONTAL, TOP, ALL, RIGHT, LEFT, BITMAP_TYPE_ANY, Bitmap, Icon, StaticText
+from wx import App, Frame, Notebook, Panel, EXPAND, VERTICAL, EVT_CLOSE, \
+    HORIZONTAL, TOP, ALL, RIGHT, LEFT, BITMAP_TYPE_ANY, Bitmap, Icon
 from wx.lib.agw.hyperlink import HyperLinkCtrl
 from wxwidgets import DirectoryInput, SimpleSizer, FileInput, InputWidget, Table, Preview
 
@@ -38,16 +38,16 @@ class Window(App):
         self._Controller = controller
 
         with Timer("WINDOW BUILT"):
-            window = Frame(None, title=text_view_title + ' ' + __version__, size=(1300, 800))  # Create a Window
-
+            # Create a Window
+            window = Frame(None, title=text_view_title + ' ' + __version__, size=(1300, 800))
+            self._frame = window
+            window.Bind(EVT_CLOSE, lambda x: window.Destroy())  # Close Window event
+            # Set Icon
             loc = Icon()
             loc.CopyFromBitmap(Bitmap(icon_path, BITMAP_TYPE_ANY))
             window.SetIcon(loc)
-
-            self._frame = window
-            window.Bind(EVT_CLOSE, lambda x: window.Destroy())  # Close Window<
-
-            self.notebook = Notebook(window, EXPAND)  # Tabs
+            # Create tabs
+            self.notebook = Notebook(window, EXPAND)
             tabs = []
 
             for label in SelectionTabs:
@@ -68,9 +68,8 @@ class Window(App):
         selections = Panel(tab)
 
         with SimpleSizer(tab, VERTICAL) as sizer:
-            sizer.Add(FileInput(tab, text=text_open_file_title, callback=self.analyze_files,
-                                file_type=FileTypes.MUSIC.value.replace(".", "*.").replace(",", ";"),
-                                text_open_file_title=text_open_file_title, text_open_file=text_open_file),
+            sizer.Add(FileInput(tab, text_button=text_open_file_title, callback=self.analyze_files,
+                                text_title=text_open_file_title, text_open_file=text_open_file),
                       flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
 
             sizer.Add(selections, flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
@@ -93,7 +92,7 @@ class Window(App):
     # TODO COLORS when done
     def init_tab_download(self, tab):
 
-        download_input = InputWidget(tab, text=text_download_input, callback=self._download, reset=True)
+        download_input = InputWidget(tab, text_button=text_download_input, callback=self._download, reset=True)
         self._download_list = Table(tab, headers=[str(x.value) for x in DownloadTags])  # TODO remove hard code
 
         with SimpleSizer(tab, VERTICAL) as sizer:
@@ -105,9 +104,8 @@ class Window(App):
     # TODO BUG intial selection not applied
     # TODO remove all hard coded
     def init_tab_convert(self, tab):
-        convert_input = FileInput(tab, text=text_open_file_title, callback=self._add_convert,
-                                  file_type=("*.*"),
-                                  text_open_file_title=text_open_file_title, text_open_file=text_open_file)
+        convert_input = FileInput(tab, text_button=text_open_file_title, callback=self._add_convert,
+                                  text_title=text_open_file_title, text_open_file=text_open_file)
         self._convert_list = Preview(tab, SimpleTags, border=self._border_size,
                                      buttons=[[self._start_convert, "Start"]])
         self.codec_selection = StandardSelection(tab, callback=None, title="Codec", radio_enum=SelectionCodecs)
@@ -119,18 +117,18 @@ class Window(App):
 
     def _init_tab_config(self, tab):
         with SimpleSizer(tab, VERTICAL) as sizer:
-            sizer.Add(DirectoryInput(parent=tab, text=text_set_download, callback=set_download_directory, file_type='',
-                                     text_open_file_title=text_set_download, text_open_file=text_set_download,
-                                     initial=download_path), flag=ALL, border=self._border_size)
+            sizer.Add(DirectoryInput(parent=tab, text_button=text_set_download, callback=set_download_directory,
+                                     text_title=text_set_download, initial=download_path),
+                      flag=ALL, border=self._border_size)
 
     def _init_tab_about(self, tab):
         with SimpleSizer(tab, VERTICAL) as sizer:
-            text = HyperLinkCtrl(tab, label="https://www.youtube.com/")
-            sizer.Add(text, flag=TOP, border=self._border_size)
-            text = StaticText(tab, label="This software uses libraries from the FFmpeg project under the LGPLv2.1")
+            text = HyperLinkCtrl(tab, label="https://www.youtube.com/", URL="https://www.youtube.com/")
             sizer.Add(text, flag=TOP, border=self._border_size)
 
-        # text.GotoURL(URL="") TODO BUTTONS FOR LIBS
+            text = HyperLinkCtrl(tab, label="This software uses libraries from the FFmpeg project under the LGPLv2.1",
+                              URL="https://www.ffmpeg.org/")
+            sizer.Add(text, flag=TOP, border=self._border_size)
 
     def _start_convert(self, event):
         self._Controller.start_convert(self.codec_selection.get_selection())

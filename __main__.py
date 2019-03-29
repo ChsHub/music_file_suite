@@ -1,9 +1,8 @@
-# python-3.5
 
 
 if __name__ == '__main__':
     from utility.logger import Logger
-    from logging import info, error
+    from logging import info, exception
 
     with Logger(20):
         try:
@@ -16,10 +15,9 @@ if __name__ == '__main__':
             controller = Controller()
             controller._Main_view.MainLoop()
 
-        except Exception as exception:
-            error(exception)
+        except Exception as e:
+            exception(e)
 
     # TODO youtube link history
     # TODO Resume in next session
     # TODO click on links in download list,  open directories from link
-    # TODO Languages

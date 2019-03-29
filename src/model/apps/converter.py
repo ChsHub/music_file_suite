@@ -1,11 +1,11 @@
 # -*- coding: utf8 -*-
 
 from logging import info
+from os.path import join
 from subprocess import getoutput, run
 from threading import BoundedSemaphore
 
 from utility.os_interface import exists, make_directory
-from utility.path_str import get_full_path
 from utility.utilities import replace_file_type
 
 from src.resource.paths import commands, input_command
@@ -27,17 +27,12 @@ class Converter:
         with self._convert_sem:
             self._jobs.append((path, files))
         for file in files:
-            self._controller.add_convert_line([file, ""])
+            self._controller.add_convert_line([file, "0%"])
 
     def start_convert(self, selection):
         info(selection)
         # Get strategy
         strategy = SelectionCodecs(selection)
-
-        # TODO Refactor converter
-        # 1 convert into temp
-        # 2 make dir
-        # 3 copy to dir
 
         # copy for thread safety
         with self._convert_sem:
@@ -48,11 +43,11 @@ class Converter:
         i = 0
         for path, files in jobs:
 
-            make_directory(get_full_path(path, convert_directory))
+            make_directory(join(path, convert_directory))
             info("Convert: " + str(len(files)) + " files")
 
             for file in files:
-                file_path = get_full_path(path, file)
+                file_path = join(path, file)
 
                 # Receive new file extension based on strategy
                 extension = self._extension[strategy](file_path, i)
@@ -75,7 +70,7 @@ class Converter:
         file_path = file_path.split("/")
         file_path[-1] = replace_file_type(file_path[-1], new_extension)
         file_path.insert(-1, convert_directory)
-        return get_full_path(*file_path)
+        return join(*file_path)
 
     def _get_audio_codec(self, file_path:str) -> str:
         """

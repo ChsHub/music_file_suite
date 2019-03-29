@@ -54,7 +54,7 @@ class Downloader:
             if not line0:
                 break
             line0 = line0.strip()
-            print(line0)
+            info(line0)
 
             progress = findall(r'(\d*\.?\d%)', line0)
             if progress:

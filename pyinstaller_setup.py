@@ -3,11 +3,12 @@
 # https://stackoverflow.com/questions/2720014/upgrading-all-packages-with-pip
 # pyinstaller __main__.py --noconsole --onedir
 # pyinstaller __main__.spec --noconsole
-# C:\Python36-32\python.exe -m pip install youtube-dl --upgrade
+# C:\Python37\python.exe -m pip install youtube-dl --upgrade
 
 # GENERATES build/dist/.EXE
+from os.path import join
 from subprocess import Popen
-from utility.os_interface import delete_file, exists, get_full_path, read_file_data, write_file_data, \
+from utility.os_interface import delete_file, exists, read_file_data, write_file_data, \
     get_absolute_path
 from utility.setup_lib import get_tuples
 from src.resource.paths import icon_path
@@ -34,7 +35,7 @@ def generate_dist():
     Popen('pyinstaller "' + spec_file + '" --noconfirm').communicate()
     delete_file(spec_file)
     # Run application
-    command = '"' + get_absolute_path(get_full_path('./dist', text_view_title, text_view_title + '.exe')) + '"'
+    command = '"' + get_absolute_path(join('./dist', text_view_title, text_view_title + '.exe')) + '"'
     print(command)
     Popen(command).communicate()
 

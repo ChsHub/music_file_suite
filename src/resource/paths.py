@@ -24,5 +24,4 @@ commands = {SelectionCodecs.EXTRACT: _command_input + 'copy -map_metadata 0 -id3
 input_command = '"' + _ffprobe_path + '" -v error -select_streams ' \
                                      'a:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 -i "input"'
 
-file_path = 'D:/Downloads/Downloader/Neu mp4'
 icon_path = './resources/icon.ico'
