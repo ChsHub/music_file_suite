@@ -15,7 +15,7 @@ class Controller:
         self._Converter = Converter(self)
         self._Downloader = Downloader(self)
         self._Main_view = Window(self)
-        self._submit(self._Downloader.load_queue)
+        self._submit(self._Downloader.check_queue) # Start download thread
 
     def _submit(self, *args):
         future = self._executor.submit(*args)

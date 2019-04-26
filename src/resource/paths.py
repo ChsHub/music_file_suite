@@ -11,7 +11,7 @@ _ffprobe_path = get_absolute_path('lib\\ffmpeg\\bin\\ffprobe.exe')
 if not exists(_ffprobe_path):
     error('ffprobe not found')
 
-downloader_command = ['youtube-dl', '--no-check-certificate']  # , '-U'
+downloader_command = ['youtube-dl', '--no-check-certificate']# , '-f bestvideo+bestaudio']  # , '-U'
 
 
 _command_input = '"' + _ffmpeg_path + '" -i "input" -vn -sn -c:a '

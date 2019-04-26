@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from logging import info
-from os.path import join
+from os.path import join, split, splitext
 from subprocess import getoutput, run
 from threading import BoundedSemaphore
 
@@ -67,8 +67,10 @@ class Converter:
     # TODO convert to temp path
     @staticmethod
     def _get_output_file_path(new_extension, file_path):
-        file_path = file_path.split("/")
-        file_path[-1] = replace_file_type(file_path[-1], new_extension)
+        file_path = list(split(file_path))
+        file_name, _ = splitext(file_path[-1])
+        file_path.pop(-1)
+        file_path.append(file_name + '.' + new_extension)
         file_path.insert(-1, convert_directory)
         return join(*file_path)
 
