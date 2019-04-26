@@ -1,7 +1,7 @@
 from logging import info, exception
 from re import findall
 from subprocess import PIPE, Popen, DEVNULL
-from threading import BoundedSemaphore
+from threading import BoundedSemaphore, Thread
 
 from os.path import isfile, join, abspath
 from persistqueue import FIFOSQLiteQueue
@@ -13,23 +13,24 @@ from src.resource.settings import download_path
 
 
 # TODO KILL/STOP
-class Downloader:
+class Downloader(Thread):
     _Controller = None
-    _download_queue = FIFOSQLiteQueue(path="./youtube_links", multithreading=True, auto_commit=False)
+    _download_queue = FIFOSQLiteQueue(path="./resources/youtube_links", multithreading=True, auto_commit=False)
     _active = True
-    _log_path = abspath('resources/download_queue.log')
 
     def __init__(self, controller):
+        super().__init__()
         self._Controller = controller
         self._counter = -1
+        self.daemon = True
 
-    def check_queue(self) -> None:
+    def run(self) -> None:
         """
         If queue is not empty, download the first element
         """
         try:
             while self._active:
-                print(self._download_queue.size)
+                info("D QUEUE SIZE" + str(self._download_queue.size))
                 url = self._download_queue.get()
                 self._handle_download(url)
                 self._download_queue.task_done()  # Save queue

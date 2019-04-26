@@ -10,12 +10,14 @@ from src.view.window import Window
 class Controller:
 
     def __init__(self):
-        self._executor = ThreadPoolExecutor()
-        self._Album = Album(self)
-        self._Converter = Converter(self)
-        self._Downloader = Downloader(self)
-        self._Main_view = Window(self)
-        self._submit(self._Downloader.check_queue) # Start download thread
+        with ThreadPoolExecutor() as self._executor:
+
+            self._Album = Album(self)
+            self._Converter = Converter(self)
+            self._Downloader = Downloader(self)
+            self._Main_view = Window(self)
+            self._Downloader.start() # Start downloader thread
+            self._Main_view.MainLoop()
 
     def _submit(self, *args):
         future = self._executor.submit(*args)

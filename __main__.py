@@ -13,7 +13,6 @@ if __name__ == '__main__':
             info(get_cwd())
             info(exists(icon_path))
             controller = Controller()
-            controller._Main_view.MainLoop()
 
         except Exception as e:
             exception(e)
