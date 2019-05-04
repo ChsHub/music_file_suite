@@ -1,102 +1,117 @@
-from logging import info, exception
+import sys
+import youtube_dl
+from io import StringIO
+from threading import Thread
 from re import findall
-from subprocess import PIPE, Popen, DEVNULL
-from threading import BoundedSemaphore, Thread
+from logging import info, exception
 
-from os.path import isfile, join, abspath
 from persistqueue import FIFOSQLiteQueue
-from utility.encoding import decode
 from utility.os_interface import get_cwd, change_dir
 
-from src.resource.paths import downloader_command
-from src.resource.settings import download_path
+
+class DownloadWrapper(StringIO):
+    def __init__(self, counter, set_download_progress, set_download_title, download_path, url):
+        super().__init__()
+
+        self._counter = counter
+        self._set_download_progress = set_download_progress
+        self._set_download_title = set_download_title
+        self._download_path = download_path
+        self._url = url
+
+    def write(self, string):
+        """
+        Overwrite StringIO write().
+        Parses youtube-dl Stdout output (https://stackoverflow.com/a/19345047)
+        :param string: Stdout string
+        :return: StringIO return value
+        """
+        # TODO read err and out simultaneously
+
+        line = string.strip()
+        info(line)
+        progress = findall(r'(\d*\.?\d%)', line)
+        if progress:
+            self._set_download_progress(self._counter, progress[-1])
+
+        elif line.startswith('[download] Destination: '):
+            file_name = line.replace('[download] Destination: ', "")
+            self._set_download_title(self._counter, file_name, self._url)
+        elif line.endswith('has already been downloaded'):
+            file_name = line.replace(' has already been downloaded', "").replace('[download] ', '')
+            self._set_download_title(self._counter, file_name, self._url)
+
+        return super().write(string)
+
+    def __enter__(self):
+        info("DOWNLOAD: " + self._url)
+        # Change cwd to file output directory
+        self._os_dir = get_cwd()
+        change_dir(self._download_path)
+        # Redirect stdout to custom function
+        self._old_stdout = sys.stdout
+        sys.stdout = self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        info("Download: DONE")
+        # Reset stdout to normal
+        sys.stdout = self._old_stdout
+        # Reset cwd to normal
+        change_dir(self._os_dir)
 
 
-# TODO KILL/STOP
 class Downloader(Thread):
     _Controller = None
     _download_queue = FIFOSQLiteQueue(path="./resources/youtube_links", multithreading=True, auto_commit=False)
     _active = True
 
-    def __init__(self, controller):
+    def __init__(self, controller, download_path):
         super().__init__()
         self._Controller = controller
         self._counter = -1
         self.daemon = True
+        self._download_path = download_path
 
     def run(self) -> None:
         """
+        Overwrite Thread.run().
         If queue is not empty, download the first element
         """
         try:
             while self._active:
-                info("D QUEUE SIZE" + str(self._download_queue.size))
+                info("DOWNLOAD QUEUE SIZE" + str(self._download_queue.size))
                 url = self._download_queue.get()
-                self._handle_download(url)
-                self._download_queue.task_done()  # Save queue
+
+                # Download the url
+                # TODO test directory delete
+                # TODO playlists
+                self._counter += 1
+                with DownloadWrapper(self._counter, self.set_download_progress, self.set_download_title,
+                                     self._download_path,
+                                     url):
+                    try:
+                        youtube_dl.main([url, '--no-check-certificate'])
+                    except SystemExit as e:
+                        info(e)
+
+                # Save queue
+                self._download_queue.task_done()
+
         except Exception as e:
             exception(e)
 
     def download(self, url: str) -> None:
         """
         Put new url into the queue
-        :param url:
+        :param url: Url string
         """
         if not url:
             return
         url = url.strip()
         self._download_queue.put(url)
 
-    # TODO test directory delete
-    # TODO playlists
-    def _handle_download(self, url:str) -> bool:
-        """
-        Download the resource from the url
-        :param url: Resource link
-        :return: True, if download has been successful
-        """
+    def set_download_progress(self, id, percent):
+        self._Controller.set_download_progress(id, percent)
 
-        self._counter += 1
-        file_name = ''
-        info("DOWNLOAD: " + url)
-
-        os_dir = get_cwd()
-        change_dir(download_path)
-        process = Popen(downloader_command + [url], stdin=DEVNULL, stdout=PIPE, stderr=PIPE, shell=True)
-
-        while True:
-
-            # err = process.stderr.readlines()
-            # if err:
-            #    self._Controller.set_download_progress(self._counter, 'Error: update youtube-dl version')
-            #    error(str(err))
-            #    return # TODO use async to read err and out simultaneously
-
-            symbol = b''
-            char = True
-            while (not char in [b'\r', b'\n']) and char:
-                char = process.stdout.read(1)
-                symbol += char
-
-            line0 = decode(symbol)
-            if not line0:
-                break
-            line0 = line0.strip()
-            info(line0)
-
-            progress = findall(r'(\d*\.?\d%)', line0)
-            if progress:
-                self._Controller.set_download_progress(self._counter, progress[-1])
-            elif line0.startswith('[download] Destination: '):
-                file_name = line0.replace('[download] Destination: ', "")
-                self._Controller.set_download_title(self._counter, file_name, url)
-            elif line0.endswith('has already been downloaded'):
-                file_name = line0.replace(' has already been downloaded', "").replace('[download] ', '')
-                self._Controller.set_download_title(self._counter, file_name, url)
-
-        change_dir(os_dir)
-        if file_name:
-            if isfile(join(download_path, file_name)):
-                self._Controller.set_download_progress(self._counter, '100%')
-        info("Download: DONE")
-        return True
+    def set_download_title(self, id, title, url):
+        self._Controller.set_download_title(id, title, url)

@@ -5,7 +5,7 @@ from src.model.apps.downloader import Downloader
 from src.model.apps.converter import Converter
 from src.model.songs.album import Album
 from src.view.window import Window
-
+from src.resource.settings import download_path
 
 class Controller:
 
@@ -14,7 +14,7 @@ class Controller:
 
             self._Album = Album(self)
             self._Converter = Converter(self)
-            self._Downloader = Downloader(self)
+            self._Downloader = Downloader(self, download_path)
             self._Main_view = Window(self)
             self._Downloader.start() # Start downloader thread
             self._Main_view.MainLoop()

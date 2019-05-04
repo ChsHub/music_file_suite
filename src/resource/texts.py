@@ -1,9 +1,11 @@
 # -*- coding: utf8 -*-
 from enum import Enum
 from configparser import ConfigParser
+from os.path import abspath
+
 from utility.os_interface import exists
 
-texts_path = 'resources/texts.cfg'
+texts_path = abspath('resources/texts.cfg')
 config = ConfigParser()
 
 # Write default settings, if missing
