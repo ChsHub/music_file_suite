@@ -1,12 +1,9 @@
-# -*- coding: utf8 -*-
-
 from logging import info
 from os.path import join, split, splitext
-from subprocess import getoutput, run
+from subprocess import getoutput
 from threading import BoundedSemaphore
 
 from utility.os_interface import exists, make_directory
-from utility.utilities import replace_file_type
 
 from src.resource.paths import commands, input_command
 from src.resource.texts import SelectionCodecs
@@ -58,7 +55,7 @@ class Converter:
                     self._controller.set_convert_progress(i, "FILE ALREADY EXISTS")
                 # Else convert
                 elif extension:
-                    run(command.replace("input", file_path).replace("output", output_file))
+                    getoutput(command.replace("input", file_path).replace("output", output_file))
                     self._controller.set_convert_progress(i, "100%")
                 i += 1
         info("Convert: DONE")
