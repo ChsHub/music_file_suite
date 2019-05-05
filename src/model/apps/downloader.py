@@ -8,10 +8,12 @@ from logging import info, exception
 from persistqueue import FIFOSQLiteQueue
 from utility.os_interface import get_cwd, change_dir
 
+
 class Downloader(Thread, StringIO):
     _Controller = None
     _download_queue = FIFOSQLiteQueue(path="./resources/youtube_links", multithreading=True, auto_commit=False)
     _active = True
+    _current_url = None
 
     def __init__(self, controller, download_path):
         Thread.__init__(self)
@@ -21,6 +23,8 @@ class Downloader(Thread, StringIO):
         self.daemon = True
         self._download_path = download_path
 
+    # TODO test directory delete
+    # TODO playlists
     def run(self) -> None:
         """
         Overwrite Thread.run().
@@ -32,8 +36,6 @@ class Downloader(Thread, StringIO):
                 url = self._download_queue.get()
 
                 # Download the url
-                # TODO test directory delete
-                # TODO playlists
                 self._counter += 1
                 self._current_url = url
                 with self:
@@ -47,8 +49,6 @@ class Downloader(Thread, StringIO):
 
         except Exception as e:
             exception(e)
-
-
 
     def write(self, string):
         """
