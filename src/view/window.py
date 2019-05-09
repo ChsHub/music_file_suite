@@ -10,10 +10,7 @@ from src import __version__
 from src.resource.meta_tags import MetaTags, SimpleTags, FileTypes, DownloadTags
 from src.resource.paths import icon_path
 from src.resource.settings import *
-from src.resource.texts import SelectionTabs, text_download_input, text_selection_meta, text_selection_album, \
-    SelectionCodecs, text_open_file
-from src.resource.texts import text_open_file_title, text_preview_change, text_preview_playlist, text_view_title, \
-    SelectionAlbum, SelectionMeta, text_set_download
+from src.resource.texts import SelectionCodecs, SelectionAlbum, SelectionMeta
 from src.view.standard_view.colors import color_red, color_green, color_white
 from src.view.standard_view.standard_selection import StandardSelection
 
@@ -33,13 +30,13 @@ class Window(App):
 
     # TODO RESET CONVERT LIST
     # TODO BUG set wrong song on META RENAME
-    def __init__(self, controller):
+    def __init__(self, controller, texts):
         super().__init__()
         self._Controller = controller
 
-        with Timer("WINDOW BUILT"):
+        with Timer("WINDOW BUILT", info):
             # Create a Window
-            window = Frame(None, title=text_view_title + ' ' + __version__, size=(1300, 800))
+            window = Frame(None, title=texts['text_view_title'] + ' ' + __version__, size=(1300, 800))
             self._frame = window
             window.Bind(EVT_CLOSE, lambda x: window.Destroy())  # Close Window event
             # Set Icon
@@ -49,50 +46,53 @@ class Window(App):
             # Create tabs
             self.notebook = Notebook(window, EXPAND)
             tabs = []
+            SelectionTabs = texts['SelectionTabs'].split(',')
 
             for label in SelectionTabs:
                 tabs.append(Panel(self.notebook, EXPAND))
 
-            self.init_tab_download(tabs[0])
+            self.init_tab_download(tabs[0], texts)
             window.Show()
-            self.init_tab_convert(tabs[1])
-            self.init_tab_meta(tabs[2])
-            self._init_tab_config(tabs[3])
+            self.init_tab_convert(tabs[1], texts)
+            self.init_tab_meta(tabs[2], texts)
+            self._init_tab_config(tabs[3], texts)
             self._init_tab_about(tabs[4])
 
             for i, label in enumerate(SelectionTabs):
                 self.notebook.AddPage(tabs[i], label)
 
-    def init_tab_meta(self, tab):
+    def init_tab_meta(self, tab, texts):
 
         selections = Panel(tab)
 
         with SimpleSizer(tab, VERTICAL) as sizer:
-            sizer.Add(FileInput(tab, text_button=text_open_file_title, callback=self.analyze_files,
-                                text_title=text_open_file_title, text_open_file=text_open_file),
+            sizer.Add(FileInput(tab, text_button=texts['text_open_file_title'], callback=self.analyze_files,
+                                text_title=texts['text_open_file_title'], text_open_file=texts['text_open_file']),
                       flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
 
             sizer.Add(selections, flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
 
             self._preview = Preview(tab, MetaTags, border=self._border_size,
-                                    buttons=[[self.set_meta, text_preview_change],
-                                             [self._Controller.make_playlist, text_preview_playlist]],
+                                    buttons=[[self.set_meta, texts['text_preview_change']],
+                                             [self._Controller.make_playlist, texts['text_preview_playlist']]],
                                     edit_callback=self._edit_song)
             sizer.Add(self._preview, 1, flag=EXPAND | ALL, border=self._border_size)
 
             with SimpleSizer(selections, HORIZONTAL) as sel_sizer:
                 sel_sizer.Add(StandardSelection(parent=selections, radio_enum=SelectionAlbum,
-                                                callback=self._Controller.set_is_album, title=text_selection_album),
+                                                callback=self._Controller.set_is_album,
+                                                title=texts['text_selection_album']),
                               flag=RIGHT | TOP, border=self._border_size)
                 sel_sizer.Add(StandardSelection(parent=selections, radio_enum=SelectionMeta,
-                                                callback=self._Controller.set_is_meta, title=text_selection_meta),
+                                                callback=self._Controller.set_is_meta,
+                                                title=texts['text_selection_meta']),
                               flag=TOP, border=self._border_size)
 
     # TODO link ids for multiple downloads
     # TODO COLORS when done
-    def init_tab_download(self, tab):
+    def init_tab_download(self, tab, texts):
 
-        download_input = InputWidget(tab, text_button=text_download_input, callback=self._download, reset=True)
+        download_input = InputWidget(tab, text_button=texts['text_download_input'], callback=self._download, reset=True)
         self._download_list = Table(tab, headers=[str(x.value) for x in DownloadTags])  # TODO remove hard code
 
         with SimpleSizer(tab, VERTICAL) as sizer:
@@ -103,9 +103,9 @@ class Window(App):
 
     # TODO BUG intial selection not applied
     # TODO remove all hard coded
-    def init_tab_convert(self, tab):
-        convert_input = FileInput(tab, text_button=text_open_file_title, callback=self._add_convert,
-                                  text_title=text_open_file_title, text_open_file=text_open_file)
+    def init_tab_convert(self, tab, texts):
+        convert_input = FileInput(tab, text_button=texts['text_open_file_title'], callback=self._add_convert,
+                                  text_title=texts['text_open_file_title'], text_open_file=texts['text_open_file'])
         self._convert_list = Preview(tab, SimpleTags, border=self._border_size,
                                      buttons=[[self._start_convert, "Start"]])
         self.codec_selection = StandardSelection(tab, callback=None, title="Codec", radio_enum=SelectionCodecs)
@@ -115,11 +115,12 @@ class Window(App):
             sizer.Add(self.codec_selection, flag=TOP | LEFT, border=self._border_size)
             sizer.Add(self._convert_list, 1, flag=EXPAND | ALL, border=self._border_size)
 
-    def _init_tab_config(self, tab):
+    def _init_tab_config(self, tab, texts):
         with SimpleSizer(tab, VERTICAL) as sizer:
-            sizer.Add(DirectoryInput(parent=tab, text_button=text_set_download, callback=set_download_directory,
-                                     text_title=text_set_download, initial=download_path),
-                      flag=ALL, border=self._border_size)
+            sizer.Add(
+                DirectoryInput(parent=tab, text_button=texts['text_set_download'], callback=set_download_directory,
+                               text_title=texts['text_set_download'], initial=download_path),
+                flag=ALL, border=self._border_size)
 
     def _init_tab_about(self, tab):
         with SimpleSizer(tab, VERTICAL) as sizer:
@@ -127,7 +128,7 @@ class Window(App):
             sizer.Add(text, flag=TOP, border=self._border_size)
 
             text = HyperLinkCtrl(tab, label="This software uses libraries from the FFmpeg project under the LGPLv2.1",
-                              URL="https://www.ffmpeg.org/")
+                                 URL="https://www.ffmpeg.org/")
             sizer.Add(text, flag=TOP, border=self._border_size)
 
     def _start_convert(self, event):

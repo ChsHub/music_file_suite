@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from logging import error
-from utility.os_interface import get_absolute_path, exists
+from os.path import abspath as get_absolute_path
+from utility.os_interface import exists
 from src.resource.texts import SelectionCodecs
 
 _ffmpeg_path = get_absolute_path('lib\\ffmpeg\\bin\\ffmpeg.exe')

@@ -11,17 +11,18 @@ from utility.os_interface import get_cwd, change_dir
 
 class Downloader(Thread, StringIO):
     _Controller = None
-    _download_queue = FIFOSQLiteQueue(path="./resources/youtube_links", multithreading=True, auto_commit=False)
+    _download_queue = None
     _active = True
     _current_url = None
 
-    def __init__(self, controller, download_path):
+    def __init__(self, controller, download_path, queue_path):
         Thread.__init__(self)
         StringIO.__init__(self)
         self._Controller = controller
         self._counter = -1
-        self.daemon = True
+        self.daemon = True  # Stop thread, when program is closed
         self._download_path = download_path
+        self._download_queue = FIFOSQLiteQueue(path=queue_path, multithreading=True, auto_commit=False)
 
     # TODO test directory delete
     # TODO playlists
@@ -62,9 +63,9 @@ class Downloader(Thread, StringIO):
         line = string.strip()
         info(line)
         progress = findall(r'(\d*\.?\d%)', line)
+
         if progress:
             self._set_download_progress(self._counter, progress[-1])
-
         elif line.startswith('[download] Destination: '):
             file_name = line.replace('[download] Destination: ', "")
             self._set_download_title(self._counter, file_name, self._current_url)

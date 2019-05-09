@@ -1,9 +1,12 @@
 # python 3.2+
 from concurrent.futures import ThreadPoolExecutor
 from logging import exception
+from os.path import abspath
+
 from src.model.apps.downloader import Downloader
 from src.model.apps.converter import Converter
 from src.model.songs.album import Album
+from src.resource.ConfigReader import ConfigReader
 from src.view.window import Window
 from src.resource.settings import download_path
 
@@ -11,11 +14,13 @@ class Controller:
 
     def __init__(self):
         with ThreadPoolExecutor() as self._executor:
+            # Read all strings
+            config = ConfigReader()
 
             self._Album = Album(self)
-            self._Converter = Converter(self)
-            self._Downloader = Downloader(self, download_path)
-            self._Main_view = Window(self)
+            self._Converter = Converter(self, config['Converter']['convert_directory'])
+            self._Downloader = Downloader(self, download_path, abspath(config['Downloader']['queue_path']))
+            self._Main_view = Window(self, config['Window'])
             self._Downloader.start() # Start downloader thread
             self._Main_view.MainLoop()
 

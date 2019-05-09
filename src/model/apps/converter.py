@@ -7,20 +7,25 @@ from utility.os_interface import exists, make_directory
 
 from src.resource.paths import commands, input_command
 from src.resource.texts import SelectionCodecs
-from src.resource.texts import convert_directory
 
-
+# TODO color successful green in GUI, otherwise red
 class Converter:
-    def __init__(self, controller):
+    def __init__(self, controller, convert_directory):
         self._jobs = []
         self._convert_sem = BoundedSemaphore(value=1)
         self._controller = controller
+        self.convert_directory = convert_directory
         self._resolve = {'vorbis': 'ogg', 'aac': 'm4a', 'mp3': 'mp3', 'opus': 'opus'}
-        self._extension = {SelectionCodecs.EXTRACT:self._get_file_extension,
-                           SelectionCodecs.MP3:lambda x, y: 'mp3',
-                           SelectionCodecs.OPUS:lambda x, y: 'opus'}
+        self._extension = {SelectionCodecs.EXTRACT: self._get_file_extension,
+                           SelectionCodecs.MP3: lambda x, y: 'mp3',
+                           SelectionCodecs.OPUS: lambda x, y: 'opus'}
 
-    def add_job(self, path, files):
+    def add_job(self, path:str, files:list) -> None:
+        """
+        Add files, that will be converted
+        :param path: Directory path
+        :param files: File names
+        """
         with self._convert_sem:
             self._jobs.append((path, files))
         for file in files:
@@ -40,7 +45,7 @@ class Converter:
         i = 0
         for path, files in jobs:
 
-            make_directory(join(path, convert_directory))
+            make_directory(join(path, self.convert_directory))
             info("Convert: " + str(len(files)) + " files")
 
             for file in files:
@@ -62,16 +67,15 @@ class Converter:
 
     # +++ CONVERT STRATEGIES +++
     # TODO convert to temp path
-    @staticmethod
-    def _get_output_file_path(new_extension, file_path):
+    def _get_output_file_path(self, new_extension, file_path):
         file_path = list(split(file_path))
         file_name, _ = splitext(file_path[-1])
         file_path.pop(-1)
         file_path.append(file_name + '.' + new_extension)
-        file_path.insert(-1, convert_directory)
+        file_path.insert(-1, self.convert_directory)
         return join(*file_path)
 
-    def _get_audio_codec(self, file_path:str) -> str:
+    def _get_audio_codec(self, file_path: str) -> str:
         """
         Get codec via probe
         :param file_path: Input file location
@@ -84,7 +88,7 @@ class Converter:
 
         return audio_codec.strip()
 
-    def _get_file_extension(self, file_path:str, i:int) -> (str, str):
+    def _get_file_extension(self, file_path: str, i: int) -> (str, str):
         """
         Strategy for extracting original codec
         :param file_path: Input video file
@@ -98,4 +102,3 @@ class Converter:
         else:
             self._controller.set_convert_progress(i, "TYPE NOT FOUND")
             return ''
-
