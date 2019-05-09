@@ -12,16 +12,9 @@ class ConfigReader(ConfigParser):
 
         self.read(abspath(texts_path))
 
-    """def __getitem__(self, item):
-        result = super().__getitem__(item)
-        if type(result) == str and exists(result):
-            result = abspath(result)
-        return ConfigReader(result)"""
-
-    def _write_default_settings(self, texts_path):
+    def _write_default_settings(self, texts_path: str) -> None:
         """
-        Write default settings, if missing
-        :return:
+        Write default settings, if config file is missing
         """
         self['SelectionAlbum'] = {'DETECTED': 'as detected',
                                   'ALBUM': 'is Album',
@@ -32,7 +25,15 @@ class ConfigReader(ConfigParser):
                                    'MP3': 'High quality mp3',
                                    'OPUS': 'Opus transparent'}
 
-        self['Converter'] = {'convert_directory': 'CONVERTED'}
+        self['Converter'] = {'convert_directory': 'CONVERTED',
+                             'ffmpeg_path': 'lib\\ffmpeg\\bin\\ffmpeg.exe',
+                             'convert_command': '"%%s" -i "input" -vn -sn -c:a ',
+                             'EXTRACT': 'copy',
+                             'MP3': 'libmp3lame -qscale:a 3',
+                             'OPUS': 'libopus -vbr on -b:a 128k',
+                             'output_command': '-map_metadata 0 -id3v2_version 3  "output"',
+                             'ffprobe_path': 'lib\\ffmpeg\\bin\\ffprobe.exe',
+                             'probe_command': '" -v error -select_streams a:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 -i "input"'}
 
         self['Downloader'] = {'queue_path': './resources/youtube_links'}
 
@@ -41,6 +42,8 @@ class ConfigReader(ConfigParser):
                           'text_preview_playlist': 'Create Playlist',
                           'text_download_input': 'Download YouTube',
                           'text_convert_input': 'Convert',
+                          'text_start_convert': 'Start',
+                          'text_codec_selection': 'Codec',
                           'text_file_input': 'Open File',
                           'text_view_title': 'Music Suite',
                           'text_set_download': 'Set Download Directory',

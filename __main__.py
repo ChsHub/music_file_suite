@@ -8,10 +8,6 @@ if __name__ == '__main__':
         try:
             from src.controller.controller import Controller
             from utility.os_interface import get_cwd, exists
-            from src.resource.paths import icon_path
-
-            info(get_cwd())
-            info(exists(icon_path))
             controller = Controller()
 
         except Exception as e:

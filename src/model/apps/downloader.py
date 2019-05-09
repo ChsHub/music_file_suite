@@ -41,7 +41,7 @@ class Downloader(Thread, StringIO):
                 self._current_url = url
                 with self:
                     try:
-                        youtube_dl.main([url, '--no-check-certificate'])
+                        youtube_dl.main([url, '--no-check-certificate']) # , '-f bestvideo+bestaudio']  # , '-U'
                     except SystemExit as e:
                         info(e)
 

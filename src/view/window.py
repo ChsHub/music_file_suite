@@ -68,7 +68,7 @@ class Window(App):
         with SimpleSizer(tab, VERTICAL) as sizer:
             sizer.Add(FileInput(tab, text_button=texts['text_open_file_title'], callback=self.analyze_files,
                                 text_title=texts['text_open_file_title'], text_open_file=texts['text_open_file']),
-                      flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
+                      flag=TOP | LEFT | RIGHT, border=self._border_size)
 
             sizer.Add(selections, flag=EXPAND | TOP | LEFT | RIGHT, border=self._border_size)
 
@@ -93,25 +93,24 @@ class Window(App):
     def init_tab_download(self, tab, texts):
 
         download_input = InputWidget(tab, text_button=texts['text_download_input'], callback=self._download, reset=True)
-        self._download_list = Table(tab, headers=[str(x.value) for x in DownloadTags])  # TODO remove hard code
+        self._download_list = Table(tab, headers=[str(x.value) for x in DownloadTags])
 
         with SimpleSizer(tab, VERTICAL) as sizer:
-            sizer.Add(download_input, flag=TOP | LEFT | RIGHT, border=10)
-            sizer.Add(self._download_list, 1, EXPAND | ALL, border=10)
+            sizer.Add(download_input, flag=TOP | LEFT | RIGHT, border=self._border_size)
+            sizer.Add(self._download_list, 1, EXPAND | ALL, border=self._border_size)
 
         download_input.Layout()  # Remove wrong initial value
 
-    # TODO BUG intial selection not applied
     # TODO remove all hard coded
     def init_tab_convert(self, tab, texts):
-        convert_input = FileInput(tab, text_button=texts['text_open_file_title'], callback=self._add_convert,
-                                  text_title=texts['text_open_file_title'], text_open_file=texts['text_open_file'])
         self._convert_list = Preview(tab, SimpleTags, border=self._border_size,
-                                     buttons=[[self._start_convert, "Start"]])
-        self.codec_selection = StandardSelection(tab, callback=None, title="Codec", radio_enum=SelectionCodecs)
+                                     buttons=[[self._start_convert, texts['text_start_convert']]])
+        self.codec_selection = StandardSelection(tab, callback=None, title=texts['text_codec_selection'], radio_enum=SelectionCodecs)
 
         with SimpleSizer(tab, VERTICAL) as sizer:
-            sizer.Add(convert_input, flag=ALL, border=self._border_size)
+            sizer.Add(FileInput(tab, text_button=texts['text_open_file_title'], callback=self._add_convert,
+                                text_title=texts['text_open_file_title'], text_open_file=texts['text_open_file']),
+                      flag=ALL, border=self._border_size)
             sizer.Add(self.codec_selection, flag=TOP | LEFT, border=self._border_size)
             sizer.Add(self._convert_list, 1, flag=EXPAND | ALL, border=self._border_size)
 
@@ -174,7 +173,7 @@ class Window(App):
         self._download_list.update_cell(data=percent, column=2, row=id)
 
     def set_download_title(self, id, title, url):
-        self._download_list.add_line([url, ""])
+        self._download_list.add_line([url, "", ""])
         self._download_list.update_cell(data=title, column=1, row=id)
 
     # +++ CONVERTER +++

@@ -18,7 +18,7 @@ class Controller:
             config = ConfigReader()
 
             self._Album = Album(self)
-            self._Converter = Converter(self, config['Converter']['convert_directory'])
+            self._Converter = Converter(self, config['Converter'])
             self._Downloader = Downloader(self, download_path, abspath(config['Downloader']['queue_path']))
             self._Main_view = Window(self, config['Window'])
             self._Downloader.start() # Start downloader thread

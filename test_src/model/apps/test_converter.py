@@ -4,7 +4,7 @@ from hypothesis.strategies import text
 
 from src.model.apps.converter import Converter
 
-test_converter = Converter(None)
+test_converter = Converter(None, )
 
 
 def test___init__(self, controller):

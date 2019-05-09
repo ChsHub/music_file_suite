@@ -1,7 +1,9 @@
 # python 3.6+
 
 from os import walk
-from utility.os_interface import depth_search_files, get_cwd, is_file_type, get_full_path, make_directory
+from os.path import join
+
+from utility.os_interface import depth_search_files, get_cwd, is_file_type, make_directory
 from re import findall
 
 test_directory = 'generated_tests'
@@ -12,7 +14,7 @@ def parse_file(path, file):
     re_classes = r'((?:\ {4}def.*:)|(?:class.*:))'  # classes and methods
     re_spaces = r'(\s{4})'
 
-    with open(get_full_path(path, file), 'r') as f:
+    with open(join(path, file), 'r') as f:
         lines = findall(re_classes, f.read())
 
     # add pass
@@ -30,12 +32,12 @@ def parse_file(path, file):
                      'from unittest import TestCase, main\n\n\n' + generated_test + \
                      "\n\nif __name__ == '__main__':\n    main()\n"
 
-    new_file = get_full_path(get_cwd(), test_directory, file.replace('.py', '_test.py'))
+    new_file = join(get_cwd(), test_directory, 'test_' + file)
     with open(new_file, 'w') as generated:
         generated.write(generated_test)
 
 
-path = get_full_path(get_cwd(), 'src')
+path = join(get_cwd(), 'src')
 for f_path, sub_dirs, files in walk(path):
     # exclude directories
     if not is_file_type(f_path, ['.git', 'docs', 'tests', 'build', 'documents', 'generate', test_directory]):
@@ -43,7 +45,4 @@ for f_path, sub_dirs, files in walk(path):
             if is_file_type(file_name=file_name, types='.py'):
                 parse_file(f_path, file_name)
 
-# TODO generate tests?
-# from os import chdir("D:\Making\Python\music_file_suite\lib\pythoscope-0.4.3\pythoscope")
-# from pythoscope import init_project
-# init_project("D:\Making\Python\music_file_suite\model")
+# TODO generate tests
