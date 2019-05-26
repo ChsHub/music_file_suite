@@ -1,4 +1,4 @@
-from logging import info
+from logging import info, exception, error
 
 from utility.timer import Timer
 from wx import App, Frame, Notebook, Panel, EXPAND, VERTICAL, EVT_CLOSE, \
@@ -10,7 +10,7 @@ from src import __version__
 from src.resource.meta_tags import MetaTags, SimpleTags, FileTypes, DownloadTags
 from src.resource.paths import icon_path
 from src.resource.settings import *
-from src.resource.texts import SelectionCodecs, SelectionAlbum, SelectionMeta
+from src.resource.texts import SelectionAlbum, SelectionMeta
 from src.view.standard_view.colors import color_red, color_green, color_white
 from src.view.standard_view.standard_selection import StandardSelection
 
@@ -30,7 +30,7 @@ class Window(App):
 
     # TODO RESET CONVERT LIST
     # TODO BUG set wrong song on META RENAME
-    def __init__(self, controller, texts):
+    def __init__(self, controller, texts, SelectionCodecs):
         super().__init__()
         self._Controller = controller
 
@@ -53,7 +53,7 @@ class Window(App):
 
             self.init_tab_download(tabs[0], texts)
             window.Show()
-            self.init_tab_convert(tabs[1], texts)
+            self.init_tab_convert(tabs[1], texts, SelectionCodecs)
             self.init_tab_meta(tabs[2], texts)
             self._init_tab_config(tabs[3], texts)
             self._init_tab_about(tabs[4])
@@ -102,10 +102,11 @@ class Window(App):
         download_input.Layout()  # Remove wrong initial value
 
     # TODO remove all hard coded
-    def init_tab_convert(self, tab, texts):
+    def init_tab_convert(self, tab, texts, SelectionCodecs):
         self._convert_list = Preview(tab, SimpleTags, border=self._border_size,
                                      buttons=[[self._start_convert, texts['text_start_convert']]])
-        self.codec_selection = StandardSelection(tab, callback=None, title=texts['text_codec_selection'], radio_enum=SelectionCodecs)
+        self.codec_selection = StandardSelection(tab, callback=None, title=texts['text_codec_selection'],
+                                                 radio_enum=SelectionCodecs)
 
         with SimpleSizer(tab, VERTICAL) as sizer:
             sizer.Add(FileInput(tab, text_button=texts['text_open_file_title'], callback=self._add_convert,
@@ -166,15 +167,21 @@ class Window(App):
 
     # +++ Downloader +++
 
-    def _download(self, url):
+    def _download(self, url: str):
+        info('INFO: ' + url)
         self._Controller.download(url)
 
     def set_download_progress(self, id, percent):
         self._download_list.update_cell(data=percent, column=2, row=id)
 
     def set_download_title(self, id, title, url):
-        self._download_list.add_line([url, "", ""])
-        self._download_list.update_cell(data=title, column=1, row=id)
+        # TODO find bug (Invalid item index)
+        try:
+            self._download_list.add_line([url, "", ""])
+            self._download_list.update_cell(data=title, column=1, row=id)
+        except Exception as e:
+            error(str(id, title, url))
+            exception(e)
 
     # +++ CONVERTER +++
 

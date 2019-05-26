@@ -3,8 +3,10 @@ from hypothesis._strategies import integers
 from hypothesis.strategies import text
 
 from src.model.apps.converter import Converter
+from src.resource.ConfigReader import ConfigReader
 
-test_converter = Converter(None, )
+config = ConfigReader('..\\..\\..\\resources\\texts.cfg')
+test_converter = Converter(None, config['Converter'], config.SelectionCodecs)
 
 
 def test___init__(self, controller):

@@ -5,21 +5,19 @@ from threading import BoundedSemaphore
 
 from utility.os_interface import exists, make_directory
 
-from src.resource.texts import SelectionCodecs
-
 
 # TODO color successful green in GUI, otherwise red
 class Converter:
-    def __init__(self, controller, texts):
+    def __init__(self, controller, texts, SelectionCodecs):
         self._jobs = []
         self._convert_sem = BoundedSemaphore(value=1)
         self._controller = controller
         self.convert_directory = texts['convert_directory']
         self._resolve = {'vorbis': 'ogg', 'aac': 'm4a', 'mp3': 'mp3', 'opus': 'opus'}
-        self._extension = {SelectionCodecs.EXTRACT: self._get_file_extension,
-                           SelectionCodecs.MP3: lambda x, y: 'mp3',
-                           SelectionCodecs.OPUS: lambda x, y: 'opus'}
-        self._commands = self._get_convert_command(texts)
+        self._extension = {SelectionCodecs.EXTRACT.value: self._get_file_extension,
+                           SelectionCodecs.MP3.value: lambda x, y: 'mp3',
+                           SelectionCodecs.OPUS.value: lambda x, y: 'opus'}
+        self._commands = self._get_convert_command(texts, SelectionCodecs)
         self._input_command = self._get_input_command(texts)
 
     def _get_input_command(self, texts):
@@ -30,7 +28,7 @@ class Converter:
 
         return '"' + _ffprobe_path + texts['probe_command']
 
-    def _get_convert_command(self, texts):
+    def _get_convert_command(self, texts, SelectionCodecs):
         _ffmpeg_path = abspath(texts['ffmpeg_path'])
         if not exists(_ffmpeg_path):
             error('ffmpeg not found')
@@ -39,7 +37,7 @@ class Converter:
         _command_input = texts['convert_command'] % _ffmpeg_path
         result = {}
         for enum in SelectionCodecs:
-            result[enum] = ' '.join([_command_input, texts[enum.name], texts['output_command']])
+            result[enum.value] = ' '.join([_command_input, texts[enum.name], texts['output_command']])
 
         return result
         # MP3 OPTIONS -codec:a libmp3lame -q:a 1 -ar 44100 -ar 48000 -af "volume=10dB" -af "volume=1.5"
@@ -57,15 +55,13 @@ class Converter:
 
     def start_convert(self, selection):
         info(selection)
-        # Get strategy
-        strategy = SelectionCodecs(selection)
 
         # copy for thread safety
         with self._convert_sem:
             jobs = list(self._jobs)
 
         # Receive command based on strategy
-        command = self._commands[strategy]
+        command = self._commands[selection]
         i = 0
         for path, files in jobs:
 
@@ -76,7 +72,7 @@ class Converter:
                 file_path = join(path, file)
 
                 # Receive new file extension based on strategy
-                extension = self._extension[strategy](file_path, i)
+                extension = self._extension[selection](file_path, i)
                 output_file = self._get_output_file_path(extension, file_path)
 
                 # If file already exists do nothing

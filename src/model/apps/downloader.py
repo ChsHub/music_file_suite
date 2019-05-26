@@ -3,9 +3,9 @@ import youtube_dl
 from io import StringIO
 from threading import Thread
 from re import findall
-from logging import info, exception
+from logging import info, exception, error
 
-from persistqueue import FIFOSQLiteQueue
+from persistqueue import SQLiteAckQueue
 from utility.os_interface import get_cwd, change_dir
 
 
@@ -22,7 +22,7 @@ class Downloader(Thread, StringIO):
         self._counter = -1
         self.daemon = True  # Stop thread, when program is closed
         self._download_path = download_path
-        self._download_queue = FIFOSQLiteQueue(path=queue_path, multithreading=True, auto_commit=False)
+        self._download_queue = SQLiteAckQueue(path=queue_path, multithreading=True, auto_commit=True)
 
     # TODO test directory delete
     # TODO playlists
@@ -33,9 +33,9 @@ class Downloader(Thread, StringIO):
         """
         try:
             while self._active:
-                info("DOWNLOAD QUEUE SIZE" + str(self._download_queue.size))
+                info('DOWNLOAD QUEUE SIZE %s' % self._download_queue.size)
                 url = self._download_queue.get()
-
+                error('DOWNLOAD QUEUE pop: %s' % url)
                 # Download the url
                 self._counter += 1
                 self._current_url = url
@@ -46,7 +46,8 @@ class Downloader(Thread, StringIO):
                         info(e)
 
                 # Save queue
-                self._download_queue.task_done()
+                self._download_queue.ack(url)
+                info('DOWNLOAD QUEUE saved after download %s' % url)
 
         except Exception as e:
             exception(e)
@@ -76,7 +77,7 @@ class Downloader(Thread, StringIO):
         return super().write(string)
 
     def __enter__(self):
-        info("DOWNLOAD: " + self._current_url)
+        info('DOWNLOAD: %s' % self._current_url)
         # Change cwd to file output directory
         self._os_dir = get_cwd()
         change_dir(self._download_path)
@@ -97,9 +98,12 @@ class Downloader(Thread, StringIO):
         :param url: Url string
         """
         if not url:
+            error('No valid url: %s' % url)
             return
         url = url.strip()
         self._download_queue.put(url)
+
+        info('Added to queue: %s' % url)
 
     def _set_download_progress(self, id, percent):
         self._Controller.set_download_progress(id, percent)

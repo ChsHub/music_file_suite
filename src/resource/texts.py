@@ -15,8 +15,3 @@ class SelectionMeta(Enum):
     NO_META = config['SelectionMeta']['NO_META']
     META = config['SelectionMeta']['META']
 
-
-class SelectionCodecs(Enum):
-    EXTRACT = config['SelectionCodecs']['EXTRACT']
-    MP3 = config['SelectionCodecs']['MP3']
-    OPUS = config['SelectionCodecs']['OPUS']
