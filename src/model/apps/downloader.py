@@ -1,4 +1,6 @@
 import sys
+from os.path import exists, join
+
 import youtube_dl
 from io import StringIO
 from threading import Thread
@@ -14,6 +16,7 @@ class Downloader(Thread, StringIO):
     _download_queue = None
     _active = True
     _current_url = None
+    _current_file = None
 
     def __init__(self, controller, download_path, queue_path):
         Thread.__init__(self)
@@ -41,13 +44,14 @@ class Downloader(Thread, StringIO):
                 self._current_url = url
                 with self:
                     try:
-                        youtube_dl.main([url, '--no-check-certificate']) # , '-f bestvideo+bestaudio']  # , '-U'
+                        youtube_dl.main([url, '--no-check-certificate' , '-f bestvideo+bestaudio']) #  # , '-U'
                     except SystemExit as e:
                         info(e)
 
                 # Save queue
-                self._download_queue.ack(url)
-                info('DOWNLOAD QUEUE saved after download %s' % url)
+                if exists(self._current_file):
+                    self._download_queue.ack(url)
+                    info('DOWNLOAD QUEUE saved after download %s' % url)
 
         except Exception as e:
             exception(e)
@@ -69,6 +73,7 @@ class Downloader(Thread, StringIO):
             self._set_download_progress(self._counter, progress[-1])
         elif line.startswith('[download] Destination: '):
             file_name = line.replace('[download] Destination: ', "")
+            self._current_file = join(self._download_path, file_name)
             self._set_download_title(self._counter, file_name, self._current_url)
         elif line.endswith('has already been downloaded'):
             file_name = line.replace(' has already been downloaded', "").replace('[download] ', '')
