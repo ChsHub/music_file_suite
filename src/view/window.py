@@ -26,6 +26,8 @@ class Window(App):
     _selection = None
     _frame = None
     _convert_list = None
+    codec_selection = None
+    _download_list = None
     _border_size = 10
 
     # TODO RESET CONVERT LIST
@@ -39,29 +41,32 @@ class Window(App):
             window = Frame(None, title=texts['text_view_title'] + ' ' + __version__, size=(1300, 800))
             self._frame = window
             window.Bind(EVT_CLOSE, lambda x: window.Destroy())  # Close Window event
+
             # Set Icon
             loc = Icon()
             loc.CopyFromBitmap(Bitmap(icon_path, BITMAP_TYPE_ANY))
             window.SetIcon(loc)
+
             # Create tabs
             self.notebook = Notebook(window, EXPAND)
             tabs = []
-            SelectionTabs = texts['SelectionTabs'].split(',')
+            tab_labels = texts['SelectionTabs'].split(',')
 
-            for label in SelectionTabs:
+            for label in tab_labels:
                 tabs.append(Panel(self.notebook, EXPAND))
 
-            self.init_tab_download(tabs[0], texts)
-            window.Show()
-            self.init_tab_convert(tabs[1], texts, SelectionCodecs)
-            self.init_tab_meta(tabs[2], texts)
+            self._init_tab_download(tabs[0], texts)
+            self._init_tab_convert(tabs[1], texts, SelectionCodecs)
+            self._init_tab_meta(tabs[2], texts)
             self._init_tab_config(tabs[3], texts)
             self._init_tab_about(tabs[4])
 
-            for i, label in enumerate(SelectionTabs):
+            for i, label in enumerate(tab_labels):
                 self.notebook.AddPage(tabs[i], label)
 
-    def init_tab_meta(self, tab, texts):
+            window.Show()
+
+    def _init_tab_meta(self, tab, texts):
 
         selections = Panel(tab)
 
@@ -79,39 +84,44 @@ class Window(App):
             sizer.Add(self._preview, 1, flag=EXPAND | ALL, border=self._border_size)
 
             with SimpleSizer(selections, HORIZONTAL) as sel_sizer:
-                sel_sizer.Add(StandardSelection(parent=selections, radio_enum=SelectionAlbum,
+                sel_sizer.Add(StandardSelection(parent=selections, choices=SelectionAlbum,
                                                 callback=self._Controller.set_is_album,
                                                 title=texts['text_selection_album']),
                               flag=RIGHT | TOP, border=self._border_size)
-                sel_sizer.Add(StandardSelection(parent=selections, radio_enum=SelectionMeta,
+                sel_sizer.Add(StandardSelection(parent=selections, choices=SelectionMeta,
                                                 callback=self._Controller.set_is_meta,
                                                 title=texts['text_selection_meta']),
                               flag=TOP, border=self._border_size)
 
     # TODO link ids for multiple downloads
     # TODO COLORS when done
-    def init_tab_download(self, tab, texts):
+    def _init_tab_download(self, tab, texts):
 
         download_input = InputWidget(tab, text_button=texts['text_download_input'], callback=self._download, reset=True)
+
+        self.video_selection = StandardSelection(tab, callback=None, title=texts['text_video_option'],
+                                                 choices=[texts['no_video'], texts['video']])
         self._download_list = Table(tab, headers=[str(x.value) for x in DownloadTags])
 
         with SimpleSizer(tab, VERTICAL) as sizer:
-            sizer.Add(download_input, flag=TOP | LEFT | RIGHT, border=self._border_size)
-            sizer.Add(self._download_list, 1, EXPAND | ALL, border=self._border_size)
+            sizer.Add(download_input, flag=ALL, border=self._border_size)
+            sizer.Add(self.video_selection, flag=TOP | LEFT, border=self._border_size)
+            sizer.Add(self._download_list, 1, flag=EXPAND | ALL, border=self._border_size)
 
         download_input.Layout()  # Remove wrong initial value
 
-    # TODO remove all hard coded
-    def init_tab_convert(self, tab, texts, SelectionCodecs):
+    def _init_tab_convert(self, tab, texts, SelectionCodecs):
+
+        convert_input = FileInput(tab, text_button=texts['text_open_file_title'], callback=self._add_convert,
+                                  text_title=texts['text_open_file_title'], text_open_file=texts['text_open_file'])
+
+        self.codec_selection = StandardSelection(tab, callback=None, title=texts['text_codec_selection'],
+                                                 choices=SelectionCodecs)
         self._convert_list = Preview(tab, SimpleTags, border=self._border_size,
                                      buttons=[[self._start_convert, texts['text_start_convert']]])
-        self.codec_selection = StandardSelection(tab, callback=None, title=texts['text_codec_selection'],
-                                                 radio_enum=SelectionCodecs)
 
         with SimpleSizer(tab, VERTICAL) as sizer:
-            sizer.Add(FileInput(tab, text_button=texts['text_open_file_title'], callback=self._add_convert,
-                                text_title=texts['text_open_file_title'], text_open_file=texts['text_open_file']),
-                      flag=ALL, border=self._border_size)
+            sizer.Add(convert_input, flag=ALL, border=self._border_size)
             sizer.Add(self.codec_selection, flag=TOP | LEFT, border=self._border_size)
             sizer.Add(self._convert_list, 1, flag=EXPAND | ALL, border=self._border_size)
 
@@ -168,8 +178,12 @@ class Window(App):
     # +++ Downloader +++
 
     def _download(self, url: str):
+        if not url:
+            error('No valid url: %s' % url)
+            return
+
         info('INFO: ' + url)
-        self._Controller.download(url)
+        self._Controller.download(url, self.video_selection.get_selection())
 
     def set_download_progress(self, id, percent):
         self._download_list.update_cell(data=percent, column=2, row=id)

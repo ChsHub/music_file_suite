@@ -1,12 +1,12 @@
 import sys
-from os.path import exists, join
+from io import StringIO
+from logging import info, exception, error
+from re import findall
+from threading import Thread
 
 import youtube_dl
-from io import StringIO
-from threading import Thread
-from re import findall
-from logging import info, exception, error
-
+from os.path import abspath
+from os.path import exists, join
 from persistqueue import SQLiteAckQueue
 from utility.os_interface import get_cwd, change_dir
 
@@ -25,6 +25,8 @@ class Downloader(Thread, StringIO):
         self._counter = -1
         self.daemon = True  # Stop thread, when program is closed
         self._download_path = download_path
+
+        queue_path = abspath(queue_path['queue_path'])
         self._download_queue = SQLiteAckQueue(path=queue_path, multithreading=True, auto_commit=True)
 
     # TODO test directory delete
@@ -40,18 +42,19 @@ class Downloader(Thread, StringIO):
                 url = self._download_queue.get()
                 error('DOWNLOAD QUEUE pop: %s' % url)
                 # Download the url
-                self._counter += 1
                 self._current_url = url
                 with self:
                     try:
-                        youtube_dl.main([url, '--no-check-certificate' , '-f bestvideo+bestaudio']) #  # , '-U'
+                        # TODO handle playlists
+                        youtube_dl.main([url, '--no-check-certificate', '-f bestvideo+bestaudio', '--no-playlist'])  # , '' # , '-U'
                     except SystemExit as e:
                         info(e)
 
                 # Save queue
-                if exists(self._current_file):
+                if self._current_file and exists(self._current_file):
                     self._download_queue.ack(url)
                     info('DOWNLOAD QUEUE saved after download %s' % url)
+                self._current_file = None  # Reset file name
 
         except Exception as e:
             exception(e)
@@ -71,13 +74,19 @@ class Downloader(Thread, StringIO):
 
         if progress:
             self._set_download_progress(self._counter, progress[-1])
+
         elif line.startswith('[download] Destination: '):
+            self._counter += 1
             file_name = line.replace('[download] Destination: ', "")
             self._current_file = join(self._download_path, file_name)
             self._set_download_title(self._counter, file_name, self._current_url)
+
         elif line.endswith('has already been downloaded'):
+            self._counter += 1
             file_name = line.replace(' has already been downloaded', "").replace('[download] ', '')
+            self._current_file = join(self._download_path, file_name)
             self._set_download_title(self._counter, file_name, self._current_url)
+        # No else: irrelevant line
 
         return super().write(string)
 
@@ -97,14 +106,12 @@ class Downloader(Thread, StringIO):
         # Reset cwd to normal
         change_dir(self._os_dir)
 
-    def download(self, url: str) -> None:
+    def download(self, url: str, video_choice: str) -> None:
         """
         Put new url into the queue
         :param url: Url string
         """
-        if not url:
-            error('No valid url: %s' % url)
-            return
+
         url = url.strip()
         self._download_queue.put(url)
 

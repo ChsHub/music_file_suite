@@ -1,7 +1,7 @@
 # python 3.2+
 from concurrent.futures import ThreadPoolExecutor
 from logging import exception
-from os.path import abspath
+
 
 from src.model.apps.downloader import Downloader
 from src.model.apps.converter import Converter
@@ -19,7 +19,7 @@ class Controller:
 
             self._Album = Album(self)
             self._Converter = Converter(self, config['Converter'], config.SelectionCodecs)
-            self._Downloader = Downloader(self, download_path, abspath(config['Downloader']['queue_path']))
+            self._Downloader = Downloader(self, download_path, config['Downloader'])
             self._Main_view = Window(self, config['Window'], config.SelectionCodecs)
             self._Downloader.start() # Start downloader thread
             self._Main_view.MainLoop()
@@ -53,9 +53,9 @@ class Controller:
         if self._Album:
             self._submit(self._Album.set_is_album, is_album)
 
-    def download(self, url):
+    def download(self, url, video_choice:str):
         if self._Downloader:
-            self._submit(self._Downloader.download, url)
+            self._submit(self._Downloader.download, url, video_choice)
 
     def make_playlist(self):
         if self._Album:

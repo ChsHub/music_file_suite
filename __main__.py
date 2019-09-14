@@ -1,4 +1,4 @@
-
+# TODO catch wx exceptions http://www.blog.pythonlibrary.org/2014/03/14/wxpython-catching-exceptions-from-anywhere/
 
 if __name__ == '__main__':
     from utility.logger import Logger
@@ -8,10 +8,10 @@ if __name__ == '__main__':
         try:
             from src.controller.controller import Controller
             from utility.os_interface import get_cwd, exists
+
             controller = Controller()
 
         except Exception as e:
             exception(e)
 
     # TODO click on links in download list,  open directories from link
-
