@@ -8,7 +8,7 @@ from src.model.apps.converter import Converter
 from src.model.songs.album import Album
 from src.resource.ConfigReader import ConfigReader
 from src.view.window import Window
-from src.resource.settings import download_path
+from src.resource.settings import download_path, icon_path
 
 class Controller:
 
@@ -19,8 +19,8 @@ class Controller:
 
             self._Album = Album(self)
             self._Converter = Converter(self, config['Converter'], config.SelectionCodecs)
-            self._Downloader = Downloader(self, download_path, config['Downloader'])
-            self._Main_view = Window(self, config['Window'], config.SelectionCodecs)
+            self._Downloader = Downloader(self, download_path, config['Downloader']['queue_path'], config.SelectionVideo)
+            self._Main_view = Window(self, config['Window'], config.SelectionCodecs, config.SelectionVideo, icon_path)
             self._Downloader.start() # Start downloader thread
             self._Main_view.MainLoop()
 

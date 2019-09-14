@@ -8,7 +8,6 @@ from wxwidgets import DirectoryInput, SimpleSizer, FileInput, InputWidget, Table
 
 from src import __version__
 from src.resource.meta_tags import MetaTags, SimpleTags, FileTypes, DownloadTags
-from src.resource.paths import icon_path
 from src.resource.settings import *
 from src.resource.texts import SelectionAlbum, SelectionMeta
 from src.view.standard_view.colors import color_red, color_green, color_white
@@ -32,7 +31,7 @@ class Window(App):
 
     # TODO RESET CONVERT LIST
     # TODO BUG set wrong song on META RENAME
-    def __init__(self, controller, texts, SelectionCodecs):
+    def __init__(self, controller, texts, codec_choices, video_choices, icon_path):
         super().__init__()
         self._Controller = controller
 
@@ -55,8 +54,8 @@ class Window(App):
             for label in tab_labels:
                 tabs.append(Panel(self.notebook, EXPAND))
 
-            self._init_tab_download(tabs[0], texts)
-            self._init_tab_convert(tabs[1], texts, SelectionCodecs)
+            self._init_tab_download(tabs[0], texts, video_choices)
+            self._init_tab_convert(tabs[1], texts, codec_choices)
             self._init_tab_meta(tabs[2], texts)
             self._init_tab_config(tabs[3], texts)
             self._init_tab_about(tabs[4])
@@ -95,12 +94,12 @@ class Window(App):
 
     # TODO link ids for multiple downloads
     # TODO COLORS when done
-    def _init_tab_download(self, tab, texts):
+    def _init_tab_download(self, tab, texts, video_choices):
 
         download_input = InputWidget(tab, text_button=texts['text_download_input'], callback=self._download, reset=True)
 
         self.video_selection = StandardSelection(tab, callback=None, title=texts['text_video_option'],
-                                                 choices=[texts['no_video'], texts['video']])
+                                                 choices=video_choices)
         self._download_list = Table(tab, headers=[str(x.value) for x in DownloadTags])
 
         with SimpleSizer(tab, VERTICAL) as sizer:

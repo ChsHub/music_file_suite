@@ -17,3 +17,4 @@ if not exists(settings_path):
 
 config.read(settings_path)
 download_path = config['Paths']['download']
+icon_path = config['Paths']['icon_path']

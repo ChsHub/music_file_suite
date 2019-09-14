@@ -17,7 +17,6 @@ class StandardSelection(Panel):
         else:
             self.selection = ComboBox(self, style=CB_DROPDOWN | CB_READONLY,
                                       choices=choices)
-
             self.selection.SetValue(choices[0])
 
         if callback:

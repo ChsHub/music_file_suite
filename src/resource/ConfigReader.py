@@ -21,3 +21,8 @@ class ConfigReader(ConfigParser):
             MP3 = self['SelectionCodecs']['MP3']
             OPUS = self['SelectionCodecs']['OPUS']
         self.SelectionCodecs = SelectionCodecs
+
+        class SelectionVideo(Enum):
+            NO_VIDEO = self['SelectionVideo']['no_video']
+            VIDEO = self['SelectionVideo']['video']
+        self.SelectionVideo = SelectionVideo
