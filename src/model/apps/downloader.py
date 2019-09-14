@@ -25,12 +25,12 @@ class Downloader(Thread, StringIO):
         self._counter = -1
         self.daemon = True  # Stop thread, when program is closed
         self._download_path = download_path
-
         queue_path = abspath(queue_path)
         self._download_queue = SQLiteAckQueue(path=queue_path, multithreading=True, auto_commit=True)
+        self.get_video = {SelectionVideo.NO_VIDEO.value: '', SelectionVideo.VIDEO.value: 'bestvideo+'}
 
     # TODO test directory delete
-    # TODO playlists
+    # TODO handle playlists
     def run(self) -> None:
         """
         Overwrite Thread.run().
@@ -39,21 +39,22 @@ class Downloader(Thread, StringIO):
         try:
             while self._active:
                 info('DOWNLOAD QUEUE SIZE %s' % self._download_queue.size)
-                url, video_choice = self._download_queue.get()
+                item = self._download_queue.get()
+                url, video_choice = item
                 error('DOWNLOAD QUEUE pop: %s' % url)
                 # Download the url
                 self._current_url = url
                 with self:
                     try:
                         self._counter += 1
-                        # TODO handle playlists
-                        youtube_dl.main([url, '--no-check-certificate', '-f bestvideo+bestaudio', '--no-playlist'])  # , '' # , '-U'
+                        youtube_dl.main([url, '--no-check-certificate', '--no-playlist',
+                                         '-f %sbestaudio' % self.get_video[video_choice]])  # , '-U'
                     except SystemExit as e:
                         info(e)
 
                 # Save queue
                 if self._current_file and exists(self._current_file):
-                    self._download_queue.ack((url, video_choice))
+                    self._download_queue.ack(item)
                     info('DOWNLOAD QUEUE saved after download %s' % url)
                 self._current_file = None  # Reset file name
 
