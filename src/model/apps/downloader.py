@@ -2,10 +2,11 @@ import sys
 from io import StringIO
 from logging import info, exception, error
 from re import findall
+from subprocess import run
 from threading import Thread
 
 import youtube_dl
-from os.path import abspath
+from os.path import abspath, splitext
 from os.path import exists, join
 from persistqueue import SQLiteAckQueue
 from utility.os_interface import get_cwd, change_dir
@@ -16,14 +17,16 @@ class Downloader(Thread, StringIO):
     _download_queue = None
     _active = True
     _current_url = None
-    _current_file = None
+    _current_file = []
 
-    def __init__(self, controller, download_path, queue_path, SelectionVideo):
+    def __init__(self, controller, download_path, queue_path, SelectionVideo, ffmpeg_path):
         Thread.__init__(self)
         StringIO.__init__(self)
         self._Controller = controller
         self._counter = -1
         self.daemon = True  # Stop thread, when program is closed
+        self._ffmpeg_path = ffmpeg_path
+
         self._download_path = download_path
         queue_path = abspath(queue_path)
         self._download_queue = SQLiteAckQueue(path=queue_path, multithreading=True, auto_commit=True)
@@ -41,7 +44,8 @@ class Downloader(Thread, StringIO):
                 info('DOWNLOAD QUEUE SIZE %s' % self._download_queue.size)
                 item = self._download_queue.get()
                 url, video_choice = item
-                error('DOWNLOAD QUEUE pop: %s' % url)
+                error('DOWNLOAD: %s' % url)
+
                 # Download the url
                 self._current_url = url
                 with self:
@@ -52,11 +56,17 @@ class Downloader(Thread, StringIO):
                     except SystemExit as e:
                         info(e)
 
+                    # Join audio and video
+                    if self.get_video[video_choice]:
+                        name, ext = splitext(self._current_file[-1])
+                        self._current_file.append(name[:-5] + '.mp4')
+                        run(self._ffmpeg_path + ' -i "%s" -i "%s" -c:v copy -c:a copy  -strict experimental -map 0:v:0 -map 1:a:0 "%s"' % tuple(self._current_file))
+
                 # Save queue
-                if self._current_file and exists(self._current_file):
+                if self._current_file and exists(self._current_file[-1]):
                     self._download_queue.ack(item)
                     info('DOWNLOAD QUEUE saved after download %s' % url)
-                self._current_file = None  # Reset file name
+                self._current_file = []  # Reset file name
 
         except Exception as e:
             exception(e)
@@ -79,18 +89,22 @@ class Downloader(Thread, StringIO):
 
         elif line.startswith('[download] Destination: '):
             file_name = line.replace('[download] Destination: ', "")
-            self._current_file = join(self._download_path, file_name)
+            self._current_file.append(join(self._download_path, file_name))
             self._set_download_title(self._counter, file_name, self._current_url)
 
         elif line.endswith('has already been downloaded'):
             file_name = line.replace(' has already been downloaded', "").replace('[download] ', '')
-            self._current_file = join(self._download_path, file_name)
+            self._current_file.append(join(self._download_path, file_name))
             self._set_download_title(self._counter, file_name, self._current_url)
         # No else: irrelevant line
 
         return super().write(string)
 
     def __enter__(self):
+        '''
+        Enter processing one queue item
+        :return:
+        '''
         info('DOWNLOAD: %s' % self._current_url)
         # Change cwd to file output directory
         self._os_dir = get_cwd()
@@ -100,6 +114,13 @@ class Downloader(Thread, StringIO):
         sys.stdout = self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        '''
+        Exit queue item processing
+        :param exc_type:
+        :param exc_val:
+        :param exc_tb:
+        :return:
+        '''
         info("Download: DONE")
         # Reset stdout to normal
         sys.stdout = self._old_stdout

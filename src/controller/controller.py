@@ -18,8 +18,8 @@ class Controller:
             config = ConfigReader()
 
             self._Album = Album(self)
-            self._Converter = Converter(self, config['Converter'], config.SelectionCodecs)
-            self._Downloader = Downloader(self, download_path, config['Downloader']['queue_path'], config.SelectionVideo)
+            self._Converter = Converter(self, config['Converter'], config.SelectionCodecs, config.ffmpeg_path)
+            self._Downloader = Downloader(self, download_path, config['Downloader']['queue_path'], config.SelectionVideo, config.ffmpeg_path)
             self._Main_view = Window(self, config['Window'], config.SelectionCodecs, config.SelectionVideo, icon_path)
             self._Downloader.start() # Start downloader thread
             self._Main_view.MainLoop()

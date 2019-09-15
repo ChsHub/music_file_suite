@@ -1,5 +1,6 @@
 from configparser import ConfigParser
 from enum import Enum
+from logging import error
 
 from os.path import abspath, exists
 
@@ -26,3 +27,8 @@ class ConfigReader(ConfigParser):
             NO_VIDEO = self['SelectionVideo']['no_video']
             VIDEO = self['SelectionVideo']['video']
         self.SelectionVideo = SelectionVideo
+
+        self.ffmpeg_path = abspath(self['Converter']['ffmpeg_path'])
+        if not exists(self.ffmpeg_path):
+            error('ffmpeg not found')
+            raise FileNotFoundError

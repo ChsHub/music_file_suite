@@ -8,7 +8,7 @@ from utility.os_interface import exists, make_directory
 
 # TODO color successful green in GUI, otherwise red
 class Converter:
-    def __init__(self, controller, texts, SelectionCodecs):
+    def __init__(self, controller, texts, SelectionCodecs, ffmpeg_path):
         self._jobs = []
         self._convert_sem = BoundedSemaphore(value=1)
         self._controller = controller
@@ -17,7 +17,8 @@ class Converter:
         self._extension = {SelectionCodecs.EXTRACT.value: self._get_file_extension,
                            SelectionCodecs.MP3.value: lambda x, y: 'mp3',
                            SelectionCodecs.OPUS.value: lambda x, y: 'opus'}
-        self._commands = self._get_convert_command(texts, SelectionCodecs)
+
+        self._commands = self._get_convert_command(texts, SelectionCodecs, ffmpeg_path)
         self._input_command = self._get_input_command(texts)
 
     def _get_input_command(self, texts):
@@ -28,13 +29,9 @@ class Converter:
 
         return '"' + _ffprobe_path + texts['probe_command']
 
-    def _get_convert_command(self, texts, SelectionCodecs):
-        _ffmpeg_path = abspath(texts['ffmpeg_path'])
-        if not exists(_ffmpeg_path):
-            error('ffmpeg not found')
-            raise FileNotFoundError
+    def _get_convert_command(self, texts, SelectionCodecs, ffmpeg_path):
 
-        _command_input = texts['convert_command'] % _ffmpeg_path
+        _command_input = texts['convert_command'] % ffmpeg_path
         result = {}
         for enum in SelectionCodecs:
             result[enum.value] = ' '.join([_command_input, texts[enum.name], texts['output_command']])

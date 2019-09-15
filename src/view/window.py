@@ -190,10 +190,10 @@ class Window(App):
     def set_download_title(self, id, title, url):
         # TODO find bug (Invalid item index)
         try:
-            self._download_list.add_line([url, "", ""])
+            self._download_list.update_cell(data=url, column=0, row=id)
             self._download_list.update_cell(data=title, column=1, row=id)
         except Exception as e:
-            error(str(id, title, url))
+            error(str(str(id) + title + url))
             exception(e)
 
     # +++ CONVERTER +++
