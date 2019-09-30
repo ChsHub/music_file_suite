@@ -31,7 +31,7 @@ class Window(App):
 
     # TODO RESET CONVERT LIST
     # TODO BUG set wrong song on META RENAME
-    def __init__(self, controller, texts, codec_choices, video_choices, icon_path):
+    def __init__(self, controller, texts, codec_choices, video_choices):
         super().__init__()
         self._Controller = controller
 
@@ -42,6 +42,7 @@ class Window(App):
             window.Bind(EVT_CLOSE, lambda x: window.Destroy())  # Close Window event
 
             # Set Icon
+            icon_path = texts['icon_path']
             loc = Icon()
             loc.CopyFromBitmap(Bitmap(icon_path, BITMAP_TYPE_ANY))
             window.SetIcon(loc)
