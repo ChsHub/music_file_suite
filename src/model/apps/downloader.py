@@ -17,6 +17,7 @@ class Downloader(Thread, StringIO):
     _download_queue = None
     _active = True
     _current_url = None
+    _size = None
     _current_file = []
 
     def __init__(self, controller, download_path, queue_path, SelectionVideo, ffmpeg_path):
@@ -66,7 +67,11 @@ class Downloader(Thread, StringIO):
                 if self._current_file and exists(self._current_file[-1]):
                     self._download_queue.ack(item)
                     info('DOWNLOAD QUEUE saved after download %s' % url)
-                self._current_file = []  # Reset file name
+
+                # Reset file name
+                self._current_file = []
+                self._size = None # TODO put this in extra class
+
 
         except Exception as e:
             exception(e)
@@ -82,20 +87,27 @@ class Downloader(Thread, StringIO):
 
         line = string.strip()
         info(line)
-        progress = findall(r'(\d*\.?\d%)', line)
 
+        progress = findall('(\d*\.?\d%)', line)
         if progress:
-            self._set_download_progress(self._counter, progress[-1])
+            self._set_download_progress(progress[-1])
+
+            # Get file size
+            if not self._size:
+                size = findall('of\s([^\s]+)', line)
+                if len(size) == 1:
+                    self._size = size[0]
+                    self.set_download_size(self._size)
 
         elif line.startswith('[download] Destination: '):
             file_name = line.replace('[download] Destination: ', "")
             self._current_file.append(join(self._download_path, file_name))
-            self._set_download_title(self._counter, file_name, self._current_url)
+            self._set_download_title(file_name, self._current_url)
 
         elif line.endswith('has already been downloaded'):
             file_name = line.replace(' has already been downloaded', "").replace('[download] ', '')
             self._current_file.append(join(self._download_path, file_name))
-            self._set_download_title(self._counter, file_name, self._current_url)
+            self._set_download_title(file_name, self._current_url)
         # No else: irrelevant line
 
         return super().write(string)
@@ -138,8 +150,11 @@ class Downloader(Thread, StringIO):
 
         info('Added to queue: %s' % url)
 
-    def _set_download_progress(self, id, percent):
-        self._Controller.set_download_progress(id, percent)
+    def _set_download_progress(self, percent):
+        self._Controller.set_download_progress(self._counter, percent)
 
-    def _set_download_title(self, id, title, url):
-        self._Controller.set_download_title(id, title, url)
+    def _set_download_title(self, title, url):
+        self._Controller.set_download_title(self._counter, title, url)
+
+    def set_download_size(self, size):
+        self._Controller.set_download_size(self._counter, size)

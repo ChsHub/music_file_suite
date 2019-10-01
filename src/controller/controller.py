@@ -2,13 +2,13 @@
 from concurrent.futures import ThreadPoolExecutor
 from logging import exception
 
-
 from src.model.apps.downloader import Downloader
 from src.model.apps.converter import Converter
 from src.model.songs.album import Album
 from src.resource.ConfigReader import ConfigReader
 from src.view.window import Window
 from src.resource.settings import download_path
+
 
 class Controller:
 
@@ -19,9 +19,10 @@ class Controller:
 
             self._Album = Album(self)
             self._Converter = Converter(self, config['Converter'], config.SelectionCodecs, config.ffmpeg_path)
-            self._Downloader = Downloader(self, download_path, config['Downloader']['queue_path'], config.SelectionVideo, config.ffmpeg_path)
+            self._Downloader = Downloader(self, download_path, config['Downloader']['queue_path'],
+                                          config.SelectionVideo, config.ffmpeg_path)
             self._Main_view = Window(self, config['Window'], config.SelectionCodecs, config.SelectionVideo)
-            self._Downloader.start() # Start downloader thread
+            self._Downloader.start()  # Start downloader thread
             self._Main_view.MainLoop()
 
     def _submit(self, *args):
@@ -53,7 +54,7 @@ class Controller:
         if self._Album:
             self._submit(self._Album.set_is_album, is_album)
 
-    def download(self, url, video_choice:str):
+    def download(self, url, video_choice: str):
         if self._Downloader:
             self._submit(self._Downloader.download, url, video_choice)
 
@@ -88,6 +89,9 @@ class Controller:
 
     def set_download_title(self, id, title, url):
         self._Main_view.set_download_title(id, title, url)
+
+    def set_download_size(self, id, size):
+        self._Main_view.set_download_size(id, size)
 
     # +++ CONVERTER +++
 

@@ -197,6 +197,9 @@ class Window(App):
             error(str(str(id) + title + url))
             exception(e)
 
+    def set_download_size(self, id, size):
+        self._download_list.update_cell(data=size, column=3, row=id)
+
     # +++ CONVERTER +++
 
     def set_convert_progress(self, id, percent):
