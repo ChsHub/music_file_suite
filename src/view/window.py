@@ -194,7 +194,7 @@ class Window(App):
             self._download_list.update_cell(data=url, column=0, row=id)
             self._download_list.update_cell(data=title, column=1, row=id)
         except Exception as e:
-            error(str(str(id) + title + url))
+            error('SET DOWNLOAD TITLE:%s%s%s' % (id, title, url))
             exception(e)
 
     def set_download_size(self, id, size):

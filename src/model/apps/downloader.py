@@ -9,19 +9,18 @@ import youtube_dl
 from os.path import abspath, splitext
 from os.path import exists, join
 from persistqueue import SQLiteAckQueue
+from send2trash import send2trash
 from utility.os_interface import get_cwd, change_dir
 
 
 class FileDownload(StringIO):
-    _current_url = None
-    _size = None
-    _current_file = []
-
     def __init__(self, ffmpeg_path, url, video_command, downloader):
         StringIO.__init__(self)
         # Download the url
         self._current_url = url
         self._downloader = downloader
+        self._size = None
+        self._current_file = []
         """
         Enter processing one queue item
         """
@@ -45,7 +44,10 @@ class FileDownload(StringIO):
                 self._current_file.append(name[:-5] + '.mp4')
                 run(ffmpeg_path +
                     ' -i "%s" -i "%s" -c:v copy -c:a copy  -strict experimental -map 0:v:0 -map 1:a:0 "%s"' %
-                    tuple(self._current_file))
+                    tuple(self._current_file), shell=False)
+                # Delete audio and video files
+                send2trash(self._current_file[0])
+                send2trash(self._current_file[1])
         """
         Exit queue item processing
         """
@@ -135,8 +137,10 @@ class Downloader(Thread):
                 if current_file.success:
                     self._download_queue.ack(item)
                     info('DOWNLOAD QUEUE saved after download %s' % url)
+                del current_file
         except Exception as e:
             exception(e)
+            pass
 
     def download(self, url: str, video_choice: str) -> None:
         """
