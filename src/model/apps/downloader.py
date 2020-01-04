@@ -1,9 +1,10 @@
 import sys
 from io import StringIO
-from logging import info, exception, error
+from logging import info, exception
 from re import findall
 from subprocess import run
 from threading import Thread
+from time import sleep
 
 import youtube_dl
 from os.path import abspath, splitext
@@ -39,15 +40,19 @@ class FileDownload(StringIO):
                 info(e)
 
             # Join audio and video
-            if video_command:
+            if video_command and self._current_file:
                 name, _ = splitext(self._current_file[-1])
                 self._current_file.append(name[:-5] + '.mp4')
                 run(ffmpeg_path +
                     ' -i "%s" -i "%s" -c:v copy -c:a copy  -strict experimental -map 0:v:0 -map 1:a:0 "%s"' %
                     tuple(self._current_file), shell=False)
                 # Delete audio and video files
-                send2trash(self._current_file[0])
-                send2trash(self._current_file[1])
+                self._current_file[0] = self._current_file[0].replace('/', '\\')
+                self._current_file[1] = self._current_file[1].replace('/', '\\')
+                while exists(self._current_file[0]) or exists(self._current_file[1]):
+                    send2trash(self._current_file[0])
+                    send2trash(self._current_file[1])
+                    sleep(1)
         """
         Exit queue item processing
         """
@@ -129,9 +134,6 @@ class Downloader(Thread):
 
                 info('DOWNLOAD: %s' % url)
                 self._counter += 1
-                if video_command in self.get_command:  # TODO REMOVE THIS
-                    video_command = self.get_command[video_command]  # TODO REMOVE THIS
-
                 current_file = FileDownload(self._ffmpeg_path, url, video_command, self)
                 # Save queue
                 if current_file.success:

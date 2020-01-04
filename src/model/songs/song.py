@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from logging import info, error
-from utility.utilities import remove_file_type, get_file_type
+from os.path import splitext
+
 from src.model.songs.meta_data.file_data import File_data
 from src.model.songs.meta_data.tag_data import Tag_data
 from src.resource.meta_tags import MetaTags
@@ -17,8 +18,7 @@ class Song:
 
     def __init__(self, album_path, file_name, album):
 
-        self._file_type = get_file_type(file_name)
-        self.file_name = remove_file_type(file_name)
+        self.file_name, self._file_type = splitext(file_name)
         self._error = False
         self._Album = album
 
