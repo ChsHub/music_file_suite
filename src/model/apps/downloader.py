@@ -1,17 +1,17 @@
 import sys
 from io import StringIO
 from logging import info, exception
+from os import chdir, getcwd
+from os.path import abspath, splitext
+from os.path import exists, join
 from re import findall
 from subprocess import run
 from threading import Thread
 from time import sleep
 
 import youtube_dl
-from os.path import abspath, splitext
-from os.path import exists, join
 from persistqueue import SQLiteAckQueue
 from send2trash import send2trash
-from utility.os_interface import get_cwd, change_dir
 
 
 class FileDownload(StringIO):
@@ -29,8 +29,8 @@ class FileDownload(StringIO):
         old_stdout = sys.stdout
         sys.stdout = self
         # Change cwd to file output directory
-        self._os_dir = get_cwd()
-        change_dir(self._downloader.download_path)
+        self._os_dir = getcwd()
+        chdir(self._downloader.download_path)
 
         with self:
             try:
@@ -59,7 +59,7 @@ class FileDownload(StringIO):
         # Reset stdout to normal
         sys.stdout = old_stdout
         # Reset cwd to normal
-        change_dir(self._os_dir)
+        chdir(self._os_dir)
         info("Download: DONE")
 
     def write(self, string):
