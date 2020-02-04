@@ -1,8 +1,7 @@
 import logging
 import re
-import utility.os_interface as os_interface
-from utility.path_str import change_file_name
-from utility.utilities import get_file_type
+from os.path import join
+from shutil import move
 
 
 class File_data:
@@ -27,11 +26,10 @@ class File_data:
         self._clean_title()
 
     def _clean_title(self):
-        # TODO Regex
-        self._title = self._title.replace(":", "").replace("*", "").replace("/", " ").replace('"', "").replace(
-            '#', "")
-        self._title = self._title.replace("[", "(").replace("]", ")").replace("é", "e")
-        self._title = change_file_name(self._title)
+        for old, new in [('*', ''), ('/', ' '), ('"', ''), (':', ''), ('#', ''), ('[', '('), ('_', ' '), (']', ')'),
+                         ('(', ' ('), ('Feat', 'ft.'), ('ft', 'ft.'), ('vs', 'ft.'), ('Vs.', 'ft.'), ('  ', ' '),
+                         ('..', '.'), ('..', '.')]:
+            self._title = self._title.replace(old, new)
 
     # Artist - Song
     def _read_song_title(self, file_name):
@@ -58,4 +56,4 @@ class File_data:
         return self.is_album
 
     def rename_file(self, album_path, file_name, new_name):
-        os_interface.rename_file(album_path, file_name, new_name)
+        move(join(album_path, file_name), join(album_path, new_name))
