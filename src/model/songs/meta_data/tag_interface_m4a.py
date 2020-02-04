@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from logging import info, error, exception
+from os.path import join
+
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 from mutagen._file import File
 from mutagen.id3 import ID3, TRCK, TIT2, TPE1, TALB, TPE2
-from utility.path_str import get_full_path
 from tag_interface import Tag
 
 
@@ -19,7 +20,7 @@ class Tag(Tag):
 
     def __init__(self, path, file_name):
 
-        self.file_path = get_full_path(path, file_name)
+        self.file_path = join(path, file_name)
 
         if self.file_path is None:
             raise NameError

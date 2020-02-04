@@ -1,12 +1,10 @@
 from logging import info
+from os.path import isdir, split
 from threading import BoundedSemaphore
-
-from utility.os_interface import exists
 
 from src.resource.meta_tags import MetaTags
 from src.model.songs.song import Song
 from src.resource.texts import SelectionAlbum, SelectionMeta
-from utility.utilities import get_artist_and_album
 
 
 class Album:
@@ -28,7 +26,7 @@ class Album:
 
         with self._album_sem:
             self._active = True
-            if not exists(album_path):
+            if not isdir(album_path):
                 info('Not a valid path')
                 return
 
@@ -37,7 +35,7 @@ class Album:
             self._Songs = []
 
             # gather data from path
-            artist, album = get_artist_and_album(self.album_path)
+            artist, album = split(self.album_path)[-1].split(' - ')
             self.meta_data[MetaTags.Artist] = artist
             self.meta_data[MetaTags.AlbumArtist] = artist  # Album path
             self.meta_data[MetaTags.Album] = album  # Album path

@@ -1,5 +1,5 @@
 import playlists
-from utility.levenshtein import is_levenshtein_fit
+from difflib import SequenceMatcher
 
 
 # Read old playlists
@@ -19,7 +19,7 @@ class Playlist:
         return playlists.playlist_wpl().get_files(path_to_playlists, playlist_name)
 
     # normal order if not possible
-    def get_mp3_files_ordered(self, dir_files, playlist_files):
+    def get_mp3_files_ordered(self, dir_files, playlist_files, limit=0.95):
         if playlist_files is None:
             return [(dir_file, None) for dir_file in dir_files]
 
@@ -35,7 +35,7 @@ class Playlist:
             else:
                 play_file_short = play_file[:-4]
                 for dir_file in dir_files:
-                    if is_levenshtein_fit(play_file_short, dir_file[:-4]):
+                    if SequenceMatcher(None, play_file_short, dir_file[:-4]).ratio() >= limit: # TODO TEST
                         result.append((dir_file, i))
                         dir_files.remove(dir_file)
                         break
