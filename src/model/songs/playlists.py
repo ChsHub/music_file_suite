@@ -1,10 +1,13 @@
 # -*- coding: utf8 -*-
 __author__ = 'christian'
+
 from logging import error
 
+# TODO REMOVE UTILITY
+from os.path import join
+
 from utility.os_interface import write_file_data, read_file_data
-from utility.path_str import get_relative_path, get_full_path
-from utility.utilities import is_file_type
+from utility.path_str import get_relative_path
 
 
 class playlist_wpl:
@@ -90,15 +93,15 @@ class playlist_xspf:
 
 def generate_playlist_m3u(album_path, playlist_path, playlist_name, files):
     album_path = get_relative_path(playlist_path, album_path)
-    files = [get_full_path(album_path, file) for file in files]
+    files = [join(album_path, file) for file in files]
 
     write_file_data(playlist_path, playlist_name, data="\n".join(files).replace("/", '\\'))
 
 
 # GENERATE the playlist
 def generate_playlist(album_path, playlist_path, playlist_name, files):
-    if is_file_type(playlist_name, types=[".m3u", ".pls"]):
+    if playlist_name.endswith('.m3u') or playlist_name.endswith('.pls'):
         generate_playlist_m3u(album_path, playlist_path, playlist_name, files)
 
-    elif is_file_type(playlist_name, types=".xspf"):
+    elif playlist_name.endswith('.xspf'):
         playlist_xspf().generate_playlist(album_path, playlist_path, playlist_name, files)

@@ -1,6 +1,6 @@
 from logging import info, exception, error
 
-from utility.timer import Timer
+from timerpy import Timer
 from wx import App, Frame, Notebook, Panel, EXPAND, VERTICAL, EVT_CLOSE, \
     HORIZONTAL, TOP, ALL, RIGHT, LEFT, BITMAP_TYPE_ANY, Bitmap, Icon
 from wx.lib.agw.hyperlink import HyperLinkCtrl
