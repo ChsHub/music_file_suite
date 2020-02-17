@@ -1,4 +1,4 @@
-import playlists
+from src.model.songs.playlists import playlist_wpl
 from difflib import SequenceMatcher
 
 
@@ -16,7 +16,7 @@ class Playlist:
         raise NotImplementedError
 
     def get_playlist_files(self, path_to_playlists, playlist_name):
-        return playlists.playlist_wpl().get_files(path_to_playlists, playlist_name)
+        return playlist_wpl().get_files(path_to_playlists, playlist_name)
 
     # normal order if not possible
     def get_mp3_files_ordered(self, dir_files, playlist_files, limit=0.95):

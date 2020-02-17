@@ -6,17 +6,21 @@ class ControllerConverter(GenericController):
     def __init__(self, view, config):
         GenericController.__init__(self)
         self._view = view
-        self._Converter = Converter(self, config['Converter'], config.SelectionCodecs, config.ffmpeg_path)
+        self._converter = Converter(self, config['Converter'], config.SelectionCodecs, config.ffmpeg_path)
 
     # Notify model
 
     def add_convert(self, path, files):
-        if self._Converter:
-            self._submit(self._Converter.add_job, path, files)
+        if self._converter:
+            self._submit(self._converter.add_job, path, files)
 
     def start_convert(self, selection):
-        if self._Converter:
-            self._submit(self._Converter.start_convert, selection)
+        if self._converter:
+            self._submit(self._converter.start_convert, selection)
+
+    def reset_convert(self):
+        if self._converter:
+            self._submit(self._converter.reset)
 
     # Notify view
 

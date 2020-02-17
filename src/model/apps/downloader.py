@@ -104,23 +104,18 @@ class FileDownload(StringIO):
 
 
 class Downloader(Thread):
-    _Controller = None
-    _download_queue = None
-    _active = True
-    _counter = -1
-
     def __init__(self, controller, download_path, queue_path, SelectionVideo, ffmpeg_path):
         Thread.__init__(self)
         self._Controller = controller
-        self.daemon = True  # Stop thread, when program is closed
+
+        self._counter = -1
         self._ffmpeg_path = ffmpeg_path
         self.download_path = download_path
-        queue_path = abspath(queue_path)
-        self._download_queue = SQLiteAckQueue(path=queue_path, multithreading=True, auto_commit=True)
+        self._download_queue = SQLiteAckQueue(path=abspath(queue_path), multithreading=True, auto_commit=True)
         self.get_command = {SelectionVideo.NO_VIDEO.value: '', SelectionVideo.VIDEO.value: 'bestvideo+'}
 
-        # Start downloader thread
-        self.start()
+        self.daemon = True  # Stop thread, when parent thread is terminated
+        self.start()  # Start Downloader thread
 
     # TODO test directory delete
     # TODO handle playlists
@@ -130,7 +125,7 @@ class Downloader(Thread):
         If queue is not empty, download the first element
         """
         try:
-            while self._active:
+            while True:
                 info('DOWNLOAD QUEUE SIZE %s' % self._download_queue.size)
                 item = self._download_queue.get()
                 url, video_command = item
@@ -151,7 +146,7 @@ class Downloader(Thread):
         """
         Add new url to the queue
         :param url: Url string
-        :param video_choice: Url string
+        :param video_choice: Video quality
         """
 
         url = url.strip()
@@ -160,7 +155,7 @@ class Downloader(Thread):
 
         info('Added to queue: %s' % url)
 
-    # +++ CONTROLLER +++
+    # Notify controller
 
     def set_download_progress(self, percent):
         self._Controller.set_download_progress(self._counter, percent)

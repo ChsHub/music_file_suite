@@ -16,8 +16,6 @@ from src.view.tab_meta import TabMeta
 
 
 class Window(App):
-
-    # TODO RESET CONVERT LIST
     # TODO BUG set wrong song on META RENAME
     def __init__(self):
         super().__init__()

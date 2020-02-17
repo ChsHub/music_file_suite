@@ -28,7 +28,7 @@ class ControllerMeta(GenericController):
 
     def make_playlist(self):
         if self._album:
-            self._submit(self._album.make_playlist) # TODO make playlist
+            self._submit(self._album.make_playlist)
 
     def edit_song(self, row, column, data):
         if self._album:

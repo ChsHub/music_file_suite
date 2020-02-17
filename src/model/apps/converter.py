@@ -9,19 +9,20 @@ from utility.os_interface import exists, make_directory
 # TODO color successful green in GUI, otherwise red
 class Converter:
     def __init__(self, controller, texts, SelectionCodecs, ffmpeg_path):
-        self._jobs = []
         self._convert_sem = BoundedSemaphore(value=1)
+
         self._controller = controller
         self.convert_directory = texts['convert_directory']
         self._resolve = {'vorbis': 'ogg', 'aac': 'm4a', 'mp3': 'mp3', 'opus': 'opus'}
         self._extension = {SelectionCodecs.EXTRACT.value: self._get_file_extension,
                            SelectionCodecs.MP3.value: lambda x, y: 'mp3',
                            SelectionCodecs.OPUS.value: lambda x, y: 'opus'}
-
         self._commands = self._get_convert_command(texts, SelectionCodecs, ffmpeg_path)
         self._input_command = self._get_input_command(texts)
 
-    def _get_input_command(self, texts):
+        self._jobs = []
+
+    def _get_input_command(self, texts) -> str:
         _ffprobe_path = abspath(texts['ffprobe_path'])
         if not exists(_ffprobe_path):
             error('NOT FOUND: ffprobe')
@@ -41,7 +42,7 @@ class Converter:
 
     def add_job(self, path: str, files: list) -> None:
         """
-        Add files, that will be converted
+        Add files for converting
         :param path: Directory path
         :param files: File names
         """
@@ -82,6 +83,10 @@ class Converter:
                     self._controller.set_convert_progress(i, "100%")
                 i += 1
         info("Convert: DONE")
+
+    def reset(self):
+        with self._convert_sem:
+            self._jobs = []
 
     # +++ CONVERT STRATEGIES +++
     # TODO convert to temp path
