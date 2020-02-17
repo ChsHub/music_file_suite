@@ -9,6 +9,7 @@ if __name__ == '__main__':
 
         _main_view = Window()
         _main_view.MainLoop()
+
     except Exception as e:
         exception(e)
 
