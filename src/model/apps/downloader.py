@@ -119,6 +119,9 @@ class Downloader(Thread):
         self._download_queue = SQLiteAckQueue(path=queue_path, multithreading=True, auto_commit=True)
         self.get_command = {SelectionVideo.NO_VIDEO.value: '', SelectionVideo.VIDEO.value: 'bestvideo+'}
 
+        # Start downloader thread
+        self.start()
+
     # TODO test directory delete
     # TODO handle playlists
     def run(self) -> None:

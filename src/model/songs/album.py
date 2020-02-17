@@ -2,21 +2,20 @@ from logging import info
 from os.path import isdir, split
 from threading import BoundedSemaphore
 
-from src.resource.meta_tags import MetaTags
 from src.model.songs.song import Song
+from src.resource.meta_tags import MetaTags
 from src.resource.texts import SelectionAlbum, SelectionMeta
 
 
 class Album:
-    album_path = None
-    # Meta
-    _Songs = {}
-    _failed_Songs = None
-    # Threading
-    _active = True
-    meta_data = None
-
     def __init__(self, controller):
+        self.album_path = None
+        # Meta
+        self._Songs = {}
+        self._failed_Songs = None
+        # Threading
+        self._active = True
+        self.meta_data = None
 
         self._Controller = controller
         self._album_sem = BoundedSemaphore(value=1)
@@ -35,10 +34,11 @@ class Album:
             self._Songs = []
 
             # gather data from path
-            artist, album = split(self.album_path)[-1].split(' - ')
-            self.meta_data[MetaTags.Artist] = artist
-            self.meta_data[MetaTags.AlbumArtist] = artist  # Album path
-            self.meta_data[MetaTags.Album] = album  # Album path
+            if ' - ' in self.album_path:
+                artist, album = split(self.album_path)[-1].split(' - ')
+                self.meta_data[MetaTags.Artist] = artist
+                self.meta_data[MetaTags.AlbumArtist] = artist  # Album path
+                self.meta_data[MetaTags.Album] = album  # Album path
 
             for file in files:
                 self._Songs.append(Song(album_path, file, self))
