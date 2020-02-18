@@ -27,3 +27,6 @@ class ControllerDownloader(GenericController):
 
     def set_download_size(self, id, size):
         self._view.set_download_size(id, size)
+
+    def set_finished_color(self, row):
+        self._view.set_finished_color(row)

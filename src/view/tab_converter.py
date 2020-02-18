@@ -26,11 +26,11 @@ class TabConverter:
 
     # Notify model
 
-    def _start_convert(self, event):
-        self._controller.start_convert(self.codec_selection.get_selection())
-
     def _add_convert(self, path, files):
         self._controller.add_convert(path, files)
+
+    def _start_convert(self, event):
+        self._controller.start_convert(self.codec_selection.get_selection())
 
     def _reset_convert(self, event):
         self._controller.reset_convert()

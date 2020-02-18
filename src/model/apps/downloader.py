@@ -106,7 +106,7 @@ class FileDownload(StringIO):
 class Downloader(Thread):
     def __init__(self, controller, download_path, queue_path, SelectionVideo, ffmpeg_path):
         Thread.__init__(self)
-        self._Controller = controller
+        self._controller = controller
 
         self._counter = -1
         self._ffmpeg_path = ffmpeg_path
@@ -136,6 +136,7 @@ class Downloader(Thread):
                 # Save queue
                 if current_file.success:
                     self._download_queue.ack(item)
+                    self._controller.set_finished_color(self._counter)
                     info('DOWNLOAD QUEUE saved after download %s' % url)
                 del current_file
         except Exception as e:
@@ -158,10 +159,10 @@ class Downloader(Thread):
     # Notify controller
 
     def set_download_progress(self, percent):
-        self._Controller.set_download_progress(self._counter, percent)
+        self._controller.set_download_progress(self._counter, percent)
 
     def set_download_title(self, title, url):
-        self._Controller.set_download_title(self._counter, title, url)
+        self._controller.set_download_title(self._counter, title, url)
 
     def set_download_size(self, size):
-        self._Controller.set_download_size(self._counter, size)
+        self._controller.set_download_size(self._counter, size)

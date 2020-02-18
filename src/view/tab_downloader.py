@@ -5,6 +5,7 @@ from wxwidgets import SimpleSizer, InputWidget, Table
 
 from src.controller.controller_downloader import ControllerDownloader
 from src.resource.meta_tags import DownloadTags
+from src.view.standard_view.colors import color_green
 from src.view.standard_view.standard_selection import StandardSelection
 
 
@@ -52,3 +53,6 @@ class TabDownloader:
 
     def set_download_size(self, id, size):
         self._download_list.update_cell(data=size, column=3, row=id)
+
+    def set_finished_color(self, row):
+        self._download_list.set_row_color(row, color_green)
