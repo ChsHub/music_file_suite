@@ -2,13 +2,17 @@ from logging import info
 from os.path import isdir, split
 from threading import BoundedSemaphore
 
+from src.model.abstract_list_model import AbstractListModel
 from src.model.songs.song import Song
 from src.resource.meta_tags import MetaTags
 from src.resource.texts import SelectionAlbum, SelectionMeta
 
 
-class Album:
+class Album(AbstractListModel):
     def __init__(self, controller):
+        AbstractListModel.__init__(self, controller)
+        self._album_sem = BoundedSemaphore(value=1)
+
         self.album_path = None
         # Meta
         self._Songs = {}
@@ -16,9 +20,6 @@ class Album:
         # Threading
         self._active = True
         self.meta_data = None
-
-        self._Controller = controller
-        self._album_sem = BoundedSemaphore(value=1)
 
     def set_files(self, album_path, files):
         self._active = False  # join everything / wait
@@ -54,24 +55,24 @@ class Album:
 
     def set_all_view(self):
         result = [[song[tag] for tag in MetaTags] for song in self._Songs]
-        self._Controller.set_view(result)
+        self._controller.set_view(result)
 
         for i in range(len(self._Songs)):
             self.set_error_color(i)
 
     def set_error_color(self, i):
         if self._Songs[i].get_error():
-            self._Controller.set_meta_color_warning(i)
+            self._controller.set_meta_color_warning(i)
         else:
-            self._Controller.set_meta_color_normal(i)
+            self._controller.set_meta_color_normal(i)
 
     def set_data(self):
 
         for i, song in enumerate(self._Songs):
             if song.set_data():
-                self._Controller.set_meta_color_ok(i)
+                self.set_color_ok(i)
             else:
-                self._Controller.set_meta_color_warning(i)
+                self._controller.set_meta_color_warning(i)
         info('Set meta and rename complete')
 
     def set_is_album(self, is_album):
@@ -110,7 +111,7 @@ class Album:
     def update_song_view(self, row):
 
         result = [self._Songs[row][tag] for tag in MetaTags]
-        self._Controller.update_meta_line(row, result)
+        self.update_row(row, result)
         self.set_error_color(row)
 
     def make_playlist(self):

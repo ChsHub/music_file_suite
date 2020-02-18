@@ -1,17 +1,19 @@
-from logging import info, error
-from os.path import join, split, splitext, abspath
+from logging import info
+from os.path import join, split, splitext
 from subprocess import getoutput
 from threading import BoundedSemaphore
 
 from utility.os_interface import exists, make_directory
 
-
 # TODO color successful green in GUI, otherwise red
-class Converter:
+from src.model.abstract_list_model import AbstractListModel
+
+
+class Converter(AbstractListModel):
     def __init__(self, controller, texts, SelectionCodecs, ffmpeg_path):
+        AbstractListModel.__init__(self, controller)
         self._convert_sem = BoundedSemaphore(value=1)
 
-        self._controller = controller
         self.convert_directory = texts['convert_directory']
         self._resolve = {'vorbis': 'ogg', 'aac': 'm4a', 'mp3': 'mp3', 'opus': 'opus'}
         self._extension = {SelectionCodecs.EXTRACT.value: self._get_file_extension,
@@ -23,12 +25,7 @@ class Converter:
         self._jobs = []
 
     def _get_input_command(self, texts) -> str:
-        _ffprobe_path = abspath(texts['ffprobe_path'])
-        if not exists(_ffprobe_path):
-            error('NOT FOUND: ffprobe')
-            raise FileNotFoundError
-
-        return '"' + _ffprobe_path + texts['probe_command']
+        return '"' + texts['ffprobe_path'] + texts['probe_command']
 
     def _get_convert_command(self, texts, SelectionCodecs, ffmpeg_path):
 
@@ -49,7 +46,7 @@ class Converter:
         with self._convert_sem:
             self._jobs.append((path, files))
         for file in files:
-            self._controller.add_convert_line([file, "0%"])
+            self.add_line([file, "0%"])
 
     def start_convert(self, selection):
         info(selection)
@@ -75,12 +72,13 @@ class Converter:
 
                 # If file already exists do nothing
                 if exists(output_file):
-                    self._controller.set_convert_progress(i, "FILE ALREADY EXISTS")
+                    self.set_progress(i, "FILE ALREADY EXISTS")
                 # Else convert
                 elif extension:
                     result = getoutput(command.replace("input", file_path).replace("output", output_file))
                     info(result)
-                    self._controller.set_convert_progress(i, "100%")
+                    self.set_progress(i, "100%")
+                    self.set_color_ok(i)
                 i += 1
         info("Convert: DONE")
 
@@ -123,5 +121,5 @@ class Converter:
         if audio_codec in self._resolve:
             return self._resolve[audio_codec]
         else:
-            self._controller.set_convert_progress(i, "TYPE NOT FOUND")
+            self.set_progress(i, "TYPE NOT FOUND")
             return ''

@@ -34,3 +34,8 @@ class ConfigReader(ConfigParser):
         if not exists(self.ffmpeg_path):
             error('ffmpeg not found')
             raise FileNotFoundError
+
+        self['Converter']['ffprobe_path'] = abspath(self['Converter']['ffprobe_path'])
+        if not exists(self['Converter']['ffprobe_path']):
+            error('NOT FOUND: ' + self['Converter']['ffprobe_path'])
+            raise FileNotFoundError

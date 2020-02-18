@@ -4,8 +4,7 @@ from src.model.songs.album import Album
 
 class ControllerMeta(GenericController):
     def __init__(self, view, config):
-        GenericController.__init__(self)
-        self._view = view
+        GenericController.__init__(self, view)
         self._album = Album(self)
 
     # Notify model
@@ -47,7 +46,3 @@ class ControllerMeta(GenericController):
     def set_meta_color_warning(self, row):
         if self._view:
             self._view.set_meta_color_warning(row)
-
-    def set_meta_color_ok(self, row):
-        if self._view:
-            self._view.set_meta_color_ok(row)

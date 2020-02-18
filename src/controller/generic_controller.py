@@ -1,11 +1,15 @@
 from concurrent.futures.thread import ThreadPoolExecutor
 from logging import exception
 
+from src.abstract_list_function import AbstractListFunction
 
-class GenericController:
 
-    def __init__(self):
+class GenericController(AbstractListFunction):
+
+    def __init__(self, view):
+        AbstractListFunction.__init__(self)
         self._executor = ThreadPoolExecutor()
+        self._view = view
 
     def _submit(self, *args):
         future = self._executor.submit(*args)
@@ -18,3 +22,7 @@ class GenericController:
         result = future.exception()
         if result:
             exception(result)
+
+    @property
+    def _observer(self):
+        return self._view

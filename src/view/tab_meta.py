@@ -6,13 +6,15 @@ from wxwidgets import SimpleSizer, FileInput, Preview
 from src.controller.controller_meta import ControllerMeta
 from src.resource.meta_tags import MetaTags
 from src.resource.texts import SelectionAlbum, SelectionMeta
-from src.view.standard_view.colors import color_white, color_red, color_green
+from src.view.abstract_list_view import AbstractListView
+from src.view.standard_view.colors import color_white, color_red
 from src.view.standard_view.standard_selection import StandardSelection
 
 
-class TabMeta:
+class TabMeta(AbstractListView):
     def __init__(self, tab, texts, border_size, config):
-        self._Controller = ControllerMeta(self, config)
+        AbstractListView.__init__(self, None)
+        self._controller = ControllerMeta(self, config)
 
         selections = Panel(tab)
 
@@ -23,19 +25,19 @@ class TabMeta:
 
             sizer.Add(selections, flag=EXPAND | TOP | LEFT | RIGHT, border=border_size)
 
-            self._preview = Preview(tab, MetaTags, border=border_size,
-                                    buttons=[[self.set_meta, texts['text_preview_change']],
-                                             [self._Controller.make_playlist, texts['text_preview_playlist']]],
-                                    edit_callback=self._edit_song)
-            sizer.Add(self._preview, 1, flag=EXPAND | ALL, border=border_size)
+            self._data_list = Preview(tab, MetaTags, border=border_size,
+                                      buttons=[[self.set_meta, texts['text_preview_change']],
+                                               [self._controller.make_playlist, texts['text_preview_playlist']]],
+                                      edit_callback=self._edit_song)
+            sizer.Add(self._data_list, 1, flag=EXPAND | ALL, border=border_size)
 
             with SimpleSizer(selections, HORIZONTAL) as sel_sizer:
                 sel_sizer.Add(StandardSelection(parent=selections, choices=SelectionAlbum,
-                                                callback=self._Controller.set_is_album,
+                                                callback=self._controller.set_is_album,
                                                 title=texts['text_selection_album']),
                               flag=RIGHT | TOP, border=border_size)
                 sel_sizer.Add(StandardSelection(parent=selections, choices=SelectionMeta,
-                                                callback=self._Controller.set_is_meta,
+                                                callback=self._controller.set_is_meta,
                                                 title=texts['text_selection_meta']),
                               flag=TOP, border=border_size)
 
@@ -43,29 +45,22 @@ class TabMeta:
 
     def _edit_song(self, row, column, data):
         info("EDIT SONG: " + str(row) + " " + str(column) + " " + str(data))
-        self._Controller.edit_song(row, column, data)
+        self._controller.edit_song(row, column, data)
+
+    def set_meta(self, event):
+        self._controller.set_data()
+
+    def analyze_files(self, path, files):
+        self._controller.analyze_files(path, files)
 
     # Change View
 
-    def set_meta(self, event):
-        self._Controller.set_data()
-
-    def analyze_files(self, path, files):
-        self._Controller.analyze_files(path, files)
-
     def set_preview_data(self, data):
-        self._preview.clear()
-        self._preview.add_lines(data)
+        self._data_list.clear()
+        self._data_list.add_lines(data)
 
     def set_meta_color_normal(self, row):
-        self._preview.set_row_color(row, color_white)
+        self._data_list.set_row_color(row, color_white)
 
     def set_meta_color_warning(self, row):
-        self._preview.set_row_color(row, color_red)
-
-    def set_meta_color_ok(self, row):
-        self._preview.set_row_color(row, color_green)
-
-    def update_preview_row(self, row, data):
-        info("UPDATE PREVIEW ROW: " + str(row) + " " + str(data))
-        self._preview.update_row(data, row)
+        self._data_list.set_row_color(row, color_red)
