@@ -51,13 +51,10 @@ class TabMeta(AbstractListView):
         self._controller.set_data()
 
     def analyze_files(self, path, files):
+        self._data_list.clear() # Clear previous lines
         self._controller.analyze_files(path, files)
 
     # Change View
-
-    def set_preview_data(self, data):
-        self._data_list.clear()
-        self._data_list.add_lines(data)
 
     def set_meta_color_normal(self, row):
         self._data_list.set_row_color(row, color_white)

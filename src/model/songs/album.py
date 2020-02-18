@@ -54,8 +54,8 @@ class Album(AbstractListModel):
         return self.meta_data[item]
 
     def set_all_view(self):
-        result = [[song[tag] for tag in MetaTags] for song in self._Songs]
-        self._controller.set_view(result)
+        for song in self._Songs:
+            self.add_line([song[tag] for tag in MetaTags])
 
         for i in range(len(self._Songs)):
             self.set_error_color(i)

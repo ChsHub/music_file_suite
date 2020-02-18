@@ -35,10 +35,6 @@ class ControllerMeta(GenericController):
 
     # Notify view
 
-    def set_view(self, data):
-        if self._view:
-            self._view.set_preview_data(data)
-            
     def set_meta_color_normal(self, id):
         if self._view:
             self._view.set_meta_color_normal(id)
