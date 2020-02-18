@@ -1,5 +1,5 @@
 from src.abstract_list_function import AbstractListFunction
-from src.view.standard_view.colors import color_green
+from src.view.standard_view.colors import color_green, color_white, color_red
 
 
 class AbstractListView(AbstractListFunction):
@@ -19,3 +19,9 @@ class AbstractListView(AbstractListFunction):
 
     def set_color_ok(self, row):
         self._data_list.set_row_color(row, color_green)
+
+    def set_meta_color_normal(self, row):
+        self._data_list.set_row_color(row, color_white)
+
+    def set_meta_color_warning(self, row):
+        self._data_list.set_row_color(row, color_red)

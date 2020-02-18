@@ -111,7 +111,7 @@ class Album(AbstractListModel):
     def update_song_view(self, row):
 
         result = [self._Songs[row][tag] for tag in MetaTags]
-        self.update_row(row, result)
+        self.update_row(result, row)
         self.set_error_color(row)
 
     def make_playlist(self):

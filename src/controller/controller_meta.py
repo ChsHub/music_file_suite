@@ -32,13 +32,3 @@ class ControllerMeta(GenericController):
     def edit_song(self, row, column, data):
         if self._album:
             self._submit(self._album.edit_song, row, column, data)
-
-    # Notify view
-
-    def set_meta_color_normal(self, id):
-        if self._view:
-            self._view.set_meta_color_normal(id)
-
-    def set_meta_color_warning(self, row):
-        if self._view:
-            self._view.set_meta_color_warning(row)

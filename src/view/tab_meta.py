@@ -7,7 +7,6 @@ from src.controller.controller_meta import ControllerMeta
 from src.resource.meta_tags import MetaTags
 from src.resource.texts import SelectionAlbum, SelectionMeta
 from src.view.abstract_list_view import AbstractListView
-from src.view.standard_view.colors import color_white, color_red
 from src.view.standard_view.standard_selection import StandardSelection
 
 
@@ -51,13 +50,5 @@ class TabMeta(AbstractListView):
         self._controller.set_data()
 
     def analyze_files(self, path, files):
-        self._data_list.clear() # Clear previous lines
+        self._data_list.clear()  # Clear previous lines
         self._controller.analyze_files(path, files)
-
-    # Change View
-
-    def set_meta_color_normal(self, row):
-        self._data_list.set_row_color(row, color_white)
-
-    def set_meta_color_warning(self, row):
-        self._data_list.set_row_color(row, color_red)
