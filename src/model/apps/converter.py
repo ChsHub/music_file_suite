@@ -5,7 +5,7 @@ from threading import BoundedSemaphore
 
 from utility.os_interface import exists, make_directory
 
-# TODO color successful green in GUI, otherwise red
+# TODO color GUI red on fail
 from src.model.abstract_list_model import AbstractListModel
 
 

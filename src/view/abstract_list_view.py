@@ -20,8 +20,8 @@ class AbstractListView(AbstractListFunction):
     def set_color_ok(self, row):
         self._data_list.set_row_color(row, color_green)
 
-    def set_meta_color_normal(self, row):
+    def set_color_normal(self, row):
         self._data_list.set_row_color(row, color_white)
 
-    def set_meta_color_warning(self, row):
+    def set_color_warning(self, row):
         self._data_list.set_row_color(row, color_red)
