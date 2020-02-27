@@ -11,10 +11,9 @@ from src.view.tab_config import TabConfig
 from src.view.tab_converter import TabConverter
 from src.view.tab_downloader import TabDownloader
 from src.view.tab_meta import TabMeta
+
+
 # TODO file types open
-
-
-
 class Window(App):
     # TODO BUG set wrong song on META RENAME
     def __init__(self):
@@ -57,4 +56,3 @@ class Window(App):
             window.Show()
 
     # TODO link ids for multiple downloads
-    # TODO COLORS when done

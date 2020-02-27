@@ -58,8 +58,7 @@ class FileDownload(StringIO):
         First phase of youtube download: Read file name from line
         :param line: Input line
         """
-        file_name = findall(r'(?:\[download\] Destination: (.+))|(?:\[download\] (.+) has already been downloaded)',
-                            line)
+        file_name = findall(r'(?:\[download\] Destination: (.+))|(?:\[download\] (.+) has already been downloaded)', line)
         if file_name:
             file_name = list(*file_name)
             file_name = ''.join(file_name).replace('/', '\\')
@@ -77,8 +76,9 @@ class FileDownload(StringIO):
         """
         progress = findall(r'(\d*\.?\d%)', line)
         if progress:
-            self._downloader.set_download_progress(progress[-1])
-            if progress == '100':
+            progress = progress[-1]
+            self._downloader.set_download_progress(progress)
+            if progress == '100%':
                 # Reset strategy
                 self._write_strategy = self._write_file_name
 
@@ -92,8 +92,8 @@ class FileDownload(StringIO):
             self._size = size[0]
             self._downloader.set_download_size(self._size)
             # Set strategy for next phase
-            self._write_progress(line)
             self._write_strategy = self._write_progress
+            self._write_progress(line)
 
     def write(self, string):
         """
@@ -102,8 +102,6 @@ class FileDownload(StringIO):
         :param string: Stdout string
         :return: StringIO return value
         """
-        # TODO read err and out simultaneously
-
         line = string.strip()
         info(line)
         self._write_strategy(line)
