@@ -7,15 +7,34 @@ from src.model.songs.meta_data.tag_data import Tag_data
 from src.resource.meta_tags import MetaTags
 
 
-class Song:
-    file_name = None
-    _tag_data = None
-    _file_data = None
-    _ignore_meta = True
-    _data_strategy = None
-    _Album = None
-    _error = False
+class AbstractStrategy:
+    def __init__(self, song, use_meta):
+        self._getter = {}
+        self._song = song
+        self._getter[MetaTags.FileName] = self.get_file_name
 
+        if use_meta:
+            self.set_meta_use_strategy()
+        else:
+            self.set_meta_ignore_strategy()
+
+    def get_file_name(self):
+        raise NotImplementedError
+
+    def set_meta_ignore_strategy(self):
+        raise NotImplementedError
+
+    def set_meta_use_strategy(self):
+        raise NotImplementedError
+
+    def __getitem__(self, item):
+        return self._getter[item]()
+
+    def __contains__(self, item):
+        return item in self._getter
+
+
+class Song:
     def __init__(self, album_path, file_name, album):
 
         self.file_name, self._file_type = splitext(file_name)
@@ -26,14 +45,16 @@ class Song:
         self._tag_data = Tag_data(album_path, file_name)  # Meta
         self._file_data = File_data(self.file_name)
         # self.read_playlist(nr_in_playlist)  # Playlist
-        self.set_detected_strategy()
+        self.set_common_strategy()
 
     # GETTER #
 
     def __getitem__(self, item):
-        result = self._data_strategy[item]
-        info(result)
-        return result
+        """
+        Return meta data about the song
+        :param item: Meta data tag
+        """
+        return self._data_strategy[item]
 
     def get_error(self):
         return self._error
@@ -64,17 +85,11 @@ class Song:
 
     # +++Strategy setter+++
 
-    def set_detected_strategy(self):
-        if self._file_data.get_is_album():
-            self.set_album_strategy()
-        else:
-            self.set_common_strategy()
-
     def set_album_strategy(self):
-        self._data_strategy = self.AlbumStrategy(self)
+        self._data_strategy = self.AlbumStrategy(self, self._Album.use_meta)
 
     def set_common_strategy(self):
-        self._data_strategy = self.CommonStrategy(self)
+        self._data_strategy = self.CommonStrategy(self, self._Album.use_meta)
 
     def set_ignore_meta(self):
         self._data_strategy.set_meta_ignore_strategy()
@@ -84,19 +99,13 @@ class Song:
 
     # STRATEGIES
     # TODO make getter normally usable without calling
-    class AlbumStrategy:
-        _getter = None
 
-        def __init__(self, song):
-            self._getter = {}
-            self._song = song
+    class AlbumStrategy(AbstractStrategy):
+        def __init__(self, song, use_meta):
+            AbstractStrategy.__init__(self, song, use_meta)
             self._getter[MetaTags.Album] = lambda: song._Album[MetaTags.Album]
             self._getter[MetaTags.AlbumArtist] = lambda: song._Album[MetaTags.AlbumArtist]
             self._getter[MetaTags.Artist] = lambda: song._Album[MetaTags.Artist]
-
-            self.set_meta_ignore_strategy()
-            # track_nr = utilities.track_nr_int_to_str(track_num)
-            self._getter[MetaTags.FileName] = self.get_file_name
 
         def get_file_name(self):
             title = self._getter[MetaTags.Title]()
@@ -112,26 +121,17 @@ class Song:
             self._getter[MetaTags.Title] = lambda: self._song._file_data._title
             self._getter[MetaTags.TrackNum] = lambda: self._song._file_data._track_num
 
-        def set_meta_no_ignore_strategy(self):
+        def set_meta_use_strategy(self):
             self._getter[MetaTags.Title] = lambda: self._song._tag_data.title
             self._getter[MetaTags.TrackNum] = lambda: self._song._tag_data._track_num
 
-        def __getitem__(self, item):
-            return self._getter[item]()
-
-    class CommonStrategy:
-        _getter = None
-
-        def __init__(self, song):
-            self._getter = {}
-            self._song = song
+    class CommonStrategy(AbstractStrategy):
+        def __init__(self, song, use_meta):
+            AbstractStrategy.__init__(self, song, use_meta)
 
             self._getter[MetaTags.TrackNum] = lambda: ""
             self._getter[MetaTags.Album] = lambda: ""
             self._getter[MetaTags.AlbumArtist] = lambda: ""
-
-            self.set_meta_ignore_strategy()
-            self._getter[MetaTags.FileName] = self.get_file_name
 
         def get_file_name(self):
             artist = self._getter[MetaTags.Artist]()
@@ -151,6 +151,3 @@ class Song:
         def set_meta_use_strategy(self):
             self._getter[MetaTags.Title] = lambda: self._song._tag_data.title
             self._getter[MetaTags.Artist] = lambda: self._song._tag_data._artist
-
-        def __getitem__(self, item):
-            return self._getter[item]()

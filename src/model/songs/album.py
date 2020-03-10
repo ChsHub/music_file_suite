@@ -15,11 +15,22 @@ class Album(AbstractListModel):
 
         self.album_path = None
         # Meta
+        self.use_meta = False  # Has to match initial selection in view
+
         self._Songs = {}
         self._failed_Songs = None
+        self.meta_data = None
         # Threading
         self._active = True
-        self.meta_data = None
+
+    def _read_album_path(self, album_path):
+        album_path = split(album_path)[-1]
+        # gather data from path
+        if ' - ' in album_path:
+            artist, album = album_path.split(' - ')
+            self.meta_data[MetaTags.Artist] = artist
+            self.meta_data[MetaTags.AlbumArtist] = artist  # Album path
+            self.meta_data[MetaTags.Album] = album  # Album path
 
     def set_files(self, album_path, files):
         self._active = False  # join everything / wait
@@ -34,12 +45,7 @@ class Album(AbstractListModel):
             self.meta_data = {}
             self._Songs = []
 
-            # gather data from path
-            if ' - ' in self.album_path:
-                artist, album = split(self.album_path)[-1].split(' - ')
-                self.meta_data[MetaTags.Artist] = artist
-                self.meta_data[MetaTags.AlbumArtist] = artist  # Album path
-                self.meta_data[MetaTags.Album] = album  # Album path
+            self._read_album_path(self.album_path)
 
             for file in files:
                 self._Songs.append(Song(album_path, file, self))
@@ -48,23 +54,18 @@ class Album(AbstractListModel):
                     return
 
             info("ANALISE: DONE")
-            self.set_all_view()
+            for song in self._Songs:
+                self.add_line([song[tag] for tag in MetaTags])
 
-    def __getitem__(self, item):
-        return self.meta_data[item]
-
-    def set_all_view(self):
-        for song in self._Songs:
-            self.add_line([song[tag] for tag in MetaTags])
-
-        for i in range(len(self._Songs)):
-            self.set_error_color(i)
-
-    def set_error_color(self, i):
-        if self._Songs[i].get_error():
-            self._controller.set_meta_color_warning(i)
+    def __getitem__(self, item) -> str:
+        """
+        Return meta data about the album
+        :param item: Meta data tag
+        """
+        if item in self.meta_data:
+            return self.meta_data[item]
         else:
-            self._controller.set_meta_color_normal(i)
+            return ''
 
     def set_data(self):
 
@@ -72,7 +73,7 @@ class Album(AbstractListModel):
             if song.set_data():
                 self.set_color_ok(i)
             else:
-                self._controller.set_meta_color_warning(i)
+                self._controller.set_color_warning(i)
         info('Set meta and rename complete')
 
     def set_is_album(self, is_album):
@@ -87,26 +88,43 @@ class Album(AbstractListModel):
                     song.set_common_strategy()
             else:
                 raise ValueError
-            self.set_all_view()
+            self.update_view()
 
     def set_is_meta(self, use_meta):
         with self._album_sem:
 
             use_meta = SelectionMeta(use_meta)
             if use_meta == SelectionMeta.NO_META:
+                self.use_meta = False
                 for song in self._Songs:
                     song.set_ignore_meta()
             elif use_meta == SelectionMeta.META:
+                self.use_meta = True
                 for song in self._Songs:
                     song.set_use_meta()
             else:
                 raise ValueError
-            self.set_all_view()
+            self.update_view()
 
     def edit_song(self, row, column, data):
         with self._album_sem:
             self._Songs[row].edit(column, data)
             self.update_song_view(row)
+
+    # +++ View +++
+
+    def update_view(self) -> None:
+        """
+        Update list view of all songs
+        """
+        for i, song in enumerate(self._Songs):
+            self.update_song_view(i)
+
+    def set_error_color(self, i):
+        if self._Songs[i].get_error():
+            self._controller.set_color_warning(i)
+        else:
+            self._controller.set_color_normal(i)
 
     def update_song_view(self, row):
 

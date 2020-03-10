@@ -52,8 +52,5 @@ class File_data:
         else:
             return False
 
-    def get_is_album(self):
-        return self.is_album
-
     def rename_file(self, album_path, file_name, new_name):
         move(join(album_path, file_name), join(album_path, new_name))
