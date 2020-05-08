@@ -16,6 +16,7 @@ class Album(AbstractListModel):
         self.album_path = None
         # Meta
         self.use_meta = False  # Has to match initial selection in view
+        self.is_album = False
 
         self._Songs = {}
         self._failed_Songs = None
@@ -81,9 +82,11 @@ class Album(AbstractListModel):
 
             is_album = SelectionAlbum(is_album)
             if is_album == SelectionAlbum.ALBUM:
+                self.is_album = True
                 for song in self._Songs:
                     song.set_album_strategy()
             elif is_album == SelectionAlbum.RANDOM:
+                self.is_album = False
                 for song in self._Songs:
                     song.set_common_strategy()
             else:

@@ -1,10 +1,8 @@
 from logging import info
-from os.path import join, split, splitext
-from subprocess import getoutput
+from os import mkdir
+from os.path import join, split, splitext, exists
+from subprocess import getoutput, Popen
 from threading import BoundedSemaphore
-
-from utility.os_interface import exists, make_directory
-
 # TODO color GUI red on fail
 from src.model.abstract_list_model import AbstractListModel
 
@@ -60,7 +58,9 @@ class Converter(AbstractListModel):
         i = 0
         for path, files in jobs:
 
-            make_directory(join(path, self.convert_directory))
+            convert_dir = join(path, self.convert_directory)
+            if not exists(convert_dir):
+                mkdir(convert_dir)
             info("Convert: " + str(len(files)) + " files")
 
             for file in files:
@@ -75,8 +75,9 @@ class Converter(AbstractListModel):
                     self.set_progress(i, "FILE ALREADY EXISTS")
                 # Else convert
                 elif extension:
-                    result = getoutput(command.replace("input", file_path).replace("output", output_file))
-                    info(result)
+                    result = Popen(command.replace("input", file_path).replace("output", output_file),
+                                   universal_newlines=True)
+                    info(result.communicate())
                     self.set_progress(i, "100%")
                     self.set_color_ok(i)
                 i += 1

@@ -1,10 +1,10 @@
 # TODO catch wx exceptions http://www.blog.pythonlibrary.org/2014/03/14/wxpython-catching-exceptions-from-anywhere/
-from utility.logger import Logger
+from logger_default import Logger
 
 if __name__ == '__main__':
     from logging import exception
 
-    with Logger():
+    with Logger(debug=True):
         try:
             from src.view.window import Window
 

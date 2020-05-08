@@ -1,7 +1,7 @@
 import logging
-import re
 from os.path import join
 from shutil import move
+from re import sub, findall
 
 
 class File_data:
@@ -44,7 +44,7 @@ class File_data:
 
     # 00 Song.mp3
     def _read_song_title_album(self, file_name):
-        match = re.findall(r"(\d+)\s(.+)", file_name)
+        match = findall(r"(\d+)\s(.+)", file_name)
         if len(match) == 1:
             self._track_num = match[0][0]
             self._title = match[0][1][:-4]
@@ -53,4 +53,5 @@ class File_data:
             return False
 
     def rename_file(self, album_path, file_name, new_name):
+        new_name = sub(r'([?\\/:*"><|])', '', new_name).strip()  # Remove invalid characters under windows
         move(join(album_path, file_name), join(album_path, new_name))

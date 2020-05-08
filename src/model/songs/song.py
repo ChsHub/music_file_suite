@@ -45,7 +45,10 @@ class Song:
         self._tag_data = Tag_data(album_path, file_name)  # Meta
         self._file_data = File_data(self.file_name)
         # self.read_playlist(nr_in_playlist)  # Playlist
-        self.set_common_strategy()
+        if self._Album.is_album:
+            self._data_strategy = self.AlbumStrategy(self, self._Album.use_meta)
+        else:
+            self._data_strategy = self.CommonStrategy(self, self._Album.use_meta)
 
     # GETTER #
 

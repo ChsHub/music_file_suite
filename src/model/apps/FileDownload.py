@@ -28,7 +28,7 @@ class FileDownload(StringIO):
 
         with self:
             try:
-                youtube_dl.main([url, '--no-check-certificate', '--no-playlist',
+                youtube_dl.main([url, '--no-check-certificate', '--no-playlist', '--rm-cache-dir',
                                  '-f', '%sbestaudio' % video_command,
                                  '-o', ('%s' % self._downloader.download_path) + '/%(title)s.%(ext)s'])
             except SystemExit as e:
