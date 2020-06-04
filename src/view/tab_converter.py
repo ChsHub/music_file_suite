@@ -2,15 +2,17 @@ from wx import VERTICAL, ALL, TOP, LEFT, EXPAND
 from wxwidgets import FileInput, Preview, SimpleSizer
 
 from src.controller.controller_converter import ControllerConverter
+from src.model.abstract_converter import AbstractConverter
 from src.resource.meta_tags import SimpleTags
 from src.view.standard_view.standard_selection import StandardSelection
 from src.view.abstract_list_view import AbstractListView
 
 
-class TabConverter(AbstractListView):
+class TabConverter(AbstractListView, AbstractConverter):
     def __init__(self, tab, texts, SelectionCodecs, border_size, config):
         AbstractListView.__init__(self, 1)
         self._controller = ControllerConverter(self, config)
+        AbstractConverter.__init__(self, self._controller)
 
         convert_input = FileInput(tab, text_button=texts['text_open_file_title'], callback=self._add_convert,
                                   text_title=texts['text_open_file_title'], text_open_file=texts['text_open_file'])
@@ -19,7 +21,8 @@ class TabConverter(AbstractListView):
                                                  choices=SelectionCodecs)
         self._data_list = Preview(tab, SimpleTags, border=border_size,
                                   buttons=[(self._start_convert, texts['text_start_convert']),
-                                              (self._reset_convert, texts['text_reset_convert'])])
+                                           (self._reset_convert, texts['text_reset_convert'])],
+                                  edit_callback=self.set_time)
 
         with SimpleSizer(tab, VERTICAL) as sizer:
             sizer.Add(convert_input, flag=ALL, border=border_size)

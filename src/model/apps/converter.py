@@ -11,7 +11,7 @@ class Converter(AbstractListModel):
     def __init__(self, controller, texts, SelectionCodecs, ffmpeg_path):
         AbstractListModel.__init__(self, controller)
         self._convert_sem = BoundedSemaphore(value=1)
-
+        self._zero_time = '00:00:00.0'
         self.convert_directory = texts['convert_directory']
         self._resolve = {'vorbis': 'ogg', 'aac': 'm4a', 'mp3': 'mp3', 'opus': 'opus'}
         self._extension = {SelectionCodecs.EXTRACT.value: self._get_file_extension,
@@ -23,7 +23,7 @@ class Converter(AbstractListModel):
         self._jobs = []
 
     def _get_input_command(self, texts) -> str:
-        return '"' + texts['ffprobe_path'] + texts['probe_command']
+        return texts['probe_command'] % texts['ffprobe_path']
 
     def _get_convert_command(self, texts, SelectionCodecs, ffmpeg_path):
 
@@ -42,9 +42,11 @@ class Converter(AbstractListModel):
         :param files: File names
         """
         with self._convert_sem:
-            self._jobs.append((path, files))
+            self._jobs.append([path,
+                               list(map(lambda file: [file, self._zero_time, self._zero_time], files))
+                               ])
         for file in files:
-            self.add_line([file, "0%"])
+            self.add_line([file, "0%", self._zero_time, self._zero_time])
 
     def start_convert(self, selection):
         info(selection)
@@ -63,19 +65,25 @@ class Converter(AbstractListModel):
                 mkdir(convert_dir)
             info("Convert: " + str(len(files)) + " files")
 
-            for file in files:
+            for file, start, end in files:
                 file_path = join(path, file)
 
                 # Receive new file extension based on strategy
                 extension = self._extension[selection](file_path, i)
                 output_file = self._get_output_file_path(extension, file_path)
+                time = ''
+                if start != self._zero_time or end != self._zero_time:
+                    time += '-ss %s' % start
+                    if end != self._zero_time:
+                        time += ' -to %s' % end
+                    time = '-sn %s ' % time
 
                 # If file already exists do nothing
                 if exists(output_file):
                     self.set_progress(i, "FILE ALREADY EXISTS")
                 # Else convert
                 elif extension:
-                    result = Popen(command.replace("input", file_path).replace("output", output_file),
+                    result = Popen(command.replace("input", file_path).replace("time", time).replace("output", output_file),
                                    universal_newlines=True)
                     info(result.communicate())
                     self.set_progress(i, "100%")
@@ -124,3 +132,15 @@ class Converter(AbstractListModel):
         else:
             self.set_progress(i, "TYPE NOT FOUND")
             return ''
+
+    def set_time(self, row, column, new_data):
+        column -= 1
+        if 0 < column < 3:
+            with self._convert_sem:
+                for i, (path, files) in enumerate(self._jobs):
+                    if row < len(files):
+                        self._jobs[i][1][row][column] = new_data
+                        break
+                    else:
+                        row -= len(files)
+            print(row, column, new_data)

@@ -13,6 +13,8 @@ class MetaTags(Enum):
 class SimpleTags(Enum):
     File = 'File'
     Progress = 'Progress'
+    Start = 'Start'
+    End = 'End'
 
 
 class DownloadTags(Enum):
