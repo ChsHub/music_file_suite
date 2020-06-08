@@ -1,9 +1,12 @@
+from concurrent.futures.thread import ThreadPoolExecutor
 from logging import info
-from os import mkdir
+from os import mkdir, cpu_count
 from os.path import join, split, splitext, exists
 from subprocess import getoutput, Popen
 from threading import BoundedSemaphore
 # TODO color GUI red on fail
+from timerpy import Timer
+
 from src.model.abstract_list_model import AbstractListModel
 
 
@@ -48,6 +51,32 @@ class Converter(AbstractListModel):
         for file in files:
             self.add_line([file, "0%", self._zero_time, self._zero_time])
 
+    def _get_time_command(self, start, end):
+        time = ''
+        if start != self._zero_time or end != self._zero_time:
+            time += '-ss %s' % start
+            if end != self._zero_time:
+                time += ' -to %s' % end
+            time = '-sn %s ' % time
+        return time
+
+    def _convert_file(self, file_path, selection, start, end, command, i):
+        # Receive new file extension based on strategy
+        extension = self._extension[selection](file_path, i)
+        output_file = self._get_output_file_path(extension, file_path)
+        time = self._get_time_command(start, end)
+
+        # If file already exists do nothing
+        if exists(output_file):
+            self.set_progress(i, "FILE ALREADY EXISTS")
+        # Else convert
+        elif extension:
+            result = Popen(command.replace("input", file_path).replace("time", time).replace("output", output_file),
+                           universal_newlines=True)
+            info(result.communicate())
+            self.set_progress(i, "100%")
+            self.set_color_ok(i)
+
     def start_convert(self, selection):
         info(selection)
 
@@ -58,38 +87,19 @@ class Converter(AbstractListModel):
         # Receive command based on strategy
         command = self._commands[selection]
         i = 0
-        for path, files in jobs:
+        with Timer('CONVERT', log_function=info):
+            with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
+                for path, files in jobs:
+                    convert_dir = join(path, self.convert_directory)
+                    if not exists(convert_dir):
+                        mkdir(convert_dir)
+                    info("Convert: " + str(len(files)) + " files")
 
-            convert_dir = join(path, self.convert_directory)
-            if not exists(convert_dir):
-                mkdir(convert_dir)
-            info("Convert: " + str(len(files)) + " files")
+                    for file, start, end in files:
+                        file_path = join(path, file)
+                        executor.submit(self._convert_file, file_path, selection, start, end, command, i)
 
-            for file, start, end in files:
-                file_path = join(path, file)
-
-                # Receive new file extension based on strategy
-                extension = self._extension[selection](file_path, i)
-                output_file = self._get_output_file_path(extension, file_path)
-                time = ''
-                if start != self._zero_time or end != self._zero_time:
-                    time += '-ss %s' % start
-                    if end != self._zero_time:
-                        time += ' -to %s' % end
-                    time = '-sn %s ' % time
-
-                # If file already exists do nothing
-                if exists(output_file):
-                    self.set_progress(i, "FILE ALREADY EXISTS")
-                # Else convert
-                elif extension:
-                    result = Popen(command.replace("input", file_path).replace("time", time).replace("output", output_file),
-                                   universal_newlines=True)
-                    info(result.communicate())
-                    self.set_progress(i, "100%")
-                    self.set_color_ok(i)
-                i += 1
-        info("Convert: DONE")
+                        i += 1
 
     def reset(self):
         with self._convert_sem:
