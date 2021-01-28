@@ -21,6 +21,7 @@ class ConfigReader(ConfigParser):
             EXTRACT = self['SelectionCodecs']['EXTRACT']
             MP3 = self['SelectionCodecs']['MP3']
             OPUS = self['SelectionCodecs']['OPUS']
+            FLAC = self['SelectionCodecs']['FLAC']
 
         self.SelectionCodecs = SelectionCodecs
 

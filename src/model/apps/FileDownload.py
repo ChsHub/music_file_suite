@@ -37,7 +37,7 @@ class FileDownload(StringIO):
             # Join audio and video
             if video_command and self._current_file:
                 name, _ = splitext(self._current_file[-1])
-                self._current_file.append(name[:-5] + '.mp4')
+                self._current_file.append(name[:-5] + '.mp4')  # ADD output
                 run(ffmpeg_path +
                     ' -i "%s" -i "%s" -c:v copy -c:a copy  -strict experimental -map 0:v:0 -map 1:a:0 "%s"' %
                     tuple(self._current_file), shell=False, cwd=self._downloader.download_path)
@@ -58,7 +58,8 @@ class FileDownload(StringIO):
         First phase of youtube download: Read file name from line
         :param line: Input line
         """
-        file_name = findall(r'(?:\[download\] Destination: (.+))|(?:\[download\] (.+) has already been downloaded)', line)
+        file_name = findall(r'(?:\[download\] Destination: (.+))|(?:\[download\] (.+) has already been downloaded)',
+                            line)
         if file_name:
             file_name = list(*file_name)
             file_name = ''.join(file_name).replace('/', '\\')

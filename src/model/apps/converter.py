@@ -19,7 +19,8 @@ class Converter(AbstractListModel):
         self._resolve = {'vorbis': 'ogg', 'aac': 'm4a', 'mp3': 'mp3', 'opus': 'opus'}
         self._extension = {SelectionCodecs.EXTRACT.value: self._get_file_extension,
                            SelectionCodecs.MP3.value: lambda x, y: 'mp3',
-                           SelectionCodecs.OPUS.value: lambda x, y: 'opus'}
+                           SelectionCodecs.OPUS.value: lambda x, y: 'opus',
+                           SelectionCodecs.FLAC.value: lambda x, y: 'flac'}
         self._commands = self._get_convert_command(texts, SelectionCodecs, ffmpeg_path)
         self._input_command = self._get_input_command(texts)
 
