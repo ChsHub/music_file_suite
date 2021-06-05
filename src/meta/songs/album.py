@@ -2,8 +2,8 @@ from logging import info
 from os.path import isdir, split
 from threading import BoundedSemaphore
 
-from src.model.abstract_list_model import AbstractListModel
-from src.model.songs.song import Song
+from src.abstract.abstract_list_model import AbstractListModel
+from src.meta.songs.song import Song
 from src.resource.meta_tags import MetaTags
 from src.resource.texts import SelectionAlbum, SelectionMeta
 

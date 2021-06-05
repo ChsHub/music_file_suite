@@ -1,6 +1,6 @@
-from src.model.songs.meta_data.tag_interface import Tag
-from src.model.songs.meta_data.tag_interface_mp3 import TagMP3
-from src.resource.meta_tags import MetaTags, FileTypes
+from src.meta.songs.meta_data.tag_interface import Tag
+from src.meta.songs.meta_data.tag_interface_mp3 import TagMP3
+from src.resource.meta_tags import MetaTags
 from logging import error, info
 
 

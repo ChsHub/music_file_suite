@@ -7,7 +7,7 @@ from threading import BoundedSemaphore
 # TODO color GUI red on fail
 from timerpy import Timer
 
-from src.model.abstract_list_model import AbstractListModel
+from src.abstract.abstract_list_model import AbstractListModel
 
 
 class Converter(AbstractListModel):

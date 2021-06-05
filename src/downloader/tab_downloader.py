@@ -1,12 +1,12 @@
-from logging import info, exception, error
+from logging import info, error
 
 from wx import EXPAND, VERTICAL, TOP, ALL, LEFT
 from wxwidgets import SimpleSizer, InputWidget, Table
 
-from src.controller.controller_downloader import ControllerDownloader
+from src.downloader.controller_downloader import ControllerDownloader
 from src.resource.meta_tags import DownloadTags
-from src.view.abstract_list_view import AbstractListView
-from src.view.standard_view.standard_selection import StandardSelection
+from src.abstract.abstract_list_view import AbstractListView
+from src.abstract.view.standard_view.standard_selection import StandardSelection
 
 
 class TabDownloader(AbstractListView):

@@ -1,4 +1,4 @@
-from src.abstract_list_function import AbstractListFunction
+from src.abstract.abstract_list_function import AbstractListFunction
 
 
 class AbstractListModel(AbstractListFunction):

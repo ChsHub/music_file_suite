@@ -1,13 +1,10 @@
 import sys
 from io import StringIO
 from logging import info
-from os.path import exists, join, split, splitext
+from os.path import exists, join, split
 from re import findall
-from subprocess import run
-from time import sleep
 
 import youtube_dl
-from send2trash import send2trash
 
 
 class FileDownload(StringIO):
@@ -19,6 +16,7 @@ class FileDownload(StringIO):
         self._size = None
         self._current_file = []
         self._write_strategy = self._write_file_name
+        self._downloader.set_download_title(' ', self._current_url)
         """
         Enter processing one queue item
         """
@@ -34,10 +32,10 @@ class FileDownload(StringIO):
             except SystemExit as e:
                 info(e)
 
-            # Join audio and video
-            if video_command and self._current_file:
+            # Join audio and video TODO REMOVE
+            """if video_command and self._current_file:
                 name, _ = splitext(self._current_file[-1])
-                self._current_file.append(name[:-5] + '.mp4')  # ADD output
+                self._current_file.append(splitext(name)[0] + '.mkv')  # ADD output
                 run(ffmpeg_path +
                     ' -i "%s" -i "%s" -c:v copy -c:a copy  -strict experimental -map 0:v:0 -map 1:a:0 "%s"' %
                     tuple(self._current_file), shell=False, cwd=self._downloader.download_path)
@@ -45,7 +43,7 @@ class FileDownload(StringIO):
                 while exists(self._current_file[0]) or exists(self._current_file[1]):
                     send2trash(self._current_file[0])
                     send2trash(self._current_file[1])
-                    sleep(1)
+                    sleep(1)"""
         """
         Exit queue item processing
         """

@@ -1,10 +1,10 @@
-from src.controller.generic_controller import GenericController
-from src.model.songs.album import Album
+from src.abstract.abstract_controller import AbstractController
+from src.meta.songs.album import Album
 
 
-class ControllerMeta(GenericController):
+class ControllerMeta(AbstractController):
     def __init__(self, view, config):
-        GenericController.__init__(self, view)
+        AbstractController.__init__(self, view)
         self._album = Album(self)
 
     # Notify model

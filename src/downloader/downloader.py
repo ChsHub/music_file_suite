@@ -4,13 +4,13 @@ from threading import Thread
 
 from persistqueue import SQLiteAckQueue
 
-from src.model.abstract_list_model import AbstractListModel
-from src.model.apps.FileDownload import FileDownload
+from src.abstract.abstract_list_model import AbstractListModel
+from src.downloader.FileDownload import FileDownload
 
 
 class Downloader(Thread, AbstractListModel):
     def __init__(self, controller, download_path, queue_path, SelectionVideo, ffmpeg_path):
-        Thread.__init__(self)
+        Thread.__init__(self, daemon=True)
         AbstractListModel.__init__(self, controller)
 
         self._counter = -1
@@ -56,9 +56,9 @@ class Downloader(Thread, AbstractListModel):
 
         url = url.strip()
         video_choice = self.get_command[video_choice]
-        self._download_queue.put((url, video_choice))
-
-        info('Added to queue: %s' % url)
+        if 'youtu' in url:
+            self._download_queue.put((url, video_choice))
+            info('Added to queue: %s' % url)
 
     # Notify view
 

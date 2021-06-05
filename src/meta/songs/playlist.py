@@ -1,4 +1,4 @@
-from src.model.songs.playlists import playlist_wpl
+from src.meta.songs.playlists import playlist_wpl
 from difflib import SequenceMatcher
 
 

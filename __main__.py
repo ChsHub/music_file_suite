@@ -6,7 +6,7 @@ if __name__ == '__main__':
 
     with Logger(debug=True):
         try:
-            from src.view.window import Window
+            from src.abstract.view.window import Window
 
             _main_view = Window()
             _main_view.MainLoop()

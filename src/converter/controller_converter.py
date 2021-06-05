@@ -1,11 +1,11 @@
-from src.controller.generic_controller import GenericController
-from src.model.abstract_converter import AbstractConverter
-from src.model.apps.converter import Converter
+from src.abstract.abstract_controller import AbstractController
+from src.converter.abstract_converter import AbstractConverter
+from src.converter.converter import Converter
 
 
-class ControllerConverter(GenericController, AbstractConverter):
+class ControllerConverter(AbstractController, AbstractConverter):
     def __init__(self, view, config):
-        GenericController.__init__(self, view)
+        AbstractController.__init__(self, view)
         self._converter = Converter(self, config['Converter'], config.SelectionCodecs, config.ffmpeg_path)
         AbstractConverter.__init__(self, self._converter)
 

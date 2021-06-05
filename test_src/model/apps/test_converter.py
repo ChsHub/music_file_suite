@@ -3,7 +3,7 @@ from os.path import split
 from hypothesis import given
 from hypothesis.strategies import text, integers
 
-from src.model.apps.converter import Converter
+from src.converter.converter import Converter
 from src.resource.ConfigReader import ConfigReader
 from os import getcwd, chdir
 

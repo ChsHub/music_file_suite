@@ -1,3 +1,6 @@
+from logging import error
+
+
 class AbstractListFunction:
     _observer = None
 
@@ -22,4 +25,7 @@ class AbstractListFunction:
         self._observer.update_row(data, row)
 
     def update_cell(self, data: list, column: int, row: int):
-        self._observer.update_cell(data, column, row)
+        try:
+            self._observer.update_cell(data, column, row)
+        except Exception as e:
+            error(str(e))

@@ -1,9 +1,9 @@
 # -*- coding: utf8 -*-
-from logging import info, error
+from logging import error
 from os.path import splitext
 
-from src.model.songs.meta_data.file_data import File_data
-from src.model.songs.meta_data.tag_data import Tag_data
+from src.meta.songs.meta_data.file_data import File_data
+from src.meta.songs.meta_data.tag_data import Tag_data
 from src.resource.meta_tags import MetaTags
 
 

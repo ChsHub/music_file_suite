@@ -1,11 +1,11 @@
-from src.controller.generic_controller import GenericController
-from src.model.apps.downloader import Downloader
+from src.abstract.abstract_controller import AbstractController
+from src.downloader.downloader import Downloader
 from src.resource.settings import download_path
 
 
-class ControllerDownloader(GenericController):
+class ControllerDownloader(AbstractController):
     def __init__(self, view, config):
-        GenericController.__init__(self, view)
+        AbstractController.__init__(self, view)
         self._downloader = Downloader(self, download_path, config['Downloader']['queue_path'],
                                       config.SelectionVideo, config.ffmpeg_path)
 

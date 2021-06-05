@@ -6,11 +6,11 @@ from wx import App, Frame, Notebook, Panel, EXPAND, EVT_CLOSE, \
 
 from src import __version__
 from src.resource.ConfigReader import ConfigReader
-from src.view.tab_about import TabAbout
-from src.view.tab_config import TabConfig
-from src.view.tab_converter import TabConverter
-from src.view.tab_downloader import TabDownloader
-from src.view.tab_meta import TabMeta
+from src.abstract.view.tab_about import TabAbout
+from src.abstract.view.tab_config import TabConfig
+from src.converter.tab_converter import TabConverter
+from src.downloader.tab_downloader import TabDownloader
+from src.meta.tab_meta import TabMeta
 
 
 # TODO file types open

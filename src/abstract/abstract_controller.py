@@ -1,10 +1,10 @@
 from concurrent.futures.thread import ThreadPoolExecutor
 from logging import exception
 
-from src.abstract_list_function import AbstractListFunction
+from src.abstract.abstract_list_function import AbstractListFunction
 
 
-class GenericController(AbstractListFunction):
+class AbstractController(AbstractListFunction):
 
     def __init__(self, view):
         AbstractListFunction.__init__(self)

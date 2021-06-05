@@ -1,5 +1,5 @@
-from src.abstract_list_function import AbstractListFunction
-from src.view.standard_view.colors import color_green, color_white, color_red
+from src.abstract.abstract_list_function import AbstractListFunction
+from src.abstract.view.standard_view.colors import color_green, color_white, color_red
 
 
 class AbstractListView(AbstractListFunction):

@@ -1,11 +1,11 @@
 from wx import VERTICAL, ALL, TOP, LEFT, EXPAND
 from wxwidgets import FileInput, Preview, SimpleSizer
 
-from src.controller.controller_converter import ControllerConverter
-from src.model.abstract_converter import AbstractConverter
+from src.converter.controller_converter import ControllerConverter
+from src.converter.abstract_converter import AbstractConverter
 from src.resource.meta_tags import SimpleTags
-from src.view.standard_view.standard_selection import StandardSelection
-from src.view.abstract_list_view import AbstractListView
+from src.abstract.view.standard_view.standard_selection import StandardSelection
+from src.abstract.abstract_list_view import AbstractListView
 
 
 class TabConverter(AbstractListView, AbstractConverter):
