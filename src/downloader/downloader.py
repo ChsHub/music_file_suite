@@ -38,6 +38,7 @@ class Downloader(Thread, AbstractListModel):
                 info('DOWNLOAD: %s' % url)
                 self._counter += 1
                 current_file = FileDownload(self._ffmpeg_path, url, video_command, self)
+
                 # Save queue
                 if current_file.success:
                     self._download_queue.ack(item)
