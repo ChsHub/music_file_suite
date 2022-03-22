@@ -1,6 +1,5 @@
 # pip install youtube-dl
 # pip install mutagen
-# https://stackoverflow.com/questions/2720014/upgrading-all-packages-with-pip
 # C:\Python38-32\python.exe -m pip install youtube-dl --upgrade
 
 # GENERATES build/dist/.EXE
