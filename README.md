@@ -1,5 +1,5 @@
 # Music file suite
-Program for downloading from youtube, and converting and setting meta data of audio files.
+A program that adds meta data to audio files, converts audio files, or downloads from youtube.
 
 # Downloader
 ![Download tab](https://github.com/ChsHub/music_file_suite/blob/master/readme_resources/config_tab.png?raw=true)
