@@ -28,6 +28,7 @@ class FileDownload(StringIO):
             try:
                 youtube_dl.main([url, '--no-check-certificate', '--no-playlist', '--rm-cache-dir',
                                  '-f', '%sbestaudio' % video_command,
+                                 '-r', '2.0M', # Download rate
                                  '-o', ('%s' % self._downloader.download_path) + '/%(title)s.%(ext)s'])
             except SystemExit as e:
                 info(e)
